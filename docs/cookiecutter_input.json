@@ -1,0 +1,19 @@
+{
+    "_template": "https://gitlab.com/dboe/dough.git",
+    "author": "Nathan Belmore",
+    "continuous_integration": "y",
+    "copyright_holder": "Nathan Belmore",
+    "copyright_license": "Unlicensed",
+    "data_science": "y",
+    "distribution_name": "hfcnn",
+    "email": "nate.physics@berkeley.edu",
+    "keywords": "machine learning, data science, plasma physics, thesis project",
+    "package_name": "hfcnn",
+    "package_version": "0.0.1",
+    "pypi_username": "natephysics",
+    "remote_namespace": "natephysics",
+    "remote_provider": "github.com",
+    "remote_username": "natephysics",
+    "summary": "A convolutional neural network designed to extract plasma parameters from thermal camera heat load images."
+}
+
