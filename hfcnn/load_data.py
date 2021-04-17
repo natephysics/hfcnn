@@ -2,32 +2,39 @@
 # loading required packages
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pltd
 from matplotlib.colors import LogNorm
 import tensorflow as tf
 import seaborn as sns
 import torch
 import torch.nn.functional as F
-import doctest
-from scipy import ndimage
-import downloadversionIRdata as IR
 from lib import files
 
 
 # %%
 # import the data
-df = files.import_file_from_local_cache('.\data\df.hkl')
-
+df = files.import_file_from_local_cache('..\data\df.hkl')
 
 # %%
+# helper functions
+
 # Create a dummy generator.
-def generate_features(df: pd.DataFrame, directory='./data'):
+def generate_features(df: pd.DataFrame, directory: str='../data'):
     # Function to generate a single data point from the dataframe
     for row in df.iterrows():
         timestamp, port = row[1]['times'], row[1]['port']
         image_path = files.generate_file_path(timestamp, port, directory)
         image = files.import_file_from_local_cache(image_path)
         yield image, row[1]['PC1']
+
+
+def avg_data_filter(image: np.ndarray):
+    """[summary]
+
+    Args:
+        image (np.ndarray): [description]
+    """
+
 
 
 # %%

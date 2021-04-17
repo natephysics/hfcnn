@@ -3,7 +3,9 @@
 """Tests for `hfcnn` package."""
 
 import unittest
+leaving out until ready for import
 import hfcnn
+
 
 
 class TestPackage(unittest.TestCase):
@@ -11,6 +13,7 @@ class TestPackage(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures, if any."""
+
 
     def tearDown(self):
         """Tear down test fixtures, if any."""

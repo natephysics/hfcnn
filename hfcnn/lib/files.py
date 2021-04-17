@@ -3,7 +3,6 @@ import os
 import hickle as hkl
 import pandas as pd
 
-
 def check_if_file_exists(filename, port=False, cache_folder_path='./data'):
     """Checks to see if the hickle binary for an image at a given timestamp is already cached to disk.
     
