@@ -64,6 +64,3 @@ def data_selection(image: np.ndarray, int_threshold=5):
         return True
     else:
         return False
-
-# %%
-import hickle as hkl
