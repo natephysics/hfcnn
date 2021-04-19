@@ -1,3 +1,5 @@
+# Needs a lot of revisions 
+
 # %%
 # loading required packages
 import pandas as pd
@@ -19,7 +21,7 @@ df = files.import_file_from_local_cache('.\data\df.hkl')
 # %%
 # helper functions
 def conv2d(image, kernel, strides):
-    """Uses pytorch to convolve a kernel over a 2D image
+    """Uses PyTorch to convolve a kernel over a 2D image
     
     >>> image = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12]])
     >>> kernel = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1],])
@@ -78,7 +80,7 @@ df_temp = df[df['program_num'] == program_num]
 # index to use to identify which data point exceeded the integral threshold. 
 included_index = -1
 
-# loop over a subeset of the data
+# loop over a subset of the data
 for row in df_temp[1:num_of_data + 1].reset_index().iterrows():
     current_index = row[0]
 

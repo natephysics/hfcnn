@@ -28,15 +28,6 @@ def generate_features(df: pd.DataFrame, directory: str='../data'):
         yield image, row[1]['PC1']
 
 
-def avg_data_filter(image: np.ndarray):
-    """[summary]
-
-    Args:
-        image (np.ndarray): [description]
-    """
-
-
-
 # %%
 # Load data using tf data api using the generator
 data = tf.data.Dataset.from_generator(lambda: generate_features(df), output_types=(tf.float32, tf.float32))
