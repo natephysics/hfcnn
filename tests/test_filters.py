@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 
-"""Tests for `hfcnn` package."""
-from re import A
+"""Tests for filters.py."""
 import unittest
 from numpy.testing._private.utils import assert_equal
 from hfcnn.lib import filters
 from hfcnn.lib import files
-import hfcnn
 import numpy as np
 
 

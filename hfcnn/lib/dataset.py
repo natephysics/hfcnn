@@ -12,14 +12,14 @@ class HeatLoadDataset(Dataset):
         self.target_transform = target_transform
 
     def __len__(self):
-        return self.img_labels.size
+        return self.img_labels.shape[0]
 
     def __getitem__(self, time, label_names=['PC1']):
         row = self.img_labels[self.img_labels['times'] == time]
-        timestamp, port = row[1]['times'], row[1]['port']
+        timestamp, port = row['times'].values[0], row['port'].values[0]
         img_path = files.generate_file_path(timestamp, port, self.img_dir)
         image = files.import_file_from_local_cache(img_path)
-        label = self.img_labels[label_names]
+        label = row[label_names].values[0]
         if self.transform:
             image = self.transform(image)
         if self.target_transform:

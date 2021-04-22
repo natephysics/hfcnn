@@ -15,7 +15,7 @@ from lib import files
 
 # %%
 # import the data
-df = files.import_file_from_local_cache('.\data\df.hkl')
+df = files.import_file_from_local_cache('..\data\df.hkl')
 
 
 # %%
