@@ -20,7 +20,7 @@ class TestDataSetClass(unittest.TestCase):
         """Testing the HeatLoadDataset class."""
         # Check __init__ method for both file import and manual import
         dataset_file = HeatLoadDataset(self.df, 'tests')
-        dataset_df = files.import_file_from_local_cache('tests/resources/bad.hkl')
+        dataset_df = HeatLoadDataset(files.import_file_from_local_cache('tests/resources/test_df.hkl'), 'tests')
 
         # Check __len__ method
         assert_equal(dataset_file.__len__(), 2)
