@@ -8,7 +8,7 @@ def check_if_file_exists(filename, port=False, cache_folder_path='./data'):
     
     Parameters
     ----------
-    timestamp : string with the unix absolute timestamp
+    filename : string with the unix absolute timestamp
 
     port: int with the number of the port
 
@@ -43,7 +43,7 @@ def export_data_to_local_cache(data, path: str):
     
     Parameters
     ----------
-    data_label : string with the label of the data
+    data : string with the label of the data
 
     path : string with path
     """
