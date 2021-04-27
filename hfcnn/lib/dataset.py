@@ -2,12 +2,26 @@ from six import string_types
 from torch.utils.data import Dataset
 import pandas as pd # needed for the df format
 from hfcnn.lib import files
-import copy
 
 class HeatLoadDataset(Dataset):
     def __init__(self, df: str or pd.DataFrame, img_dir: str, transform=None, target_transform=None):
-        """HeatLoadDataset expects string with a path to a dataframe stored in 
-        a hickle format. For more details see the readme."""
+        """Creates at HeatloadDatatset object from a dataframe or link to a dataframe
+
+        Args:
+            df (str or pd.DataFrame): a dataframe object or a directory for the
+            dataframe object stored in .hkl format.
+
+            img_dir (str): link to the data directory
+            
+            transform (optional): The transformation function to be
+            applied to image data. Defaults to None.
+            
+            target_transform (optional): The transformation function to be
+            applied to label data. Defaults to None.
+
+        Raises:
+            TypeError: [description]
+        """
         if type(df) == str:
             self.img_labels = files.import_file_from_local_cache(df)
         elif type(df) == pd.DataFrame:
@@ -20,16 +34,40 @@ class HeatLoadDataset(Dataset):
         self.target_transform = target_transform
 
     def __len__(self):
+        """Returns the number of data points in the set
+
+        Returns:
+            length: number of data points in the set
+        """
         return self.img_labels.shape[0]
 
     def __getitem__(self, time: int, label_names: list=False):
-        """Returns a single sample with labels based on the list label_names"""
+        """Returns a data point with "image" and "label" where the labels are 
+        pulled from the label_names, a list of column names from the data frame.
+
+        Args:
+            time (int): the timestamp of the heatload image data.
+            label_names (list, optional): A list containing data from the
+            corresponding column names of the dataframe to return as the "label"
+            in the sample. 
+            Defaults to ['PC1'].
+
+        Returns:
+            Sample (dic): Returns a sample with "image" and "label" 
+        """
+        # Sets the default option if left blank (needed because list is permutable)
         if label_names == False:
             label_names = ['PC1']
+
+        # select the row of the df with the correct timestamp
         row = self.img_labels[self.img_labels['times'] == time]
+        
+        # load the image from the local cache
         timestamp, port = row['times'].values[0], row['port'].values[0]
         img_path = files.generate_file_path(timestamp, port, self.img_dir)
         image = files.import_file_from_local_cache(img_path)
+        
+        # define image and label and preform any provided transformations 
         label = row[label_names].values[0]
         if self.transform:
             image = self.transform(image)
