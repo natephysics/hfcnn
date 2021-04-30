@@ -1,14 +1,17 @@
 # %%
 # loading required packages
 import numpy as np
+import pandas as pd
 import torch
+from torch._C import BoolType
 import torch.nn.functional as F
+from hfcnn.lib import files
 
 
 # %%
 # helper functions
 def conv2d(image, kernel, strides):
-    """Uses pytorch to convolve a kernel over a 2D image
+    """Uses PyTorch to convolve a kernel over a 2D image
     
     >>> image = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12]])
     >>> kernel = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1],])
@@ -18,7 +21,7 @@ def conv2d(image, kernel, strides):
     >>> conv2d(image, kernel, 1)
     array([45, 72])
     """
-    # convert the inputs into pytorch tensor objects
+    # convert the inputs into PyTorch tensor objects
     image = torch.tensor(np.expand_dims(image, axis=(0,1)))
     kernel = torch.tensor(np.expand_dims(kernel, axis=(0,1)))
 
@@ -64,3 +67,20 @@ def data_selection(image: np.ndarray, int_threshold=5):
         return True
     else:
         return False
+
+
+
+# %%
+def load_and_filter(row: pd.Series):
+    """Function designed to make it easier to apply data_selection() to a pandas
+    dataframe.
+
+    Args:
+        row (pd.Series): the row expected from df.apply()
+
+    Returns:
+       Boolean : if the data that corresponds to the row is included by the filter.
+    """
+    path = files.generate_file_path(row['times'], row['port'], '.\\tests')
+    image = files.import_file_from_local_cache(path)
+    return data_selection(image)
