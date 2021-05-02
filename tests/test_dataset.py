@@ -14,6 +14,8 @@ class TestDataSetClass(unittest.TestCase):
         self.data_good = files.import_file_from_local_cache('tests/resources/good.hkl')
         self.data_bad = files.import_file_from_local_cache('tests/resources/bad.hkl')
         self.PC1 = np.array([8698.])
+        self.index_bad = 0
+        self.index_good = 1
 
     def test_HeatLoadDataset(self):
 
@@ -27,8 +29,8 @@ class TestDataSetClass(unittest.TestCase):
         assert_equal(dataset_df.__len__(), 2)
 
         # check __getitem__ method
-        good = dataset_file.__getitem__('good')
-        bad = dataset_df.__getitem__('bad')
+        good = dataset_file.__getitem__(self.index_good)
+        bad = dataset_df.__getitem__(self.index_bad)
         assert_equal(good['image'], self.data_good)
         assert_equal(good['label'], self.PC1)
         assert_equal(bad['image'], self.data_bad)

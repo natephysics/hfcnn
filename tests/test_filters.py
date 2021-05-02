@@ -37,6 +37,13 @@ class TestFilters(unittest.TestCase):
 
     def test_load_and_filter(self):
         """Test the combined filter imports and correctly filters the file.
+
+        good_only_passes should only return the row with the 'good' value
         """
         good_only_passes = self.df.apply(filters.load_and_filter, axis=1)
-        assert_equal(self.df[good_only_passes['times']].item())
+        assert_equal(
+            # the filtered value
+            self.df[good_only_passes]['times'].item(), 
+            # the expected value
+            self.df[self.df['times'] == 'good']['times'].item()
+            )

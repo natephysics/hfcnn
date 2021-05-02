@@ -1,7 +1,7 @@
-from six import string_types
 from torch.utils.data import Dataset
 import pandas as pd # needed for the df format
 from hfcnn.lib import files
+from numpy import integer, issubdtype
 
 class HeatLoadDataset(Dataset):
     def __init__(self, df: str or pd.DataFrame, img_dir: str, transform=None, target_transform=None):
@@ -24,8 +24,10 @@ class HeatLoadDataset(Dataset):
         """
         if type(df) == str:
             self.img_labels = files.import_file_from_local_cache(df)
+            self.img_labels = self.img_labels.reset_index()
         elif type(df) == pd.DataFrame:
             self.img_labels = df.copy()
+            self.img_labels = self.img_labels.reset_index()
         else:
             raise TypeError('Input must be a str or df')
         
@@ -41,12 +43,12 @@ class HeatLoadDataset(Dataset):
         """
         return self.img_labels.shape[0]
 
-    def __getitem__(self, time: int, label_names: list=False):
+    def __getitem__(self, idx: int, label_names: list=False):
         """Returns a data point with "image" and "label" where the labels are 
         pulled from the label_names, a list of column names from the data frame.
 
         Args:
-            time (int): the timestamp of the heatload image data.
+            idx (int): the timestamp of the heatload image data OR an index.
             label_names (list, optional): A list containing data from the
             corresponding column names of the dataframe to return as the "label"
             in the sample. 
@@ -55,13 +57,24 @@ class HeatLoadDataset(Dataset):
         Returns:
             Sample (dic): Returns a sample with "image" and "label" 
         """
+        # Assuming there is no more than max_number_of_samples worth of samples.
+        # This is to help differentiate between timestamps and index values. 
+        max_number_of_samples = 9999999999
+
         # Sets the default option if left blank (needed because list is permutable)
         if label_names == False:
             label_names = ['PC1']
 
-        # select the row of the df with the correct timestamp
-        row = self.img_labels[self.img_labels['times'] == time]
-        
+        # If idx is too small to be a timestamp, find the timestamp that
+        # corresponds to the index.
+        if (idx <= max_number_of_samples) and issubdtype(type(idx), integer):
+            idx = self.img_labels.iloc[idx]['times']
+        elif not issubdtype(type(idx), integer):
+            raise TypeError('idx needs to be an int')
+
+        # find the row that matches the timestamp
+        row = self.img_labels[self.img_labels['times'] == idx]
+            
         # load the image from the local cache
         timestamp, port = row['times'].values[0], row['port'].values[0]
         img_path = files.generate_file_path(timestamp, port, self.img_dir)
