@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from numpy.testing._private.utils import assert_equal
 from hfcnn.lib.dataset import HeatLoadDataset
-from hfcnn.lib import files
+from hfcnn.lib import files, filters
 
 class TestDataSetClass(unittest.TestCase):
     """Tests for data set classes."""
@@ -24,7 +24,7 @@ class TestDataSetClass(unittest.TestCase):
         dataset_file = HeatLoadDataset(self.df, 'tests')
         dataset_df = HeatLoadDataset(files.import_file_from_local_cache('tests/resources/test_df.hkl'), 'tests')
 
-        # Check __len__ method
+        # Check __len__ method  
         assert_equal(dataset_file.__len__(), 2)
         assert_equal(dataset_df.__len__(), 2)
 
@@ -35,6 +35,14 @@ class TestDataSetClass(unittest.TestCase):
         assert_equal(good['label'], self.PC1)
         assert_equal(bad['image'], self.data_bad)
         assert_equal(bad['label'], self.PC1)
+
+        # check apply method
+        dataset_good = dataset_df.apply(
+            lambda x: filters.load_and_filter(x, dataset_df.img_dir))
+        assert_equal(dataset_good.__len__(), 1)
+
+
+
 
 
 

@@ -24,10 +24,10 @@ class HeatLoadDataset(Dataset):
         """
         if type(df) == str:
             self.img_labels = files.import_file_from_local_cache(df)
-            self.img_labels = self.img_labels.reset_index()
+            self.img_labels = self.img_labels.reset_index(drop=True)
         elif type(df) == pd.DataFrame:
             self.img_labels = df.copy()
-            self.img_labels = self.img_labels.reset_index()
+            self.img_labels = self.img_labels.reset_index(drop=True)
         else:
             raise TypeError('Input must be a str or df')
         
@@ -88,3 +88,21 @@ class HeatLoadDataset(Dataset):
             label = self.target_transform(label)
         sample = {"image": image, "label": label}
         return sample
+
+    def apply(self, filter_fn):
+        """Applies a filter to the dataset and removes any elements that
+        don't pass the filter criteria. Returns a HeatLoadDataset object
+        with the filtered dataset. 
+
+        Args:
+            filter_fn (function): A function designed to take in a row from
+            the self.img_labels dataframe (pd.Series) and return a Boolean.
+        """
+        filter_for_df = self.img_labels.apply(filter_fn, axis=1)
+        return HeatLoadDataset(
+            self.img_labels[filter_for_df], 
+            self.img_dir,
+            self.transform,
+            self.target_transform
+            )
+            

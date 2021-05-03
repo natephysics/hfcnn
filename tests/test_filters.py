@@ -2,10 +2,9 @@
 
 """Tests for filters.py."""
 import unittest
-from numpy.testing._private.utils import assert_equal
-from hfcnn.lib import filters
-from hfcnn.lib import files
 import numpy as np
+from hfcnn.lib import files, filters
+from numpy.testing._private.utils import assert_equal
 
 
 class TestFilters(unittest.TestCase):
@@ -40,7 +39,7 @@ class TestFilters(unittest.TestCase):
 
         good_only_passes should only return the row with the 'good' value
         """
-        good_only_passes = self.df.apply(filters.load_and_filter, axis=1)
+        good_only_passes = self.df.apply(lambda x: filters.load_and_filter(x, './tests'), axis=1)
         assert_equal(
             # the filtered value
             self.df[good_only_passes]['times'].item(), 

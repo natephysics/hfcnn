@@ -71,16 +71,18 @@ def data_selection(image: np.ndarray, int_threshold=5):
 
 
 # %%
-def load_and_filter(row: pd.Series):
+def load_and_filter(row: pd.Series, img_dir='.\\data'):
     """Function designed to make it easier to apply data_selection() to a pandas
     dataframe.
 
     Args:
         row (pd.Series): the row expected from df.apply()
 
+        img_dir (str): path to the directory containing the images
+        
     Returns:
        Boolean : if the data that corresponds to the row is included by the filter.
     """
-    path = files.generate_file_path(row['times'], row['port'], '.\\tests')
+    path = files.generate_file_path(row['times'], row['port'], img_dir)
     image = files.import_file_from_local_cache(path)
     return data_selection(image)
