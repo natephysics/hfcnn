@@ -7,7 +7,8 @@ __pycache__/
 *.so
 
 # Data files
-data/*
+data/51/*.hkl
+data/*.hkl
 
 # Distribution / packaging
 .Python
