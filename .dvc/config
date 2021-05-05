@@ -1,0 +1,4 @@
+[core]
+    remote = datashare
+['remote "datashare"']
+    url = webdavs://datashare.mpcdf.mpg.de/public.php/webdav

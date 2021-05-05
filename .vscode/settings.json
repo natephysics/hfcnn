@@ -13,5 +13,9 @@
     "cSpell.words": [
         "conv",
         "nums"
-    ]
+    ],
+    "files.associations": {
+        "*.dvc": "yaml",
+        "dvc.lock": "yaml"
+    }
 }
