@@ -2,9 +2,10 @@ from torch.utils.data import Dataset
 import pandas as pd # needed for the df format
 from hfcnn.lib import files
 from numpy import integer, issubdtype
+import pyyaml
 
 class HeatLoadDataset(Dataset):
-    def __init__(self, df: str or pd.DataFrame, img_dir: str, transform=None, target_transform=None):
+    def __init__(self, df: str or pd.DataFrame, img_dir: str):
         """Creates at HeatloadDatatset object from a dataframe or link to a dataframe
 
         Args:
@@ -12,12 +13,6 @@ class HeatLoadDataset(Dataset):
             dataframe object stored in .hkl format.
 
             img_dir (str): link to the data directory
-            
-            transform (optional): The transformation function to be
-            applied to image data. Defaults to None.
-            
-            target_transform (optional): The transformation function to be
-            applied to label data. Defaults to None.
 
         Raises:
             TypeError: [description]
@@ -31,9 +26,10 @@ class HeatLoadDataset(Dataset):
         else:
             raise TypeError('Input must be a str or df')
         
+        if not os.path.isdir(img_dir):
+            raise ValueError('Expected path to directory from img_dir')
+
         self.img_dir = img_dir
-        self.transform = transform
-        self.target_transform = target_transform
 
     def __len__(self):
         """Returns the number of data points in the set
@@ -80,12 +76,8 @@ class HeatLoadDataset(Dataset):
         img_path = files.generate_file_path(timestamp, port, self.img_dir)
         image = files.import_file_from_local_cache(img_path)
         
-        # define image and label and preform any provided transformations 
+        # generate a sample
         label = row[label_names].values[0]
-        if self.transform:
-            image = self.transform(image)
-        if self.target_transform:
-            label = self.target_transform(label)
         sample = {"image": image, "label": label}
         return sample
 
@@ -106,3 +98,15 @@ class HeatLoadDataset(Dataset):
             self.target_transform
             )
             
+    def unique(self):
+        """Returns the unique program numbers from the data set
+        """
+        return self.img_labels['program_num'].unique()
+A
+    def to_file(self, path_to_file):
+        """Exports the data set as a Pandas dataframe to hkl.
+
+        Args:
+            path_to_file ([type]): path to file (should end in .hkl)
+        """
+        files.export_data_to_local_cache(self.img_labels, path_to_file)
