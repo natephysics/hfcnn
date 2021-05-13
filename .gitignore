@@ -168,3 +168,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# yaml files
+test.yaml
