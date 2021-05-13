@@ -2,7 +2,6 @@ from torch.utils.data import Dataset
 import pandas as pd # needed for the df format
 from hfcnn.lib import files
 from numpy import integer, issubdtype
-import pyyaml
 
 class HeatLoadDataset(Dataset):
     def __init__(self, df: str or pd.DataFrame, img_dir: str):
@@ -102,7 +101,7 @@ class HeatLoadDataset(Dataset):
         """Returns the unique program numbers from the data set
         """
         return self.img_labels['program_num'].unique()
-A
+
     def to_file(self, path_to_file):
         """Exports the data set as a Pandas dataframe to hkl.
 
