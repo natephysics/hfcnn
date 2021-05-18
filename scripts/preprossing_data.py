@@ -21,11 +21,13 @@ def main():
     config = network_configuration.GenerateConfig(training_config_path)
     
     # Step 1. Import the raw the data
-    logging.info('Constructing raw data set.')
+    
     raw_data = dataset.HeatLoadDataset(
         config.get('raw_df_path'),
         config.get('raw_data_path')
         )
+    logging.info(f'Imported {raw_data.__len__()} images from the raw data set')  
+    print(f'Imported {raw_data.__len__()} images from the raw data set')
 
     # Step 2. Filter the data
     if config.num_of_filters() == 0:
@@ -33,11 +35,8 @@ def main():
     else:
         for filter in config.get('filters_to_apply'):
            logging.info(f'Applying {filter[0]} filters')
-
-           raw_data = raw_data.apply(filters.return_filter(filter[0], filter[1]))
-
-    
-    print(config.config)
+           raw_data = raw_data.apply(filters.return_filter(*filter)) 
+           print(f'{raw_data.__len__()} images remain after applying {filter[0]} filter')   
 
 # %%
 if __name__ == "__main__":

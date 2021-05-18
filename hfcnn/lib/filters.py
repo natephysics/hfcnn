@@ -1,5 +1,6 @@
 # %%
 # loading required packages
+from re import A
 import numpy as np
 import pandas as pd
 import torch
@@ -97,4 +98,4 @@ def return_filter(filter_names: str, *args):
         filter_name ([type]): [description]
     """
     if filter_names == "data_selection":
-        return lambda x: load_and_filter(x, args[0])
+        return lambda x: load_and_filter(x, *args)

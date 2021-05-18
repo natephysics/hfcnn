@@ -43,7 +43,7 @@ class TestDataSetClass(unittest.TestCase):
         # dataset_good = dataset_df.apply(
         #     lambda x: filters.load_and_filter(x, dataset_df.img_dir))
         dataset_good = dataset_df.apply(
-            filters.return_filter("data_selection", dataset_df.img_dir)
+            filters.return_filter(*["data_selection", dataset_df.img_dir])
             )
 
         assert_equal(dataset_good.__len__(), 1)
