@@ -52,6 +52,7 @@ def data_selection(image: np.ndarray, int_threshold=5):
     # when integrating ignore data below this bin
     ignore_below_this_value = 7e7
     ##########################################################
+    
     # remove values below zero convert to int
     current_image = image.astype(int).clip(min=0)
 
@@ -69,9 +70,8 @@ def data_selection(image: np.ndarray, int_threshold=5):
         return False
 
 
-
 # %%
-def load_and_filter(row: pd.Series, img_dir='.\\data'):
+def load_and_filter(row: pd.Series, img_dir='./data/raw'):
     """Function designed to make it easier to apply data_selection() to a pandas
     dataframe.
 
@@ -86,3 +86,15 @@ def load_and_filter(row: pd.Series, img_dir='.\\data'):
     path = files.generate_file_path(row['times'], row['port'], img_dir)
     image = files.import_file_from_local_cache(path)
     return data_selection(image)
+
+
+# %%
+def return_filter(filter_names: str, *args):
+    """Takes in the name of a filter and the filters arguments and returns that
+    filter.
+
+    Args:
+        filter_name ([type]): [description]
+    """
+    if filter_names == "data_selection":
+        return lambda x: load_and_filter(x, args[0])

@@ -12,6 +12,9 @@
     "python.testing.unittestEnabled": true,
     "cSpell.words": [
         "conv",
+        "datefmt",
+        "hfcnn",
+        "msecs",
         "nums"
     ],
     "files.associations": {

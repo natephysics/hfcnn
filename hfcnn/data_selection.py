@@ -10,12 +10,12 @@ import seaborn as sns
 import torch
 import torch.nn.functional as F
 import doctest
-from lib import files
+from hfcnn.lib import files
 
 
 # %%
 # import the data
-df = files.import_file_from_local_cache('..\data\df.hkl')
+df = files.import_file_from_local_cache('../data/raw/df.hkl')
 
 
 # %%

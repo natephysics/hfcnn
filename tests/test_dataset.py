@@ -22,7 +22,10 @@ class TestDataSetClass(unittest.TestCase):
         """Testing the HeatLoadDataset class."""
         # Check __init__ method for both file import and manual import
         dataset_file = HeatLoadDataset(self.df, 'tests')
-        dataset_df = HeatLoadDataset(files.import_file_from_local_cache('tests/resources/test_df.hkl'), 'tests')
+        dataset_df = HeatLoadDataset(
+            files.import_file_from_local_cache('tests/resources/test_df.hkl'), 
+            'tests'
+            )
 
         # Check __len__ method  
         assert_equal(dataset_file.__len__(), 2)
@@ -37,8 +40,12 @@ class TestDataSetClass(unittest.TestCase):
         assert_equal(bad['label'], self.PC1)
 
         # check apply method
+        # dataset_good = dataset_df.apply(
+        #     lambda x: filters.load_and_filter(x, dataset_df.img_dir))
         dataset_good = dataset_df.apply(
-            lambda x: filters.load_and_filter(x, dataset_df.img_dir))
+            filters.return_filter("data_selection", dataset_df.img_dir)
+            )
+
         assert_equal(dataset_good.__len__(), 1)
 
 

@@ -1,0 +1,25 @@
+14-May-21 16:56:45 PM 136- 20980 -INFO - Constructing raw data set.
+14-May-21 16:59:20 PM 546- 16864 -INFO - Constructing raw data set.
+16-May-21 20:20:38 PM 608- 21648 -INFO - Constructing raw data set.
+16-May-21 20:25:40 PM 932- 10048 -INFO - Constructing raw data set.
+16-May-21 20:26:09 PM 206- 22780 -INFO - Constructing raw data set.
+16-May-21 20:26:49 PM 905- 16268 -INFO - Constructing raw data set.
+16-May-21 20:58:11 PM 798- 12416 -INFO - Constructing raw data set.
+16-May-21 21:00:58 PM 716- 13032 -INFO - Constructing raw data set.
+16-May-21 21:01:24 PM 735- 27044 -INFO - Constructing raw data set.
+16-May-21 21:02:20 PM 421- 24784 -INFO - Constructing raw data set.
+16-May-21 21:02:42 PM 287- 26356 -INFO - Constructing raw data set.
+16-May-21 21:04:13 PM 34- 12252 -INFO - Constructing raw data set.
+17-May-21 17:28:53 PM 532- 20092 -INFO - Constructing raw data set.
+17-May-21 17:30:27 PM 203- 1544 -INFO - Constructing raw data set.
+17-May-21 17:31:12 PM 541- 19788 -INFO - Constructing raw data set.
+17-May-21 17:40:18 PM 298- 14220 -INFO - Constructing raw data set.
+17-May-21 17:40:43 PM 344- 18348 -INFO - Constructing raw data set.
+17-May-21 17:42:04 PM 346- 8576 -INFO - Constructing raw data set.
+17-May-21 17:43:36 PM 540- 18972 -INFO - Constructing raw data set.
+17-May-21 17:43:53 PM 451- 20300 -INFO - Constructing raw data set.
+17-May-21 17:43:53 PM 457- 20300 -INFO - No filters to apply. Skipping step
+18-May-21 16:52:30 PM 430- 5792 -INFO - Constructing raw data set.
+18-May-21 16:54:16 PM 385- 18228 -INFO - Constructing raw data set.
+18-May-21 16:54:16 PM 395- 18228 -INFO - Applying test filters
+18-May-21 16:54:16 PM 395- 18228 -INFO - Applying test2 filters

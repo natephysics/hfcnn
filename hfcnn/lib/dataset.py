@@ -2,6 +2,7 @@ from torch.utils.data import Dataset
 import pandas as pd # needed for the df format
 from hfcnn.lib import files
 from numpy import integer, issubdtype
+import os
 
 class HeatLoadDataset(Dataset):
     def __init__(self, df: str or pd.DataFrame, img_dir: str):
@@ -92,9 +93,7 @@ class HeatLoadDataset(Dataset):
         filter_for_df = self.img_labels.apply(filter_fn, axis=1)
         return HeatLoadDataset(
             self.img_labels[filter_for_df], 
-            self.img_dir,
-            self.transform,
-            self.target_transform
+            self.img_dir
             )
             
     def unique(self):
