@@ -171,3 +171,6 @@ $RECYCLE.BIN/
 
 # yaml files
 test.yaml
+
+# log files
+logs/*
