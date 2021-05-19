@@ -46,3 +46,4 @@
 18-May-21 18:54:24 PM 947- 15724 -INFO - Applying data_selection filters
 18-May-21 18:59:45 PM 189- 19548 -INFO - Imported 100 images from the raw data set
 18-May-21 18:59:45 PM 190- 19548 -INFO - Applying data_selection filters
+19-May-21 16:51:51 PM 156- 21252 -INFO - Imported 100 images from the raw data set

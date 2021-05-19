@@ -96,7 +96,7 @@ class HeatLoadDataset(Dataset):
             self.img_dir
             )
             
-    def unique(self):
+    def program_nums(self):
         """Returns the unique program numbers from the data set
         """
         return self.img_labels['program_num'].unique()

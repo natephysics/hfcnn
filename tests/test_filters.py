@@ -46,3 +46,21 @@ class TestFilters(unittest.TestCase):
             # the expected value
             self.df[self.df['times'] == 'good']['times'].item()
             )
+    
+    def test_split(self):
+        split_test_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        split_test_ratio_list = [0.6]
+        split_test_ratio_list2 = [0.6, 0.2]
+
+        expected_result = [[8, 2, 0, 7, 6, 9], [5, 1, 4, 3]]
+        expected_result2 = [[4, 0, 8, 1, 5, 3], [9, 2], [6, 7]]
+
+        assert_equal(
+            filters.split(split_test_list, split_test_ratio_list),
+            expected_result
+        )
+
+        assert_equal(
+            filters.split(split_test_list, split_test_ratio_list2),
+            expected_result2
+        )

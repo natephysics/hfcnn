@@ -4,9 +4,9 @@ from re import A
 import numpy as np
 import pandas as pd
 import torch
-from torch._C import BoolType
 import torch.nn.functional as F
 from hfcnn.lib import files
+import random
 
 
 # %%
@@ -99,3 +99,38 @@ def return_filter(filter_names: str, *args):
     """
     if filter_names == "data_selection":
         return lambda x: load_and_filter(x, *args)
+
+
+# %%
+def split(prog_num_list: list, ratio_list: list, seed: int=4):
+    """Takes in a list of program numbers and creates sublists based on the 
+    proportions list. Numbers expected to be between (0-1). If one number, x, is
+    provided, will return two sets of ratios x, and 1-x. If two are provided, 
+    will return three sets of ratios x, y, and 1 - x - y. 
+
+    Args:
+        prog_num_list (list): List of the program numbers to split
+            
+        ratio_list (list): proportion of the data to split for each sub list. 
+            Numbers expected to be between (0-1).
+
+        seed (int): random seed.
+    """
+    # get the number of elements
+    list_length = len(prog_num_list)
+    
+    # shuffle the list
+    random.seed(seed)
+    random.shuffle(prog_num_list)
+
+    # determine the index that bounds each sublist.
+    sub_index = [0]
+    for ratio in ratio_list:
+        sub_index.append(round(list_length * ratio) + sum(sub_index))
+    
+    sub_index.append(list_length)
+    
+    # return the list of list of sublists
+    return [prog_num_list[sub_index[i] : sub_index[i+1]] for i in range(len(sub_index) - 1)]
+
+# %%

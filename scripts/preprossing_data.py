@@ -20,6 +20,7 @@ def main():
     # generate the configuration
     config = network_configuration.GenerateConfig(training_config_path)
     
+    
     # Step 1. Import the raw the data
     
     raw_data = dataset.HeatLoadDataset(
@@ -29,14 +30,29 @@ def main():
     logging.info(f'Imported {raw_data.__len__()} images from the raw data set')  
     print(f'Imported {raw_data.__len__()} images from the raw data set')
 
-    # Step 2. Filter the data
+    # Step 2. Allpying filter(s) to the data
     if config.num_of_filters() == 0:
         logging.info('No filters to apply. Skipping step')
     else:
         for filter in config.get('filters_to_apply'):
            logging.info(f'Applying {filter[0]} filters')
            raw_data = raw_data.apply(filters.return_filter(*filter)) 
+           logging.info(f'{raw_data.__len__()} images remain after applying {filter[0]} filter') 
            print(f'{raw_data.__len__()} images remain after applying {filter[0]} filter')   
+
+
+    # Step 3. Test/Train/Val Split
+    # Because data for a given program number is likely corolated we'll divide
+    # the sets up by program number.
+
+
+
+    # Step 4. Normalized the training data.
+
+
+    # Step 5. Export the data sets and normalization parameters. 
+
+
 
 # %%
 if __name__ == "__main__":
