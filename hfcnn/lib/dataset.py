@@ -31,6 +31,7 @@ class HeatLoadDataset(Dataset):
 
         self.img_dir = img_dir
 
+
     def __len__(self):
         """Returns the number of data points in the set
 
@@ -38,6 +39,7 @@ class HeatLoadDataset(Dataset):
             length: number of data points in the set
         """
         return self.img_labels.shape[0]
+
 
     def __getitem__(self, idx: int, label_names: list=False):
         """Returns a data point with "image" and "label" where the labels are 
@@ -81,6 +83,7 @@ class HeatLoadDataset(Dataset):
         sample = {"image": image, "label": label}
         return sample
 
+
     def apply(self, filter_fn):
         """Applies a filter to the dataset and removes any elements that
         don't pass the filter criteria. Returns a HeatLoadDataset object
@@ -95,11 +98,13 @@ class HeatLoadDataset(Dataset):
             self.img_labels[filter_for_df], 
             self.img_dir
             )
-            
+
+
     def program_nums(self):
         """Returns the unique program numbers from the data set
         """
         return self.img_labels['program_num'].unique()
+
 
     def to_file(self, path_to_file):
         """Exports the data set as a Pandas dataframe to hkl.
@@ -108,3 +113,22 @@ class HeatLoadDataset(Dataset):
             path_to_file ([type]): path to file (should end in .hkl)
         """
         files.export_data_to_local_cache(self.img_labels, path_to_file)
+        print('Export Complete')
+
+
+    def split_by_program_num(self, prog_num_list: list):
+        """Generates a new copy of the data set with the subset of data that
+        whose program_nums match the ones in the prog_num_list.
+
+        Args:
+            prog_num_list (list): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        filter_for_df = self.img_labels.program_num.isin(prog_num_list)
+        
+        return HeatLoadDataset(
+            self.img_labels[filter_for_df], 
+            self.img_dir
+            )

@@ -49,6 +49,16 @@ class TestDataSetClass(unittest.TestCase):
         assert_equal(dataset_good.__len__(), 1)
 
 
+        # Check split_by_program_num method
+        prog_num_list1 = ['20180829.36']
+        prog_num_list2 = ['20180829.32', '20180829.36']
+
+        len1 = dataset_df.split_by_program_num(prog_num_list1).__len__()
+        len2 = dataset_df.split_by_program_num(prog_num_list2).__len__()
+
+        assert_equal(len1, 1)
+        assert_equal(len2, 2)
+
 
 
 

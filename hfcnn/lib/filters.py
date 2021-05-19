@@ -32,10 +32,10 @@ def conv2d(image, kernel, strides):
 
 # %%
 def data_selection(image: np.ndarray, int_threshold=5):
-    """[summary]
+    """A filter developed to exclude image data with too little heat load
 
     Args:
-        image (np.ndarray): [description]
+        image (np.ndarray): head load image
         int_threshold (int, optional): [description]. Defaults to 5.
 
     Returns:
@@ -90,14 +90,14 @@ def load_and_filter(row: pd.Series, img_dir='./data/raw'):
 
 
 # %%
-def return_filter(filter_names: str, *args):
+def return_filter(filter_name: str, *args):
     """Takes in the name of a filter and the filters arguments and returns that
     filter.
 
     Args:
         filter_name ([type]): [description]
     """
-    if filter_names == "data_selection":
+    if filter_name == "data_selection":
         return lambda x: load_and_filter(x, *args)
 
 
