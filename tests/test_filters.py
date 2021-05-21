@@ -39,7 +39,9 @@ class TestFilters(unittest.TestCase):
 
         good_only_passes should only return the row with the 'good' value
         """
-        good_only_passes = self.df.apply(lambda x: filters.load_and_filter(x, './tests'), axis=1)
+        good_only_passes = self.df.apply(
+            lambda x: filters.load_and_filter(x, filters.data_selection, './tests'), 
+            axis=1)
         assert_equal(
             # the filtered value
             self.df[good_only_passes]['times'].item(), 

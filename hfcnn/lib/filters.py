@@ -72,21 +72,18 @@ def data_selection(image: np.ndarray, int_threshold=5):
 
 
 # %%
-def load_and_filter(row: pd.Series, img_dir='./data/raw'):
-    """Function designed to make it easier to apply data_selection() to a pandas
-    dataframe.
+def load_and_filter(row: pd.Series, filter, img_dir='./data/raw'):
+    """Function designed to make it easier to apply filters that require images
+    to a pandas dataframe.
 
     Args:
         row (pd.Series): the row expected from df.apply()
 
         img_dir (str): path to the directory containing the images
-        
-    Returns:
-       Boolean : if the data that corresponds to the row is included by the filter.
     """
     path = files.generate_file_path(row['times'], row['port'], img_dir)
     image = files.import_file_from_local_cache(path)
-    return data_selection(image)
+    return filter(image)
 
 
 # %%
@@ -98,7 +95,7 @@ def return_filter(filter_name: str, *args):
         filter_name ([type]): [description]
     """
     if filter_name == "data_selection":
-        return lambda x: load_and_filter(x, *args)
+        return lambda x: load_and_filter(x, data_selection, *args)
 
 
 # %%

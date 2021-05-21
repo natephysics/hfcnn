@@ -40,8 +40,6 @@ class TestDataSetClass(unittest.TestCase):
         assert_equal(bad['label'], self.PC1)
 
         # check apply method
-        # dataset_good = dataset_df.apply(
-        #     lambda x: filters.load_and_filter(x, dataset_df.img_dir))
         dataset_good = dataset_df.apply(
             filters.return_filter(*["data_selection", dataset_df.img_dir])
             )

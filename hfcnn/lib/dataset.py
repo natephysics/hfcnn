@@ -3,6 +3,7 @@ import pandas as pd # needed for the df format
 from hfcnn.lib import files
 from numpy import integer, issubdtype
 import os
+import multiprocessing as mp
 
 class HeatLoadDataset(Dataset):
     def __init__(self, df: str or pd.DataFrame, img_dir: str):
@@ -86,8 +87,8 @@ class HeatLoadDataset(Dataset):
 
     def apply(self, filter_fn):
         """Applies a filter to the dataset and removes any elements that
-        don't pass the filter criteria. Returns a HeatLoadDataset object
-        with the filtered dataset. 
+        don't pass the filter criteria. Filters do no change the content of the
+        images. Returns a HeatLoadDataset object with the filtered dataset. 
 
         Args:
             filter_fn (function): A function designed to take in a row from
@@ -134,9 +135,17 @@ class HeatLoadDataset(Dataset):
             )
 
     def normalize(self, new_img_dir: str=None, drop_neg_values=True):
-        """Normalizes the dataset across all images
+        """Calculates the normalization parameters of the dataset across all 
+        images. If drop_neg_values, will set all values below zero to zero 
+        before normalizing the data. The normalized version data can be saved if
+        new_img_dir is provided.
 
         Args:
-            new_img_dir (str, optional): [description]. Defaults to None.
-            drop_neg_values (bool, optional): [description]. Defaults to True.
+            new_img_dir (str, optional): path to saved normalized (or zeroed) 
+            data. Defaults to None.
+            
+            drop_neg_values (bool, optional): Sets all negative values to zero 
+            before normalizing. Defaults to True.
         """
+        pool = mp.Pool(mp.cpu_count())
+
