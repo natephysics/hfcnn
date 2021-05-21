@@ -132,3 +132,11 @@ class HeatLoadDataset(Dataset):
             self.img_labels[filter_for_df], 
             self.img_dir
             )
+
+    def normalize(self, new_img_dir: str=None, drop_neg_values=True):
+        """Normalizes the dataset across all images
+
+        Args:
+            new_img_dir (str, optional): [description]. Defaults to None.
+            drop_neg_values (bool, optional): [description]. Defaults to True.
+        """
