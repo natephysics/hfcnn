@@ -1,12 +1,12 @@
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
+from torch import from_numpy, cuda, sqrt
 import pandas as pd # needed for the df format
 from hfcnn.lib import files
 from numpy import integer, issubdtype
 import os
-import multiprocessing as mp
 
 class HeatLoadDataset(Dataset):
-    def __init__(self, df: str or pd.DataFrame, img_dir: str):
+    def __init__(self, df: str or pd.DataFrame, img_dir: str, mean: float=0, std: float=1, drop_neg_values=True):
         """Creates at HeatloadDatatset object from a dataframe or link to a dataframe
 
         Args:
@@ -31,6 +31,9 @@ class HeatLoadDataset(Dataset):
             raise ValueError('Expected path to directory from img_dir')
 
         self.img_dir = img_dir
+        self.mean = mean
+        self.std = std
+        self.drop_neg_values = drop_neg_values
 
 
     def __len__(self):
@@ -78,9 +81,15 @@ class HeatLoadDataset(Dataset):
         timestamp, port = row['times'].values[0], row['port'].values[0]
         img_path = files.generate_file_path(timestamp, port, self.img_dir)
         image = files.import_file_from_local_cache(img_path)
-        
-        # generate a sample
+        image = from_numpy(image)
+        if self.drop_neg_values:
+            image = image.clip(min=0)
+
+        # generate the labels
         label = row[label_names].values[0]
+        label = from_numpy(label)
+
+        # return sample
         sample = {"image": image, "label": label}
         return sample
 
@@ -134,7 +143,7 @@ class HeatLoadDataset(Dataset):
             self.img_dir
             )
 
-    def normalize(self, new_img_dir: str=None, drop_neg_values=True):
+    def normalize(self, new_img_dir: str=None):
         """Calculates the normalization parameters of the dataset across all 
         images. If drop_neg_values, will set all values below zero to zero 
         before normalizing the data. The normalized version data can be saved if
@@ -147,5 +156,23 @@ class HeatLoadDataset(Dataset):
             drop_neg_values (bool, optional): Sets all negative values to zero 
             before normalizing. Defaults to True.
         """
-        pool = mp.Pool(mp.cpu_count())
+        # get the total number of pixels in the entire data set
+        x, y = self.__getitem__(1)['image'].size()
+        num_of_pixels = self.__len__() * x * y
+
+        # set up dataloader
+        temploader = DataLoader(self, batch_size=50, num_workers=6)
+
+        # solve for mean
+        total_sum = 0
+        for batch in temploader: total_sum += batch[0].sum()
+        self.mean = total_sum / num_of_pixels
+
+        # solve for std
+        sum_of_squared_error = 0
+        for batch in temploader: 
+            sum_of_squared_error += ((batch[0] - self.mean).pow(2)).sum()
+        self.std = sqrt(sum_of_squared_error / num_of_pixels)
+
+        return self.mean, self.std
 

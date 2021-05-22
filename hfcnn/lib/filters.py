@@ -72,6 +72,32 @@ def data_selection(image: np.ndarray, int_threshold=5):
 
 
 # %%
+def zero_neg_filter(image: np.ndarray):
+    """Zeros out all negative values
+
+    Args:
+        image (np.ndarray): Expects image data.
+
+    Returns:
+        (np.ndarray): zeroed image
+    """
+    return image.clip(min=0)
+
+
+# %%
+def sum_image(image: np.ndarray):
+    """Sums the values of all the pixels
+    
+
+    Args:
+        image (np.ndarray): [description]
+
+    Returns:
+        [type]: [description]
+    """
+
+
+# %%
 def load_and_filter(row: pd.Series, filter, img_dir='./data/raw'):
     """Function designed to make it easier to apply filters that require images
     to a pandas dataframe.

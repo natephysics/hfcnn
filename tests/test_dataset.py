@@ -11,8 +11,8 @@ class TestDataSetClass(unittest.TestCase):
         self.df = 'tests/resources/test_df.hkl'
 
         # actual heat load data
-        self.data_good = files.import_file_from_local_cache('tests/resources/good.hkl')
-        self.data_bad = files.import_file_from_local_cache('tests/resources/bad.hkl')
+        self.data_good = files.import_file_from_local_cache('tests/resources/good.hkl').clip(min=0)
+        self.data_bad = files.import_file_from_local_cache('tests/resources/bad.hkl').clip(min=0)
         self.PC1 = np.array([8698.])
         self.index_bad = 0
         self.index_good = 1

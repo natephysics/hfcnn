@@ -34,6 +34,10 @@ class TestFilters(unittest.TestCase):
         # verify false data
         self.assertFalse(filters.data_selection(self.data_bad))
 
+
+    def test_zero_neg_filter(self):
+        filters.zero_neg_filter(self.data_good)
+
     def test_load_and_filter(self):
         """Test the combined filter imports and correctly filters the file.
 
