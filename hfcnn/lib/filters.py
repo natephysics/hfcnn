@@ -139,6 +139,11 @@ def split(prog_num_list: list, ratio_list: list, seed: int=4):
 
         seed (int): random seed.
     """
+    # return error if any element of ratio list are outside of the interval 0-1
+    for i in ratio_list:
+        if (i <= 0) or (i >= 1):
+            raise ValueError("Ratio list elements must be (0-1)")
+
     # get the number of elements
     list_length = len(prog_num_list)
     

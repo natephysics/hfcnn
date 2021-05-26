@@ -1,6 +1,6 @@
 # %%
 import argparse
-from hfcnn.lib import network_configuration, dataset, filters
+from hfcnn.lib import network_configuration, dataset, filters, yaml_tools
 import logging
 
 logging.basicConfig(
@@ -29,6 +29,7 @@ def main():
     logging.info(f'Imported {raw_data.__len__()} images from the raw data set')  
     print(f'Imported {raw_data.__len__()} images from the raw data set')
 
+
     #### Step 2. Allpying filter(s) to the data ####
     if config.num_of_filters() == 0:
         logging.info('No filters to apply. Skipping step')
@@ -46,7 +47,7 @@ def main():
     
     # generate lists of program numbers for each train/test/val split
     program_num_split = filters.split(raw_data.program_nums(), config.get('train_test_split'))
-    
+
     # generate the training data
     training_data = raw_data.split_by_program_num(program_num_split[0])
     logging.info(f'Training dataset generated with {training_data.__len__()} samples.')
@@ -61,12 +62,26 @@ def main():
         logging.info(f'Validation dataset generated with {validation_data.__len__()} samples.')
 
 
-    # Step 4. Normalized the training data.
+    #### Step 4. Normalized the training data. #### 
+    training_data.normalize()
+    logging.info(f'Training set standardization parameters. mean: {training_data.mean}, std: {training_data.std}.')
+    print(str(f'Training set standardization parameters. mean: {training_data.mean}, std: {training_data.std}.'))
+
+
+    #### Step 5. Export the data sets and standardization parameters. #### 
+    
+    # impoort the training config, update the standardization parameters. 
+    training_config = network_configuration.GenerateConfig(config.get('training_config_path'))
+    if not (training_config.get('mean') == training_data.mean):
+        training_config.config['mean'] = training_data.mean
+    
+    if not (training_config.get('std') == training_data.std):
+        training_config.config['std'] = training_data.std
+
+    training_config.export(config.get('training_config_path'))
+
     
 
-
-
-    # Step 5. Export the data sets and normalization parameters. 
 
 
 

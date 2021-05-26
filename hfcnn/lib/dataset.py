@@ -5,13 +5,38 @@ from hfcnn.lib import files
 from numpy import integer, issubdtype
 import os
 
+def make_dict(df: pd.DataFrame, drop_neg_values: bool, mean: float, std: float):
+    """Makes a dict from the following parameters.
+
+    Args:
+        df (str or pd.DataFrame): a dataframe object cotaining possible labels.
+
+        img_dir (str): link to the data directory
+
+        drop_neg_values (bool): Drops negative pixel values
+        
+        mean (float): Standardization parameter for data.
+        std (float): Standardization parameter for data.
+
+    Returns:
+        dict: dict with the above parameters
+    """
+    my_dict = {
+        "img_labels": df,
+        "drop_neg_values": drop_neg_values,
+        "mean": mean,
+        "std": std
+    }
+    return my_dict
+
+
 class HeatLoadDataset(Dataset):
-    def __init__(self, df: str or pd.DataFrame, img_dir: str, mean: float=0, std: float=1, drop_neg_values=True):
+    def __init__(self, df: str or pd.DataFrame, img_dir: str, mean: float=0, std: float=1, drop_neg_values: bool=True):
         """Creates at HeatloadDatatset object from a dataframe or link to a dataframe
 
         Args:
-            df (str or pd.DataFrame): a dataframe object or a directory for the
-            dataframe object stored in .hkl format.
+            df (str or pd.DataFrame): a dataframe object cotaining possible labels
+            or a directory for the dataframe object and dict stored in .hkl format.
 
             img_dir (str): link to the data directory
 
@@ -19,11 +44,18 @@ class HeatLoadDataset(Dataset):
             TypeError: [description]
         """
         if type(df) == str:
-            self.img_labels = files.import_file_from_local_cache(df)
+            dict = files.import_file_from_local_cache(df)
+            self.img_labels = dict.pop('img_labels')
             self.img_labels = self.img_labels.reset_index(drop=True)
+            self.mean = dict.pop('mean')
+            self.std = dict.pop('std')
+            self.drop_neg_values = dict.pop('drop_neg_values')
         elif type(df) == pd.DataFrame:
             self.img_labels = df.copy()
             self.img_labels = self.img_labels.reset_index(drop=True)
+            self.mean = mean
+            self.std = std
+            self.drop_neg_values = drop_neg_values
         else:
             raise TypeError('Input must be a str or df')
         
@@ -31,9 +63,7 @@ class HeatLoadDataset(Dataset):
             raise ValueError('Expected path to directory from img_dir')
 
         self.img_dir = img_dir
-        self.mean = mean
-        self.std = std
-        self.drop_neg_values = drop_neg_values
+        
 
 
     def __len__(self):
@@ -117,12 +147,22 @@ class HeatLoadDataset(Dataset):
 
 
     def to_file(self, path_to_file):
-        """Exports the data set as a Pandas dataframe to hkl.
+        """Exports the data set as a Pandas dataframe and a dict to hkl.
 
         Args:
             path_to_file ([type]): path to file (should end in .hkl)
         """
-        files.export_data_to_local_cache(self.img_labels, path_to_file)
+        # construct the dict
+
+
+        files.export_data_to_local_cache(
+            make_dict(
+                self.img_labels, 
+                self.drop_neg_values,
+                self.mean, 
+                self.std
+                ), 
+            path_to_file)
         print('Export Complete')
 
 
@@ -153,26 +193,27 @@ class HeatLoadDataset(Dataset):
             new_img_dir (str, optional): path to saved normalized (or zeroed) 
             data. Defaults to None.
             
-            drop_neg_values (bool, optional): Sets all negative values to zero 
-            before normalizing. Defaults to True.
+        Returns:
+            float: mean and std
         """
         # get the total number of pixels in the entire data set
         x, y = self.__getitem__(1)['image'].size()
         num_of_pixels = self.__len__() * x * y
 
+        bs = min(50, self.__len__())
+
         # set up dataloader
-        temploader = DataLoader(self, batch_size=50, num_workers=6)
+        temploader = DataLoader(self, batch_size=bs, num_workers=12)
 
         # solve for mean
         total_sum = 0
-        for batch in temploader: total_sum += batch[0].sum()
+        for batch in temploader: total_sum += batch['image'].sum()
         self.mean = total_sum / num_of_pixels
 
         # solve for std
         sum_of_squared_error = 0
         for batch in temploader: 
-            sum_of_squared_error += ((batch[0] - self.mean).pow(2)).sum()
+            sum_of_squared_error += ((batch['image'] - self.mean).pow(2)).sum()
         self.std = sqrt(sum_of_squared_error / num_of_pixels)
 
         return self.mean, self.std
-

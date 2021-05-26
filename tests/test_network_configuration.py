@@ -8,7 +8,7 @@ class TestGenerateConfigClass(unittest.TestCase):
     """Tests for data set classes."""
     def setUp(self):
         # test dataframe
-        self.genconfig = network_configuration.GenerateConfig('tests/resources/test.yaml')
+        self.genconfig = network_configuration.GenerateConfig('tests/resources/preprossing_data.yaml')
 
 
     def test_keys(self):

@@ -1,20 +1,6 @@
 from hickle.hickle_legacy import NoneType
 from hfcnn.lib import yaml_tools
 
-# def config_tests(config: dict):
-#     """A series of tests to assure the config file contains the relevant
-#     parameters. 
-
-#     Args:
-#         config (dict): the dictionary containing the relevant parameters. 
-#     """
-#     # Check for file path
-#     expected_keys = ['raw_data_path',
-#     'raw_df_path',
-#     'processed_data_path',
-#     'filters_to_apply'
-#     ]
-
 class GenerateConfig():
     def __init__(self, path_to_config: str):
         self.config = yaml_tools.import_configuration(path_to_config)

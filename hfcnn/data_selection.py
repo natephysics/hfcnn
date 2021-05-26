@@ -181,3 +181,18 @@ np.array_equal(
 
 
 # %%
+import sys
+from ruamel.yaml import YAML
+
+class MyLogger:
+    def write(self, s):
+        sys.stdout.write(s.decode('utf-8'))
+my_logging_func = MyLogger()
+
+yaml = YAML()
+stream = open('../tests/resources/test.yaml')
+code = yaml.load(stream)
+code['raw_data_path'] = 'data/raw/delmelater/'
+
+yaml.dump(code, my_logging_func)
+# %%
