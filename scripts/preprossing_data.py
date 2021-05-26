@@ -69,20 +69,11 @@ def main():
 
 
     #### Step 5. Export the data sets and standardization parameters. #### 
-    
-    # impoort the training config, update the standardization parameters. 
-    training_config = network_configuration.GenerateConfig(config.get('training_config_path'))
-    if not (training_config.get('mean') == training_data.mean):
-        training_config.config['mean'] = training_data.mean
-    
-    if not (training_config.get('std') == training_data.std):
-        training_config.config['std'] = training_data.std
-
-    training_config.export(config.get('training_config_path'))
-
-    
-
-
+    training_data.to_file(config.get('train_df_path'))
+    test_data.to_file('test_df_path')
+    if len(program_num_split) == 3:
+        validation_data.to_file('validation_df_path')
+    logging.info(f'Datasets exported to disk.')
 
 
 # %%
