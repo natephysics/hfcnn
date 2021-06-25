@@ -1,5 +1,4 @@
 # %%
-# import yaml
 from ruamel.yaml import YAML
 
 def import_configuration(config_path: str):
@@ -9,6 +8,7 @@ def import_configuration(config_path: str):
         config_path (str): path to processing and training parameter yaml file.
     """
     yaml = YAML()
+
     with open(config_path, 'r') as files:
         config_dict = yaml.load(files)
     return config_dict
@@ -24,4 +24,4 @@ def export_configuration(config_path: str, network_config: dict):
     with open(config_path, 'w') as file:
         yaml.dump(network_config, file)    
 
-# %%
+
