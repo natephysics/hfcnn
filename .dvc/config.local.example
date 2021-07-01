@@ -1,7 +1,7 @@
 ; Steps for setup if using datashare from the mpcdf.
 ; 1. Create a public link with Download/View/Edit permissions and set the password
 ;   this will be a password used below
-; 2. From the link that's generated, the 'user' name is the sequence at the end.
+; 2. From the link that's generated, the 'user' name is the sequence at the end of the link.
 ;  eg https://datashare.mpcdf.mpg.de/s/vb4ajlzdlgashd
 ; username is vb4ajlzdlgashd
 
