@@ -9,7 +9,7 @@ Todo
     get composed by the network structure
     also reverse searching easier (find input space for given input dim)
 """
-
+# %%
 import copy
 import logging
 from typing import Union, Tuple
@@ -171,6 +171,8 @@ class NeuralNetwork(nn.Module):
         dims = copy.deepcopy(in_dim)
         for route, block in network_structure.items():
             blocklist = []
+            
+            # check to see if the route is int (therefore a layer) or a tuple (merge layer). 
             if isinstance(route, int):  # input
                 route_dim = dims.pop(route)
                 out_dim, blocklist = self._build_block(route_dim, block)
@@ -184,8 +186,6 @@ class NeuralNetwork(nn.Module):
                 blocklist.extend(block)
                 dims.update({route: out_dim})
                 self.operators.add_module(str(route), nn.Sequential(*blocklist))
-
-
             else:
                 raise ValueError(f'Unknown route shape: {route}')
             #
@@ -291,30 +291,66 @@ class NeuralNetwork(nn.Module):
         raise NotImplementedError
 
 
+# def test_cnn_lin_to_lin():
+#     structure = \
+#         {   
+#             0:
+#                 [
+#                 ('convolutional', {'out': 45,"kernel_size": [6, 6]}),
+#                 ('relu', None),
+#                 ('convolutional', {"kernel_size": [6, 6]}),
+#                 ('relu', None),
+#                 ],
+
+#             1:
+#                 [
+#                 ('linear', {'out': 512}),
+#                 ('relu', None),
+#                 ('linear', {'out': 256}),
+#                 ('relu', None)
+#                 ],
+#             (0, 1):
+#                 [
+#                 ('linear', {'out': 64}),
+#                 ('relu', None)
+#                 ]
+#         }
+#     in_dimension = {0: (1, 29, 113),
+#                     1: 7}
+#     neuraln = NeuralNetwork(in_dim=in_dimension,
+#                             network_structure=structure)
+
+#     neuraln.plot()
+#     return neuraln
+
+# test_cnn_lin_to_lin()
+
+
 if __name__ == '__main__':
     def test_cnn_lin_to_lin():
         structure = \
-            {0:
-            [
-                         ['convolutional', {'out': 45,"kernel_size": [6, 6]}],
-                         ['relu', None],
-                         ['convolutional', {"kernel_size": [6, 6]}],
-                         ['relu', None],
-            ],
-
-            1:
-                     [
-                     ['linear', {'out': 512}],
-                     ['relu', None],
-                     ['linear', {'out': 256}],
-                     ['relu', None]
-                     ],
-            [0, 1]:
+            {   
+                0:
                     [
-                     ['linear', {'out': 64}],
-                     ['relu', None]
+                    ('convolutional', {'out': 45,"kernel_size": [6, 6]}),
+                    ('relu', None),
+                    ('convolutional', {"kernel_size": [6, 6]}),
+                    ('relu', None),
+                    ],
+
+                1:
+                    [
+                    ('linear', {'out': 512}),
+                    ('relu', None),
+                    ('linear', {'out': 256}),
+                    ('relu', None)
+                    ],
+                (0, 1):
+                    [
+                    ('linear', {'out': 64}),
+                    ('relu', None)
                     ]
-        }
+            }
         in_dimension = {0: (1, 29, 113),
                         1: 7}
         neuraln = NeuralNetwork(in_dim=in_dimension,
@@ -363,3 +399,4 @@ if __name__ == '__main__':
     # test_lin()
     # test_cnn_lin()
     test_cnn_lin_to_lin()
+# %%

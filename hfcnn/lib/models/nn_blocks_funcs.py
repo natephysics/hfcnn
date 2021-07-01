@@ -158,10 +158,11 @@ class ConvLayer2D(nn.Module):
 
 
 class MergeLayer(nn.Module):
-    def __init__(self, in_routes: list):
+    def __init__(self, in_routes: list, device):
         assert isinstance(in_routes, list), f'{in_routes} key is route to be merged and value is dim'
         super().__init__()
         self.out_dim = None
+        self.device = device
         self._parse_ins(in_routes)
         # parse type of in_routes and check compatibility
         # (cnn->h1=h2,w1=w2, sum(channels); linear+cnn->Flatten; linear->sum(ins))
@@ -173,7 +174,7 @@ class MergeLayer(nn.Module):
             return x.squeeze(0)
 
     def forward(self, x: list):
-        ret = torch.Tensor([])
+        ret = torch.FloatTensor([]).to(self.device)
 
         for v in x:
             insi = self.op(v)

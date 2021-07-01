@@ -7,7 +7,7 @@ def export_nn_structure(path, nn_structure):
         json_string = json.dumps(
             nn_structure, 
             default=lambda o: o.__dict__, 
-            sort_keys=True, 
+            # sort_keys=True, 
             indent=2,
             )
         file.write(json_string)
