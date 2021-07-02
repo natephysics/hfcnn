@@ -1,7 +1,7 @@
 """Tests for filters.py."""
 import unittest
 import numpy as np
-from hfcnn.lib import files, network_configuration
+from hfcnn import files, network_configuration
 from numpy.testing._private.utils import assert_equal
 
 class TestGenerateConfigClass(unittest.TestCase):

@@ -3,8 +3,8 @@
 """Tests for filters.py."""
 import unittest
 import numpy as np
-from hfcnn.lib import files, filters
-from hfcnn.lib.dataset import HeatLoadDataset
+from hfcnn import files, filters
+from hfcnn.dataset import HeatLoadDataset
 from numpy.testing._private.utils import assert_equal
 
 

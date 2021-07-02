@@ -19,7 +19,7 @@ import torch
 import torch.nn as nn
 import torchinfo
 
-from hfcnn.lib.models.nn_blocks_funcs import \
+from hfcnn.models.nn_blocks_funcs import \
     LinearLayer, ConvLayer2D, MergeLayer, SplitLayer, \
     MaxPool, AvgPool
 

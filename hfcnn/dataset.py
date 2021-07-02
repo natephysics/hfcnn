@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset, DataLoader
 from torch import from_numpy, sqrt
 import pandas as pd  # needed for the df format
-from hfcnn.lib import files
+from hfcnn import files
 from numpy import integer, issubdtype
 import os
 
@@ -207,19 +207,21 @@ class HeatLoadDataset(Dataset):
         for batch in temploader:
             total_sum += batch["image"].sum()
         self.mean = total_sum / num_of_pixels
+        self.mean = self.mean.item()
 
         # solve for std
         sum_of_squared_error = 0
         for batch in temploader:
             sum_of_squared_error += ((batch["image"] - self.mean).pow(2)).sum()
         self.std = sqrt(sum_of_squared_error / num_of_pixels)
+        self.std = self.std.item()
 
         return self.mean, self.std
 
-def main():
-    raw_data = HeatLoadDataset('data/raw/test_df.hkl', 'data/raw/')
-    print('huh?')
+# def main():
+#     raw_data = HeatLoadDataset('data/raw/test_df.hkl', 'data/raw/')
+#     print('huh?')
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

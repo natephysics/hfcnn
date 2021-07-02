@@ -1,21 +1,17 @@
 import unittest
 import numpy as np
 from numpy.testing._private.utils import assert_equal
-from hfcnn.lib.dataset import HeatLoadDataset
-from hfcnn.lib import files, filters
+from hfcnn.dataset import HeatLoadDataset
+from hfcnn import files, filters
 
-class TestDataSetClass(unittest.TestCase):
+class TestDataSetClass_Good(unittest.TestCase):
     """Tests for data set classes."""
     def setUp(self):
         # test dataframe
         self.df = 'tests/resources/test_df.hkl'
-
-        # actual heat load data
-        self.data_good = files.import_file_from_local_cache('tests/resources/good.hkl').clip(min=0)
-        self.data_bad = files.import_file_from_local_cache('tests/resources/bad.hkl').clip(min=0)
+        self.data = files.import_file_from_local_cache('tests/resources/good.hkl').clip(min=0)
         self.PC1 = np.array([8698.])
-        self.index_bad = 0
-        self.index_good = 1
+        self.index = 1
 
     def test_HeatLoadDataset(self):
 
@@ -24,23 +20,19 @@ class TestDataSetClass(unittest.TestCase):
         dataset_file = HeatLoadDataset(self.df, 'tests')
 
         # Check __len__ method  
-        assert_equal(dataset_file.__len__(), 2)
+        self.assertEqual(dataset_file.__len__(), 2)
 
         # check __getitem__ method
-        good = dataset_file.__getitem__(self.index_good)
-        bad = dataset_file.__getitem__(self.index_bad)
-        assert_equal(good['image'], self.data_good)
-        assert_equal(good['label'], self.PC1)
-        assert_equal(bad['image'], self.data_bad)
-        assert_equal(bad['label'], self.PC1)
+        item = dataset_file.__getitem__(self.index)
+        self.assertSequenceEqual(item['image'].numpy().tolist(), self.data.tolist())
+        self.assertEqual(item['label'].numpy(), self.PC1)
 
         # check apply method
-        dataset_good = dataset_file.apply(
+        dataset = dataset_file.apply(
             filters.return_filter(*["data_selection", dataset_file.img_dir])
             )
 
-        assert_equal(dataset_good.__len__(), 1)
-
+        self.assertEqual(dataset.__len__(), 1)
 
         # Check split_by_program_num method
         prog_num_list1 = ['20180829.36']
@@ -49,12 +41,27 @@ class TestDataSetClass(unittest.TestCase):
         len1 = dataset_file.split_by_program_num(prog_num_list1).__len__()
         len2 = dataset_file.split_by_program_num(prog_num_list2).__len__()
 
-        assert_equal(len1, 1)
-        assert_equal(len2, 2)
+        self.assertEqual(len1, 1)
+        self.assertEqual(len2, 2)
 
-        # check normalize 
+class TestDataSetClass_Bad(TestDataSetClass_Good):
+    """Tests for data set classes."""
+    def setUp(self):
+        self.df = 'tests/resources/test_df.hkl'
+        self.data = files.import_file_from_local_cache('tests/resources/bad.hkl').clip(min=0)
+        self.index = 0
+        self.PC1 = np.array([8698.])
+
+
+class TestDataSetClass_norm(unittest.TestCase):
+    """Tests for normíng data"""
+    def test_norm(self):
+        # test dataframe
+        self.df = 'tests/resources/test_df.hkl'
+        dataset_file = HeatLoadDataset(self.df, 'tests')
+        
         x, y = dataset_file.normalize()
-        assert_equal(x.item(), 27289.97265625)
+        self.assertEqual(x, 27289.97265625)
 
 
 
