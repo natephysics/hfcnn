@@ -11,6 +11,13 @@ Features
 
 The following features should be highlighted:
 
-Structure:
---------
+Usage:
+------
+
+Data prep:
+
+.. code-block:: console
+
+    $ python scripts/preprocessing_data.py --training_config_path 
+
 
