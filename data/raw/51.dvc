@@ -1,3 +1,5 @@
 outs:
 - md5: 881d1e33f3369ffb869e98a0d6682166.dir
-  path: .
+  size: 47878771264
+  nfiles: 28231
+  path: '51'
