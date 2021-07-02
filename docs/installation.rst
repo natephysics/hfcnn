@@ -22,6 +22,11 @@ you through the process.
 .. _pip: https://pip.pypa.io
 .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 
+Data version control
+--------------------
+
+This project uses dvc with the webdav backend.
+Please ask the owner to share the config.local file under the .dvc folder with you.
 
 From sources
 ------------
