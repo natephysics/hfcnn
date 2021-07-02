@@ -1,11 +1,11 @@
-# tools for handleing raw files. 
+# tools for handleing raw files.
 import os
 import hickle as hkl
 import pandas as pd
 
 def check_if_file_exists(filename, port=False, cache_folder_path='./data'):
     """Checks to see if the hickle binary for an image at a given timestamp is already cached to disk.
-    
+
     Parameters
     ----------
     filename : string with the unix absolute timestamp
@@ -16,9 +16,9 @@ def check_if_file_exists(filename, port=False, cache_folder_path='./data'):
 
     Returns
     -------
-    True if the file exists in the provided folder. False otherwise. 
+    True if the file exists in the provided folder. False otherwise.
     """
-    # mode 
+    # mode
     mode = 0o666
 
     # construct the file path
@@ -30,7 +30,7 @@ def check_if_file_exists(filename, port=False, cache_folder_path='./data'):
             os.mkdir(port_dir, mode)
     else:
         file_path = os.path.join(cache_folder_path, filename)
-  
+
     # check to see if the file exists in that directory
     if os.path.isfile(file_path):
         return True
@@ -40,7 +40,7 @@ def check_if_file_exists(filename, port=False, cache_folder_path='./data'):
 
 def export_data_to_local_cache(data, path: str):
     """Exports data to the local drive cache in the hlk format.
-    
+
     Parameters
     ----------
     data : string with the label of the data
@@ -55,11 +55,11 @@ def generate_file_path(timestamp: int, port: int, directory: str = './data'):
     """Gerenates a string with the correct file path.
     """
     return os.path.join(directory, str(port), str(timestamp) + '.hkl')
-    
+
 
 def import_file_from_local_cache(file_path):
     """Imports the file from the local drive cache.
-    
+
     Parameters
     ----------
     file_path : string with the file path
@@ -75,7 +75,7 @@ def export_and_merge_data_frame(data_frame, path='./data/df.hkl', return_merged=
     """Merges the data_frame into the local cached version of the data frame.
     Compares each timestamp and does a sorted merge of the dataframes, replacing
     the dataframe on disk with the merged dataframe.
-    
+
     Parameters
     ----------
     data_frame : pandas dataframe created by extract_heat_load_by_time function.
@@ -102,9 +102,9 @@ def export_and_merge_data_frame(data_frame, path='./data/df.hkl', return_merged=
 
         # export df to disk
         export_data_to_local_cache(temp_df, path)
-        
+
         print('Export Successful')
-    
+
     #if not, just use the existing one
     else:
         # sort df
@@ -117,5 +117,5 @@ def export_and_merge_data_frame(data_frame, path='./data/df.hkl', return_merged=
 
     if return_merged:
         return temp_df
-    else: 
-        return 
+    else:
+        return
