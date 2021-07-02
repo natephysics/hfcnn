@@ -18,6 +18,6 @@ Data prep:
 
 .. code-block:: console
 
-    $ python scripts/preprocessing_data.py --training_config_path 
+    $ python scripts/preprossing_data.py --training_config_path tests/resources/preprossing_data.yaml
 
 
