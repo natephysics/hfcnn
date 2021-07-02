@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["-training_config_path","./tests/resources/preprossing_data.yaml"]
+            "args": ["--training_config_path","./tests/resources/preprossing_data.yaml"]
         }
     ]
 }
