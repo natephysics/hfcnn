@@ -36,8 +36,8 @@ class HeatLoadDataset(Dataset):
         self,
         df: str or pd.DataFrame,
         img_dir: str,
-        mean: float = 0,
-        std: float = 1,
+        mean: float = None,
+        std: float = None,
         drop_neg_values: bool = True,
     ):
         """Creates at HeatloadDatatset object from a dataframe or link to a dataframe
@@ -53,11 +53,18 @@ class HeatLoadDataset(Dataset):
         """
         if type(df) == str:
             data = files.import_file_from_local_cache(df)
-            self.img_labels = data.pop("img_labels")
-            self.img_labels = self.img_labels.reset_index(drop=True)
-            self.mean = data.pop("mean")
-            self.std = data.pop("std")
-            self.drop_neg_values = data.pop("drop_neg_values")
+            if isinstance(data, dict):
+                self.img_labels = data.pop("img_labels")
+                self.img_labels = self.img_labels.reset_index(drop=True)
+                self.mean = data.pop("mean")
+                self.std = data.pop("std")
+                self.drop_neg_values = data.pop("drop_neg_values")
+            elif isinstance(data, pd.DataFrame):
+                self.img_labels = data
+                self.img_labels = self.img_labels.reset_index(drop=True)
+                self.mean = mean
+                self.std = std
+                self.drop_neg_values = drop_neg_values
         elif type(df) == pd.DataFrame:
             self.img_labels = df.copy()
             self.img_labels = self.img_labels.reset_index(drop=True)
@@ -208,3 +215,11 @@ class HeatLoadDataset(Dataset):
         self.std = sqrt(sum_of_squared_error / num_of_pixels)
 
         return self.mean, self.std
+
+def main():
+    raw_data = HeatLoadDataset('data/raw/test_df.hkl', 'data/raw/')
+    print('huh?')
+
+
+if __name__ == "__main__":
+    main()
