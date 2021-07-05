@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
-from hfcnn.lib import files
+from hfcnn import files
 import random
 
 

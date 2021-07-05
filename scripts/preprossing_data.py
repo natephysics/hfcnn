@@ -1,6 +1,6 @@
 # %%
 import argparse
-from hfcnn.lib import network_configuration, dataset, filters, yaml_tools
+from hfcnn import network_configuration, dataset, filters, yaml_tools
 import logging
 
 logging.basicConfig(
@@ -23,9 +23,7 @@ def main():
     config = network_configuration.GenerateConfig(training_config_path)
 
     #### Step 1. Import the raw the data ####
-    raw_data = dataset.HeatLoadDataset(
-        config.get("raw_df_path"), config.get("raw_data_path")
-    )
+    raw_data = dataset.HeatLoadDataset(config.get("raw_df_path"), config.get("raw_data_path"))
     logging.info(f"Imported {raw_data.__len__()} images from the raw data set")
     print(f"Imported {raw_data.__len__()} images from the raw data set")
 

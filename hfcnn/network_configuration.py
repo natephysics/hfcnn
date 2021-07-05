@@ -1,5 +1,5 @@
 from hickle.hickle_legacy import NoneType
-from hfcnn.lib import yaml_tools
+from hfcnn import yaml_tools
 
 class GenerateConfig():
     def __init__(self, path_to_config: str):
