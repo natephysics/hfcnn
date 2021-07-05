@@ -1,0 +1,114 @@
+26-May-21 18:34:19 PM 909- 20760 -INFO - Imported 100 images from the raw data set
+26-May-21 18:34:19 PM 910- 20760 -INFO - Applying data_selection filters
+26-May-21 18:34:20 PM 243- 20760 -INFO - 91 images remain after applying data_selection filter
+26-May-21 18:34:20 PM 246- 20760 -INFO - Training dataset generated with 77 samples.
+26-May-21 18:34:20 PM 247- 20760 -INFO - Test dataset generated with 4 samples.
+26-May-21 18:34:20 PM 248- 20760 -INFO - Validation dataset generated with 10 samples.
+26-May-21 18:35:23 PM 975- 20760 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+26-May-21 22:26:35 PM 954- 20888 -INFO - Imported 100 images from the raw data set
+26-May-21 22:26:35 PM 955- 20888 -INFO - Applying data_selection filters
+26-May-21 22:26:36 PM 435- 20888 -INFO - 91 images remain after applying data_selection filter
+26-May-21 22:26:36 PM 439- 20888 -INFO - Training dataset generated with 77 samples.
+26-May-21 22:26:36 PM 441- 20888 -INFO - Test dataset generated with 4 samples.
+26-May-21 22:26:36 PM 443- 20888 -INFO - Validation dataset generated with 10 samples.
+26-May-21 22:27:41 PM 189- 20888 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+26-May-21 22:43:25 PM 997- 11808 -INFO - Imported 100 images from the raw data set
+26-May-21 22:43:25 PM 998- 11808 -INFO - Applying data_selection filters
+26-May-21 22:43:26 PM 472- 11808 -INFO - 91 images remain after applying data_selection filter
+26-May-21 22:43:26 PM 475- 11808 -INFO - Training dataset generated with 77 samples.
+26-May-21 22:43:26 PM 477- 11808 -INFO - Test dataset generated with 4 samples.
+26-May-21 22:43:26 PM 479- 11808 -INFO - Validation dataset generated with 10 samples.
+26-May-21 22:44:31 PM 254- 11808 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+26-May-21 22:44:31 PM 270- 11808 -INFO - Datasets exported to disk.
+02-Jul-21 10:40:48 AM 439- 11006 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 10:41:58 AM 471- 12630 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 11:20:01 AM 53- 678 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 11:20:01 AM 58- 678 -INFO - Imported 100 images from the raw data set
+02-Jul-21 11:20:01 AM 58- 678 -INFO - Applying data_selection filters
+02-Jul-21 11:20:03 AM 832- 678 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 11:20:03 AM 835- 678 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 11:20:03 AM 835- 678 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 11:20:03 AM 836- 678 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 11:20:05 AM 290- 678 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 11:20:05 AM 292- 678 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 11:23:36 AM 963- 6063 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 11:23:36 AM 967- 6063 -INFO - Imported 100 images from the raw data set
+02-Jul-21 11:23:36 AM 967- 6063 -INFO - Applying data_selection filters
+02-Jul-21 11:23:38 AM 454- 6063 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 11:23:38 AM 459- 6063 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 11:23:38 AM 460- 6063 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 11:23:38 AM 461- 6063 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 11:23:39 AM 839- 6063 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 11:23:39 AM 844- 6063 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 11:25:49 AM 392- 9317 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 11:25:49 AM 396- 9317 -INFO - Imported 100 images from the raw data set
+02-Jul-21 11:25:49 AM 396- 9317 -INFO - Applying data_selection filters
+02-Jul-21 11:25:51 AM 40- 9317 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 11:25:51 AM 41- 9317 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 11:25:51 AM 42- 9317 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 11:25:51 AM 43- 9317 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 11:25:52 AM 387- 9317 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 11:27:10 AM 612- 9317 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 11:27:18 AM 112- 11430 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 11:27:18 AM 115- 11430 -INFO - Imported 100 images from the raw data set
+02-Jul-21 11:27:18 AM 115- 11430 -INFO - Applying data_selection filters
+02-Jul-21 11:27:19 AM 663- 11430 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 11:27:19 AM 665- 11430 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 11:27:19 AM 665- 11430 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 11:27:19 AM 667- 11430 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 11:27:21 AM 108- 11430 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 11:28:35 AM 947- 11430 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 12:10:41 PM 611- 7185 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 12:10:41 PM 616- 7185 -INFO - Imported 100 images from the raw data set
+02-Jul-21 12:10:41 PM 616- 7185 -INFO - Applying data_selection filters
+02-Jul-21 12:10:43 PM 682- 7185 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 12:10:43 PM 684- 7185 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 12:10:43 PM 684- 7185 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 12:10:43 PM 685- 7185 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 12:10:45 PM 102- 7185 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 12:10:46 PM 477- 7185 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 12:10:51 PM 693- 7495 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 12:10:51 PM 696- 7495 -INFO - Imported 100 images from the raw data set
+02-Jul-21 12:10:51 PM 696- 7495 -INFO - Applying data_selection filters
+02-Jul-21 12:10:53 PM 310- 7495 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 12:10:53 PM 312- 7495 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 12:10:53 PM 312- 7495 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 12:10:53 PM 313- 7495 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 12:10:54 PM 615- 7495 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 12:11:42 PM 980- 7495 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 12:18:32 PM 993- 18356 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 12:18:32 PM 996- 18356 -INFO - Imported 100 images from the raw data set
+02-Jul-21 12:18:32 PM 996- 18356 -INFO - Applying data_selection filters
+02-Jul-21 12:18:34 PM 596- 18356 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 12:18:34 PM 597- 18356 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 12:18:34 PM 598- 18356 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 12:18:34 PM 598- 18356 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 12:18:35 PM 916- 18356 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 12:18:36 PM 906- 18356 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 12:19:58 PM 82- 20322 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 12:19:58 PM 85- 20322 -INFO - Imported 100 images from the raw data set
+02-Jul-21 12:19:58 PM 85- 20322 -INFO - Applying data_selection filters
+02-Jul-21 12:19:59 PM 683- 20322 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 12:19:59 PM 684- 20322 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 12:19:59 PM 685- 20322 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 12:19:59 PM 685- 20322 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 12:20:01 PM 20- 20322 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 12:20:03 PM 964- 20322 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 12:20:38 PM 729- 21280 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 12:20:38 PM 732- 21280 -INFO - Imported 100 images from the raw data set
+02-Jul-21 12:20:38 PM 732- 21280 -INFO - Applying data_selection filters
+02-Jul-21 12:20:40 PM 308- 21280 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 12:20:40 PM 309- 21280 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 12:20:40 PM 310- 21280 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 12:20:40 PM 311- 21280 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 12:20:41 PM 648- 21280 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 12:21:00 PM 896- 21280 -DEBUG - Creating converter from 5 to 3
+02-Jul-21 13:37:58 PM 917- 22384 -DEBUG - Creating converter from 3 to 5
+02-Jul-21 13:37:58 PM 923- 22384 -INFO - Imported 100 images from the raw data set
+02-Jul-21 13:37:58 PM 923- 22384 -INFO - Applying data_selection filters
+02-Jul-21 13:38:00 PM 868- 22384 -INFO - 91 images remain after applying data_selection filter
+02-Jul-21 13:38:00 PM 870- 22384 -INFO - Training dataset generated with 77 samples.
+02-Jul-21 13:38:00 PM 870- 22384 -INFO - Test dataset generated with 4 samples.
+02-Jul-21 13:38:00 PM 871- 22384 -INFO - Validation dataset generated with 10 samples.
+02-Jul-21 13:38:02 PM 157- 22384 -INFO - Training set standardization parameters. mean: 57290.62890625, std: 162169.09375.
+02-Jul-21 13:38:02 PM 163- 22384 -DEBUG - Creating converter from 5 to 3

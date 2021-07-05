@@ -1,9 +1,9 @@
-# %%
-# tools for handleing raw files. 
+# tools for handleing raw files.
 import os
 import pickle as pkl
 import pandas as pd
 import logging
+
 
 logging.basicConfig(
     filename="./logs/preprossing_data.txt",
@@ -15,7 +15,7 @@ logging.basicConfig(
 
 def export_data_to_local_cache(data, path: str):
     """Exports data to the local drive cache in the plk format.
-    
+
     Parameters
     ----------
     data : string with the label of the data
@@ -34,11 +34,10 @@ def generate_file_path(timestamp: int, port: int, directory: str = './data'):
     """Gerenates a string with the correct file path.
     """
     return os.path.join(directory, str(port), str(timestamp) + '.pkl')
-    
 
 def import_file_from_local_cache(file_path):
     """Imports the file from the local drive cache.
-    
+
     Parameters
     ----------
     file_path : string with the file path
@@ -56,7 +55,7 @@ def export_and_merge_data_frame(data_frame, path='./data/df.pkl', return_merged=
     """Merges the data_frame into the local cached version of the data frame.
     Compares each timestamp and does a sorted merge of the dataframes, replacing
     the dataframe on disk with the merged dataframe.
-    
+
     Parameters
     ----------
     data_frame : pandas dataframe created by extract_heat_load_by_time function.
@@ -83,10 +82,10 @@ def export_and_merge_data_frame(data_frame, path='./data/df.pkl', return_merged=
 
         # export df to disk
         export_data_to_local_cache(temp_df, path)
-        
+
         print('Export Successful')
-    
-    #if not, just use the existing one
+
+    #  if not, just use the existing one
     else:
         # sort df
         temp_df = data_frame.sort_values(by='times', ignore_index=True)
@@ -98,28 +97,25 @@ def export_and_merge_data_frame(data_frame, path='./data/df.pkl', return_merged=
 
     if return_merged:
         return temp_df
-    else: 
-        return 
-
-def hkl_to_pkl(directory):
-    counter = 0
-    for file in os.listdir(directory):
-        filename, file_extension = os.path.splitext(file)
-        if file_extension == '.kl':
-            path = os.path.join(directory, file)
-            new_path = os.path.join(directory, filename + '.pkl')
-            if not os.path.isfile(new_path):
-                try:
-                    image = import_file_from_local_cache(path)
-                except RuntimeError:
-                    logging.error(f"RuntimeError: unable to import {file}.")
-                finally:
-                    with open(new_path, 'wb') as handle:
-                        pkl.dump(image, handle)
-                counter += 1
-                if counter % 100 == 0:
-                    print(f'{counter} files have been converted.')
+    else:
+        return
 
 
-
-# %%
+# def hkl_to_pkl(directory):
+#     counter = 0
+#     for file in os.listdir(directory):
+#         filename, file_extension = os.path.splitext(file)
+#         if file_extension == '.kl':
+#             path = os.path.join(directory, file)
+#             new_path = os.path.join(directory, filename + '.pkl')
+#             if not os.path.isfile(new_path):
+#                 try:
+#                     image = import_file_from_local_cache(path)
+#                 except RuntimeError:
+#                     logging.error(f"RuntimeError: unable to import {file}.")
+#                 finally:
+#                     with open(new_path, 'wb') as handle:
+#                         pkl.dump(image, handle)
+#                 counter += 1
+#                 if counter % 100 == 0:
+#                     print(f'{counter} files have been converted.')
