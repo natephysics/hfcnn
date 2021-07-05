@@ -78,9 +78,9 @@ def main():
 
     #### Step 5. Export the data sets and standardization parameters. ####
     training_data.to_file(config.get("train_df_path"))
-    test_data.to_file("test_df_path")
+    test_data.to_file(config.get("test_df_path"))
     if len(program_num_split) == 3:
-        validation_data.to_file("validation_df_path")
+        validation_data.to_file(config.get("validation_df_path"))
     logging.info(f"Datasets exported to disk.")
 
 

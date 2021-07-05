@@ -6,7 +6,7 @@ import pandas as pd
 import logging
 
 logging.basicConfig(
-    filename="../logs/preprossing_data.txt",
+    filename="./logs/preprossing_data.txt",
     filemode="a",
     format="%(asctime)s %(msecs)d- %(process)d -%(levelname)s - %(message)s",
     datefmt="%d-%b-%y %H:%M:%S %p",
