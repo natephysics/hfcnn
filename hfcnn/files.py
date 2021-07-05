@@ -1,45 +1,20 @@
+# %%
 # tools for handleing raw files. 
 import os
-import hickle as hkl
+import pickle as pkl
 import pandas as pd
+import logging
 
-def check_if_file_exists(filename, port=False, cache_folder_path='./data'):
-    """Checks to see if the hickle binary for an image at a given timestamp is already cached to disk.
-    
-    Parameters
-    ----------
-    filename : string with the unix absolute timestamp
-
-    port: int with the number of the port
-
-    cache_folder_path : string with folder path
-
-    Returns
-    -------
-    True if the file exists in the provided folder. False otherwise. 
-    """
-    # mode 
-    mode = 0o666
-
-    # construct the file path
-    if port:
-        port_dir = os.path.join(cache_folder_path, port)
-        file_path = os.path.join(port_dir, filename)
-        # check to see if the port directory exists and make one if not
-        if not os.path.isdir(port_dir):
-            os.mkdir(port_dir, mode)
-    else:
-        file_path = os.path.join(cache_folder_path, filename)
-  
-    # check to see if the file exists in that directory
-    if os.path.isfile(file_path):
-        return True
-    else:
-        return False
-
+logging.basicConfig(
+    filename="../logs/preprossing_data.txt",
+    filemode="a",
+    format="%(asctime)s %(msecs)d- %(process)d -%(levelname)s - %(message)s",
+    datefmt="%d-%b-%y %H:%M:%S %p",
+    level=logging.DEBUG,
+)
 
 def export_data_to_local_cache(data, path: str):
-    """Exports data to the local drive cache in the hlk format.
+    """Exports data to the local drive cache in the plk format.
     
     Parameters
     ----------
@@ -48,13 +23,17 @@ def export_data_to_local_cache(data, path: str):
     path : string with path
     """
     # export the data
-    hkl.dump(data, path)
+    if isinstance(data, pd.DataFrame):
+        data.to_pickle(path)
+    else:
+        with open(path, 'wb') as handle:
+            pkl.dump(data, handle)
     return
 
 def generate_file_path(timestamp: int, port: int, directory: str = './data'):
     """Gerenates a string with the correct file path.
     """
-    return os.path.join(directory, str(port), str(timestamp) + '.hkl')
+    return os.path.join(directory, str(port), str(timestamp) + '.pkl')
     
 
 def import_file_from_local_cache(file_path):
@@ -68,10 +47,12 @@ def import_file_from_local_cache(file_path):
     -------
     file from cache
     """
-    return hkl.load(file_path)
+    with open(file_path, 'rb') as handle:
+        data = pkl.load(handle)
+    return data
 
 
-def export_and_merge_data_frame(data_frame, path='./data/df.hkl', return_merged=False):
+def export_and_merge_data_frame(data_frame, path='./data/df.pkl', return_merged=False):
     """Merges the data_frame into the local cached version of the data frame.
     Compares each timestamp and does a sorted merge of the dataframes, replacing
     the dataframe on disk with the merged dataframe.
@@ -119,3 +100,26 @@ def export_and_merge_data_frame(data_frame, path='./data/df.hkl', return_merged=
         return temp_df
     else: 
         return 
+
+def hkl_to_pkl(directory):
+    counter = 0
+    for file in os.listdir(directory):
+        filename, file_extension = os.path.splitext(file)
+        if file_extension == '.kl':
+            path = os.path.join(directory, file)
+            new_path = os.path.join(directory, filename + '.pkl')
+            if not os.path.isfile(new_path):
+                try:
+                    image = import_file_from_local_cache(path)
+                except RuntimeError:
+                    logging.error(f"RuntimeError: unable to import {file}.")
+                finally:
+                    with open(new_path, 'wb') as handle:
+                        pkl.dump(image, handle)
+                counter += 1
+                if counter % 100 == 0:
+                    print(f'{counter} files have been converted.')
+
+
+
+# %%

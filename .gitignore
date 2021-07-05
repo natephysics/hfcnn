@@ -1,3 +1,7 @@
+# DVC related ignores
+data/raw/51
+*.pkl
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -9,6 +13,8 @@ __pycache__/
 # Data files
 data/51/*.hkl
 data/*.hkl
+data/51/*.pkl
+data/*.pkl
 
 # Distribution / packaging
 .Python
@@ -26,9 +32,6 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-
-# DVC (data realated)
-*.hkl
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
