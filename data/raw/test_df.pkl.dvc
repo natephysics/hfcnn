@@ -1,0 +1,4 @@
+outs:
+- md5: 8f42f20390c9d0297e293efa6b1fcf75
+  size: 12077
+  path: test_df.pkl
