@@ -324,7 +324,7 @@ class NeuralNetwork(nn.Module):
 #     return neuraln
 
 # test_cnn_lin_to_lin()
-
+    
 
 if __name__ == '__main__':
     def test_cnn_lin_to_lin():

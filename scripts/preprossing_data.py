@@ -19,6 +19,8 @@ def main():
     parser.add_argument("--training_config_path", help="path to the training config.")
     training_config_path = parser.parse_args().training_config_path
 
+    
+
     # generate the configuration
     config = network_configuration.GenerateConfig(training_config_path)
 

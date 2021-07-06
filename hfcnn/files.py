@@ -2,16 +2,6 @@
 import os
 import pickle as pkl
 import pandas as pd
-import logging
-
-
-logging.basicConfig(
-    filename="./logs/preprossing_data.txt",
-    filemode="a",
-    format="%(asctime)s %(msecs)d- %(process)d -%(levelname)s - %(message)s",
-    datefmt="%d-%b-%y %H:%M:%S %p",
-    level=logging.DEBUG,
-)
 
 def export_data_to_local_cache(data, path: str):
     """Exports data to the local drive cache in the plk format.
@@ -99,23 +89,3 @@ def export_and_merge_data_frame(data_frame, path='./data/df.pkl', return_merged=
         return temp_df
     else:
         return
-
-
-# def hkl_to_pkl(directory):
-#     counter = 0
-#     for file in os.listdir(directory):
-#         filename, file_extension = os.path.splitext(file)
-#         if file_extension == '.kl':
-#             path = os.path.join(directory, file)
-#             new_path = os.path.join(directory, filename + '.pkl')
-#             if not os.path.isfile(new_path):
-#                 try:
-#                     image = import_file_from_local_cache(path)
-#                 except RuntimeError:
-#                     logging.error(f"RuntimeError: unable to import {file}.")
-#                 finally:
-#                     with open(new_path, 'wb') as handle:
-#                         pkl.dump(image, handle)
-#                 counter += 1
-#                 if counter % 100 == 0:
-#                     print(f'{counter} files have been converted.')

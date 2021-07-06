@@ -7,6 +7,7 @@ from hfcnn import files, filters
 from hfcnn.dataset import HeatLoadDataset
 from numpy.testing._private.utils import assert_equal
 
+## TODO fix test structures to reflect test_dataset
 
 class TestFilters(unittest.TestCase):
     """Tests for lib/filters."""
