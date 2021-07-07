@@ -4,22 +4,18 @@
 # %%
 import os
 import pathlib
-import typing
 import configparser
 import re
-import numpy as np
 import rna
-import hfcnn
+# Cache of already loaded .cfg files
+CONFIG_CACHE = {}  
 
+# This is a memory on options set by the user with set_option
+# These options override the options in CONFIG_CACHE
+DYNAMIC_OPTIONS = {}  
 
+REGEX = r"[^${\}]+(?=})"
 
-CONFIG_CACHE = {}  # Cache of already loaded .cfg files
-DYNAMIC_OPTIONS = {}  # This is a memory on options set by the user with set_option
-
-
-def get_project_root() -> pathlib.Path:
-    """Returns project root directory"""
-    return
 
 def get_config(config_path) -> configparser.ConfigParser:
     """
@@ -41,17 +37,17 @@ VARIABLES = dict(
 )
 VARIABLES['PROJECT_ROOT'] = os.path.dirname(VARIABLES['HFCNN_PACKAGE'])
 
-REGEX = r"[^${\}]+(?=})"
 
 def get_option(section: str, option: str, fallback=False):
     """
     Retrieve option from section.
     """
-    ### Ask about this ###
+    # First check DYNAMIC_OPTIONS for option, if found return (ignoring .cfg file)
     if section in DYNAMIC_OPTIONS and option in DYNAMIC_OPTIONS[section]:
         # set_option was active
         return DYNAMIC_OPTIONS[section][option]
-
+    
+    # Sets the order of the paths to check for a config file
     config_resolve_order = [
         rna.path.resolve(VARIABLES['PROJECT_ROOT'], "config", "config.cfg"),
         rna.path.resolve(VARIABLES['HFCNN_PACKAGE'], "default.cfg"),
@@ -75,6 +71,13 @@ def get_option(section: str, option: str, fallback=False):
             val = val.replace("$" + env_var, env_value)
 
         # replace by regex with recursive get_option
+        # example:
+        ## [global]
+        ## data = data/path
+        ##
+        ## [paths]
+        ## raw_data_path = ${global.data}/raw/ 
+        #
         matches = re.finditer(REGEX, val)
         for match in reversed(list(matches)):
             start, end = match.span()
@@ -84,6 +87,15 @@ def get_option(section: str, option: str, fallback=False):
                 + get_option(*match.group().rsplit(".", 1))
                 + val[end + 1 :]
             )
+    # impliments an inheritance between a parent and child class
+    # example:
+    ## [parent]
+    ## att1 = 3
+    ##
+    ## [parent.child]
+    ## att2 = b
+    #
+    # parent.child will have both attributes, parent will only have att1.
     elif val is None and fallback:
         val = get_option(section.rpartition(".")[0], option, fallback=fallback)
 
@@ -91,32 +103,36 @@ def get_option(section: str, option: str, fallback=False):
 
 
 def set_option(section: str, option: str, value: any):
+    """Sets an option in the DYNAMIC_OPTIONS which will override
+    options loaded from .cfg"""
     if section not in DYNAMIC_OPTIONS:
         DYNAMIC_OPTIONS[section] = {}
     DYNAMIC_OPTIONS[section][option] = value
 
 
 def unset_option(section: str, option: str):
+    """Removes an option already set in the DYNAMIC_OPTIONS."""
     del DYNAMIC_OPTIONS[section][option]
 
-def get_mgrid_options(return_type=None):
+def construct_options_dict():
+    """Creates a diction of the options available in the config file.
     """
-    Reads the [mgrid] options and returns base vectors and iter_order (see MGrid or
-    tfields.TensorGrid)
+    # List of paths to parse .cfg file for
+    paths_list = [
+        'raw_data_path', 
+        'raw_df_path', 
+        'processed_data_path', 
+        'test_df_path',
+        'train_df_path',
+        'validation_df_path'
+        ]
+    options = {}
+    # import the paths into the options dictonary
+    for path in paths_list:
+        # grab the option from the .cfg file
+        option = get_option("paths", path)
+        # verify the option is set in the config file
+        if option != None:
+            options[path] = option
 
-    Args:
-        return_type: if not None, cast directly to type
-    """
-    nfp = int(get_option("mgrid", "nfp"))
-    base_vectors = []
-    iter_order = []
-    for var in ["r", "phi", "z"]:
-        xmin = get_option("mgrid." + var, "min")
-        xmin = float(xmin) if xmin != "None" else 0
-        xmax = get_option("mgrid." + var, "max")
-        xmax = float(xmax) if xmax != "None" else 2 * np.pi / nfp
-        num = complex(get_option("mgrid." + var, "num") + "j")
-        base_vectors.append((xmin, xmax, num))
-        iter_order.append(int(get_option("mgrid." + var, "iter")))
-
-    return base_vectors
+    return options
