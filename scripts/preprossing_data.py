@@ -1,39 +1,57 @@
-# %%
 import argparse
-from hfcnn import network_configuration, dataset, filters, yaml_tools
+from hfcnn import dataset, filters, yaml_tools, config
 import logging
 
+# import the options
+options = config.construct_options_dict()
+
 logging.basicConfig(
-    filename="./logs/preprossing_data.txt",
+    filename=options['pp_log_path'],
     filemode="a",
+    force=True,
     format="%(asctime)s %(msecs)d- %(process)d -%(levelname)s - %(message)s",
     datefmt="%d-%b-%y %H:%M:%S %p",
     level=logging.DEBUG,
 )
 
-
 def main():
     # grab the path from the argument
     parser = argparse.ArgumentParser()
-    # TODO add deafault value for stupid users
-    parser.add_argument("--training_config_path", help="path to the training config.")
-    training_config_path = parser.parse_args().training_config_path
-
+    # Test/Train/Validation Split Ratio
+    # For 80/20 Train/Test, just return --train_ratio 80.
+    # The remainder of the data set is assumed to be test.
+    #
+    # For 70/15/15 Train/Test/Validate, return --train_ratio 70, --test_ratio 15
+    # The remainder of the data set is assumed to be validate. 
+    parser.add_argument("--train_ratio", help="the ratio of the data set to dedicate to training", type=int, required=True)
+    parser.add_argument("--test_ratio", help="only specify if plan to train/test/validate split", type=int)
+    parser.add_argument("--filter_list_path", help="Path to yaml containing the filters to be applied")
     
+    train_ratio = parser.parse_args().train_ratio
+    # extract the train/test/validation split
+    train_test_split = [train_ratio/100]
+    if parser.parse_args().test_ratio:
+        train_test_split.append(parser.parse_args().test_ratio/100)
 
-    # generate the configuration
-    config = network_configuration.GenerateConfig(training_config_path)
+    # Import data selection filters 
+    list_of_filters = []
+
+    if parser.parse_args().filter_list_path:
+        filter_list_path = parser.parse_args().filter_list_path
+        list_of_filters = yaml_tools.import_configuration(filter_list_path)
+        if list_of_filters == None:
+            list_of_filters = []
 
     #### Step 1. Import the raw the data ####
-    raw_data = dataset.HeatLoadDataset(config.get("raw_df_path"), config.get("raw_data_path"))
+    raw_data = dataset.HeatLoadDataset(options["raw_df_path"], options["raw_data_path"])
     logging.info(f"Imported {raw_data.__len__()} images from the raw data set")
     print(f"Imported {raw_data.__len__()} images from the raw data set")
 
     #### Step 2. Allpying filter(s) to the data ####
-    if config.num_of_filters() == 0:
+    if len(list_of_filters) == 0:
         logging.info("No filters to apply. Skipping step")
     else:
-        for filter in config.get("filters_to_apply"):
+        for filter in list_of_filters:
             logging.info(f"Applying {filter[0]} filters")
             raw_data = raw_data.apply(filters.return_filter(*filter))
             logging.info(
@@ -49,7 +67,7 @@ def main():
 
     # generate lists of program numbers for each train/test/val split
     program_num_split = filters.split(
-        raw_data.program_nums(), config.get("train_test_split")
+        raw_data.program_nums(), train_test_split
     )
 
     # generate the training data
@@ -79,10 +97,10 @@ def main():
     )
 
     #### Step 5. Export the data sets and standardization parameters. ####
-    training_data.to_file(config.get("train_df_path"))
-    test_data.to_file(config.get("test_df_path"))
+    training_data.to_file(options["train_df_path"])
+    test_data.to_file(options["test_df_path"])
     if len(program_num_split) == 3:
-        validation_data.to_file(config.get("validation_df_path"))
+        validation_data.to_file(options["validation_df_path"])
     logging.info(f"Datasets exported to disk.")
 
 

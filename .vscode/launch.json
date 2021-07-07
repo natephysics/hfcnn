@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--training_config_path","./config/preprossing_data.yaml"]
+            "args": ["--train_ratio", "80","--filter_list_path","./config/ds_filters.yaml"]
         }
     ]
 }

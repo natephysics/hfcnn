@@ -7,6 +7,7 @@ import pathlib
 import configparser
 import re
 import rna
+
 # Cache of already loaded .cfg files
 CONFIG_CACHE = {}  
 
@@ -124,7 +125,10 @@ def construct_options_dict():
         'processed_data_path', 
         'test_df_path',
         'train_df_path',
-        'validation_df_path'
+        'validation_df_path',
+        'pp_log_path',
+        'nc_log_path',
+        'train_log_path'
         ]
     options = {}
     # import the paths into the options dictonary
@@ -136,3 +140,4 @@ def construct_options_dict():
             options[path] = option
 
     return options
+# %%

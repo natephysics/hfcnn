@@ -2,6 +2,10 @@
 data/raw/51
 *.pkl
 
+# user defined config files
+config/config.cfg
+config/ds_filters.yaml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -11,8 +15,6 @@ __pycache__/
 *.so
 
 # Data files
-data/51/*.hkl
-data/*.hkl
 data/51/*.pkl
 data/*.pkl
 
@@ -175,8 +177,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# yaml files
-test.yaml
-
 # log files
 logs/*.txt
+logs/preprossing_data.txt

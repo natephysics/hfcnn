@@ -22,6 +22,4 @@ def export_configuration(config_path: str, network_config: dict):
     """
     yaml = YAML()
     with open(config_path, 'w') as file:
-        yaml.dump(network_config, file)    
-
-
+        yaml.dump(network_config, file)

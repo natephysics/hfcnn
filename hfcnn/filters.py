@@ -160,5 +160,3 @@ def split(prog_num_list: list, ratio_list: list, seed: int=4):
     
     # return the list of list of sublists
     return [prog_num_list[sub_index[i] : sub_index[i+1]] for i in range(len(sub_index) - 1)]
-
-# %%
