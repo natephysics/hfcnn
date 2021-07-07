@@ -1,20 +1,25 @@
 # %%
 ## TODO-2 setup the config.cfg to house values like data location and model location
 from hfcnn.models import model_class
-from hfcnn import network_configuration, dataset, yaml_tools
+from hfcnn import dataset, config
 import torch.optim as optim
 import torch.nn as nn
 import torch
-import argparse
+import logging
+
+# import the options
+options = config.construct_options_dict()
+
+logging.basicConfig(
+    filename=options['train_log_path'],
+    filemode="a",
+    force=True,
+    format="%(asctime)s %(msecs)d- %(process)d -%(levelname)s - %(message)s",
+    datefmt="%d-%b-%y %H:%M:%S %p",
+    level=logging.DEBUG,
+)
 
 def main():
-
-    # grab the path from the argument
-    parser = argparse.ArgumentParser()
-    # TODO add deafault value for stupid users
-    parser.add_argument("--training_config_path", help="path to the training config.")
-    training_config_path = parser.parse_args().training_config_path
-
     device = torch.device("cuda")
 
     # path to the model
