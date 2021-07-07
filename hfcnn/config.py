@@ -128,7 +128,8 @@ def construct_options_dict():
         'validation_df_path',
         'pp_log_path',
         'nc_log_path',
-        'train_log_path'
+        'train_log_path',
+        'model_path'
         ]
     options = {}
     # import the paths into the options dictonary
