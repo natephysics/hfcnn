@@ -1,5 +1,6 @@
 import argparse
 from hfcnn import dataset, filters, yaml_tools, config
+import os
 import logging
 
 # import the options
@@ -101,6 +102,9 @@ def main():
     test_data.to_file(options["test_df_path"])
     if len(program_num_split) == 3:
         validation_data.to_file(options["validation_df_path"])
+    else:
+        if os.path.isfile(options["validation_df_path"]):
+            os.remove(options["validation_df_path"])
     logging.info(f"Datasets exported to disk.")
 
 
