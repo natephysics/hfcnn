@@ -5,7 +5,7 @@ from hfcnn import files
 from numpy import integer, issubdtype
 import os
 
-def make_dict(df: pd.DataFrame, drop_neg_values: bool, mean: float, std: float):
+def make_dict(df: pd.DataFrame, drop_neg_values: bool, mean: float, std: float, transform: bool):
     """Makes a dict from the following parameters.
 
     Args:
@@ -26,6 +26,7 @@ def make_dict(df: pd.DataFrame, drop_neg_values: bool, mean: float, std: float):
         "drop_neg_values": drop_neg_values,
         "mean": mean,
         "std": std,
+        "transform": transform
     }
     return my_dict
 
@@ -62,7 +63,7 @@ class HeatLoadDataset(Dataset):
                 self.drop_neg_values = data.pop("drop_neg_values")
                 self.mean = data.pop("mean") if mean == None else mean
                 self.std = data.pop("std") if std == None else std
-                self.transform = data.pop("std") if transform == None else transform
+                self.transform = data.pop("transform") if transform == None else transform
             elif isinstance(data, pd.DataFrame):
                 self.img_labels = data
                 self.img_labels = self.img_labels.reset_index(drop=True)
