@@ -4,6 +4,7 @@ import pandas as pd  # needed for the df format
 from hfcnn import files
 from numpy import integer, issubdtype
 import os
+import numpy as np
 
 
 def make_dict(df: pd.DataFrame, drop_neg_values: bool, mean: float, std: float):
@@ -39,6 +40,7 @@ class HeatLoadDataset(Dataset):
         mean: float = None,
         std: float = None,
         drop_neg_values: bool = True,
+        transform = None
     ):
         """Creates at HeatloadDatatset object from a dataframe or link to a dataframe
 
@@ -47,6 +49,9 @@ class HeatLoadDataset(Dataset):
             or a directory for the dataframe object and dict stored in .hkl format.
 
             img_dir (str): link to the data directory
+
+            transform: any transformations of the data (applied on get item)
+                Tranonformations are applied prior to standardization. 
 
         Raises:
             TypeError: [description]
@@ -59,18 +64,21 @@ class HeatLoadDataset(Dataset):
                 self.mean = data.pop("mean")
                 self.std = data.pop("std")
                 self.drop_neg_values = data.pop("drop_neg_values")
+                self.transform = data.pop("transform")
             elif isinstance(data, pd.DataFrame):
                 self.img_labels = data
                 self.img_labels = self.img_labels.reset_index(drop=True)
                 self.mean = mean
                 self.std = std
                 self.drop_neg_values = drop_neg_values
+                self.transform = transform
         elif type(df) == pd.DataFrame:
             self.img_labels = df.copy()
             self.img_labels = self.img_labels.reset_index(drop=True)
             self.mean = mean
             self.std = std
             self.drop_neg_values = drop_neg_values
+            self.transform = transform
         else:
             raise TypeError("Input must be a str or df")
 
@@ -93,6 +101,7 @@ class HeatLoadDataset(Dataset):
 
         Args:
             idx (int): the timestamp of the heatload image data OR an index.
+            
             label_names (list, optional): A list containing data from the
             corresponding column names of the dataframe to return as the "label"
             in the sample.
@@ -124,8 +133,22 @@ class HeatLoadDataset(Dataset):
         img_path = files.generate_file_path(timestamp, port, self.img_dir)
         image = files.import_file_from_local_cache(img_path)
         image = from_numpy(image)
+        
+        # set any pixels below zero to zero
         if self.drop_neg_values:
             image = image.clip(min=0)
+
+        # apply any provided transformations of the data
+        if not isinstance(self.transform, None):
+            image = self.transform(image)
+        
+        # standardize the data
+        if isinstance(self.mean, float) and isinstance(self.std, float):
+            image = (image - self.mean) / self.std
+
+        # add channel for tensor 
+        if image.ndim < 3:
+            image = image[None, :, :]
 
         # generate the labels
         label = row[label_names].values[0]
@@ -161,7 +184,7 @@ class HeatLoadDataset(Dataset):
         # construct the dict
 
         files.export_data_to_local_cache(
-            make_dict(self.img_labels, self.drop_neg_values, self.mean, self.std),
+            make_dict(self.img_labels, self.drop_neg_values, self.mean, self.std, self.transform),
             path_to_file,
         )
         print("Export Complete")
@@ -180,19 +203,18 @@ class HeatLoadDataset(Dataset):
 
         return HeatLoadDataset(self.img_labels[filter_for_df], self.img_dir)
 
-    def normalize(self, new_img_dir: str = None):
+    def normalize(self):
         """Calculates the normalization parameters of the dataset across all
         images. If drop_neg_values, will set all values below zero to zero
         before normalizing the data. The normalized version data can be saved if
         new_img_dir is provided.
 
-        Args:
-            new_img_dir (str, optional): path to saved normalized (or zeroed)
-            data. Defaults to None.
-
         Returns:
             float: mean and std
         """
+        if isinstance(self.mean, float) and isinstance(self.std, float):
+            print('The mean and std will be updated.')
+
         # get the total number of pixels in the entire data set
         x, y = self.__getitem__(1)["image"].size()
         num_of_pixels = self.__len__() * x * y
