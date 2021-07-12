@@ -17,11 +17,11 @@ class TestFilters(unittest.TestCase):
         self.kernel = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1],])
 
         # actual heat load data
-        self.data_good = files.import_file_from_local_cache('tests/resources/good.hkl')
-        self.data_bad = files.import_file_from_local_cache('tests/resources/bad.hkl')
+        self.data_good = files.import_file_from_local_cache('tests/resources/good.pkl')
+        self.data_bad = files.import_file_from_local_cache('tests/resources/bad.pkl')
 
         # test dataframe
-        self.df = HeatLoadDataset('tests/resources/test_df.hkl', 'tests').img_labels
+        self.df = HeatLoadDataset('tests/resources/test_df.pkl', 'tests').img_labels
 
     def test_conv2d(self):
         """Testing the convolution step."""
