@@ -4,8 +4,6 @@ import pandas as pd  # needed for the df format
 from hfcnn import files
 from numpy import integer, issubdtype
 import os
-import numpy as np
-
 
 def make_dict(df: pd.DataFrame, drop_neg_values: bool, mean: float, std: float):
     """Makes a dict from the following parameters.
@@ -37,9 +35,9 @@ class HeatLoadDataset(Dataset):
         self,
         df: str or pd.DataFrame,
         img_dir: str,
+        drop_neg_values: bool = True,
         mean: float = None,
         std: float = None,
-        drop_neg_values: bool = True,
         transform = None
     ):
         """Creates at HeatloadDatatset object from a dataframe or link to a dataframe
@@ -61,10 +59,10 @@ class HeatLoadDataset(Dataset):
             if isinstance(data, dict):
                 self.img_labels = data.pop("img_labels")
                 self.img_labels = self.img_labels.reset_index(drop=True)
-                self.mean = data.pop("mean")
-                self.std = data.pop("std")
                 self.drop_neg_values = data.pop("drop_neg_values")
-                self.transform = data.pop("transform")
+                self.mean = data.pop("mean") if mean == None else mean
+                self.std = data.pop("std") if std == None else std
+                self.transform = data.pop("std") if transform == None else transform
             elif isinstance(data, pd.DataFrame):
                 self.img_labels = data
                 self.img_labels = self.img_labels.reset_index(drop=True)
@@ -139,7 +137,7 @@ class HeatLoadDataset(Dataset):
             image = image.clip(min=0)
 
         # apply any provided transformations of the data
-        if not isinstance(self.transform, None):
+        if not (self.transform == None):
             image = self.transform(image)
         
         # standardize the data
@@ -216,7 +214,8 @@ class HeatLoadDataset(Dataset):
             print('The mean and std will be updated.')
 
         # get the total number of pixels in the entire data set
-        x, y = self.__getitem__(1)["image"].size()
+
+        _, x, y = self.__getitem__(1)["image"].size()
         num_of_pixels = self.__len__() * x * y
 
         bs = min(50, self.__len__())

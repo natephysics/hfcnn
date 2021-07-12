@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-from numpy.testing._private.utils import assert_equal
 from hfcnn.dataset import HeatLoadDataset
 from hfcnn import files, filters
 
@@ -8,13 +7,13 @@ class TestDataSetClass_Good(unittest.TestCase):
     """Tests for data set classes."""
     def setUp(self):
         # test dataframe
-        self.df = 'tests/resources/test_df.hkl'
-        self.data = files.import_file_from_local_cache('tests/resources/good.hkl').clip(min=0)
+        self.df = 'tests/resources/test_df.pkl'
+        self.data = files.import_file_from_local_cache('tests/resources/good.pkl').clip(min=0)
         self.PC1 = np.array([8698.])
         self.index = 1
+        
 
     def test_HeatLoadDataset(self):
-
         """Testing the HeatLoadDataset class."""
         # Check __init__ method for both file import and manual import
         dataset_file = HeatLoadDataset(self.df, 'tests')
@@ -24,7 +23,7 @@ class TestDataSetClass_Good(unittest.TestCase):
 
         # check __getitem__ method
         item = dataset_file.__getitem__(self.index)
-        self.assertSequenceEqual(item['image'].numpy().tolist(), self.data.tolist())
+        self.assertEqual(np.array_equal(item['image'].numpy()[0,:,:], self.data), True)
         self.assertEqual(item['label'].numpy(), self.PC1)
 
         # check apply method
@@ -47,8 +46,8 @@ class TestDataSetClass_Good(unittest.TestCase):
 class TestDataSetClass_Bad(TestDataSetClass_Good):
     """Tests for data set classes."""
     def setUp(self):
-        self.df = 'tests/resources/test_df.hkl'
-        self.data = files.import_file_from_local_cache('tests/resources/bad.hkl').clip(min=0)
+        self.df = 'tests/resources/test_df.pkl'
+        self.data = files.import_file_from_local_cache('tests/resources/bad.pkl').clip(min=0)
         self.index = 0
         self.PC1 = np.array([8698.])
 
@@ -57,13 +56,9 @@ class TestDataSetClass_norm(unittest.TestCase):
     """Tests for normíng data"""
     def test_norm(self):
         # test dataframe
-        self.df = 'tests/resources/test_df.hkl'
+        self.df = 'tests/resources/test_df.pkl'
         dataset_file = HeatLoadDataset(self.df, 'tests')
         
         x, y = dataset_file.normalize()
         self.assertEqual(x, 27289.97265625)
-
-
-
-
-
+# %%
