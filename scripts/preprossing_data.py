@@ -1,5 +1,5 @@
 import argparse
-from hfcnn import dataset, filters, yaml_tools, config, files
+from hfcnn import dataset, filters, yaml_tools, config
 import os
 import logging
 
@@ -96,13 +96,6 @@ def main():
             f"Training set standardization parameters. mean: {training_data.mean}, std: {training_data.std}."
         )
     )
-
-    # Saving the standardized data to the processed data folder
-    for i in range(training_data.__len__()):
-        new_img = (training_data.__getitem__(i)["image"] - training_data.mean) / training_data.std
-        ## TODO-3 Finish this up
-        file_path = 
-        files.export_data_to_local_cache(new_img, config[''])
 
     #### Step 5. Export the data sets and standardization parameters. ####
     training_data.to_file(options["train_df_path"])

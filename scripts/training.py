@@ -8,6 +8,8 @@ import torch
 import logging
 import os 
 
+torch.cuda.empty_cache()
+
 # import the options
 options = config.construct_options_dict()
 
@@ -31,7 +33,7 @@ def main():
     training_data = dataset.HeatLoadDataset(options["train_df_path"], options["raw_data_path"])
     logging.info(f"Imported {training_data.__len__()} images from the training data set")
     print(f"Imported {training_data.__len__()} images from the training data set")
-    train_dataloader = DataLoader(training_data, batch_size=10, shuffle=True)
+    train_dataloader = DataLoader(training_data, batch_size=5, shuffle=True)
 
     # test_data = dataset.HeatLoadDataset(options["test_df_path"], options["raw_data_path"])
     # logging.info(f"Imported {test_data.__len__()} images from the test data set")
@@ -50,7 +52,7 @@ def main():
         print(param_tensor, "\t", torch_model.state_dict()[param_tensor].size())
 
     # Initialize optimizer
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.L1Loss()
     optimizer = optim.SGD(torch_model.parameters(), lr=0.001, momentum=0.9)
 
     # Print optimizer's state_dict
@@ -76,12 +78,17 @@ def main():
             loss.backward()
             optimizer.step()
 
+
             # print statistics
             running_loss += loss.item()
             if i % 10 == 9:    # print every 10 mini-batches
                 print('[%d, %5d] loss: %.3f' %
                     (epoch + 1, i + 1, running_loss / 10))
                 running_loss = 0.0
+            
+            del inputs, labels
+
+
 
     print('Finished Training')
 
