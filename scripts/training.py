@@ -1,11 +1,12 @@
 # %%
-## TODO-2 setup the config.cfg to house values like data location and model location
 from hfcnn.models import model_class
 from hfcnn import dataset, config
 import torch.optim as optim
 import torch.nn as nn
+from torch.utils.data import DataLoader
 import torch
 import logging
+import os 
 
 # import the options
 options = config.construct_options_dict()
@@ -20,14 +21,28 @@ logging.basicConfig(
 )
 
 def main():
-    device = torch.device("cuda")
-
-    # path to the model
-    PATH = './models/init_model.pt'
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     torch_model = model_class.Net()
-    torch_model.load_state_dict(torch.load(PATH), strict=False)
+    torch_model.load_state_dict(torch.load(options['model_path']), strict=False)
     torch_model.to(device)
+
+    # Import the data
+    training_data = dataset.HeatLoadDataset(options["train_df_path"], options["raw_data_path"])
+    logging.info(f"Imported {training_data.__len__()} images from the training data set")
+    print(f"Imported {training_data.__len__()} images from the training data set")
+    train_dataloader = DataLoader(training_data, batch_size=10, shuffle=True)
+
+    # test_data = dataset.HeatLoadDataset(options["test_df_path"], options["raw_data_path"])
+    # logging.info(f"Imported {test_data.__len__()} images from the test data set")
+    # print(f"Imported {test_data.__len__()} images from the test data set")
+    # test_dataloader = DataLoader(test_data, batch_size=5, shuffle=True)
+
+    # if os.path.isfile(options["validation_df_path"]):
+    #     val_data = dataset.HeatLoadDataset(options["validation_df_path"], options["raw_data_path"])
+    #     logging.info(f"Imported {val_data.__len__()} images from the validation data set")
+    #     print(f"Imported {val_data.__len__()} images from the validation data set")
+    #     val_dataloader = DataLoader(val_data, batch_size=5, shuffle=True)
 
     # Print model's state_dict
     print("Model's state_dict:")
@@ -45,9 +60,12 @@ def main():
 
     for epoch in range(2):
         running_loss = 0.0
-        for i, data in enumerate(trainloader, 0):
+        for i, data in enumerate(train_dataloader, 0):
             # get the inputs; data is a list of [inputs, labels]
-            inputs, labels = data
+            inputs, labels = data['image'], data['label']
+
+            # Transfer to GPU
+            inputs, labels = inputs.to(device), labels.to(device)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -67,4 +85,5 @@ def main():
 
     print('Finished Training')
 
-# %%
+if __name__ == "__main__":
+    main()
