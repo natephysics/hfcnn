@@ -180,3 +180,6 @@ $RECYCLE.BIN/
 # log files
 logs/*.txt
 logs/preprossing_data.txt
+output.png
+models/model.pt
+logs/preprossing_data.txt

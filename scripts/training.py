@@ -7,7 +7,10 @@ from torch.utils.data import DataLoader
 import torch
 import logging
 import torcheck
-import os 
+import os
+import numpy as np
+
+
 
 # import the options
 options = config.construct_options_dict()
@@ -22,6 +25,10 @@ logging.basicConfig(
 )
 
 def main():
+    # training variables 
+    min_valid_loss = np.inf
+    epochs = 5  
+
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     torch_model = model_class.Net()
@@ -39,11 +46,11 @@ def main():
     # print(f"Imported {test_data.__len__()} images from the test data set")
     # test_dataloader = DataLoader(test_data, batch_size=5, shuffle=True)
 
-    # if os.path.isfile(options["validation_df_path"]):
-    #     val_data = dataset.HeatLoadDataset(options["validation_df_path"])
-    #     logging.info(f"Imported {val_data.__len__()} images from the validation data set")
-    #     print(f"Imported {val_data.__len__()} images from the validation data set")
-    #     val_dataloader = DataLoader(val_data, batch_size=5, shuffle=True)
+    if os.path.isfile(options["validation_df_path"]):
+        val_data = dataset.HeatLoadDataset(options["validation_df_path"])
+        logging.info(f"Imported {val_data.__len__()} images from the validation data set")
+        print(f"Imported {val_data.__len__()} images from the validation data set")
+        val_dataloader = DataLoader(val_data, batch_size=5, shuffle=True)
 
     # Print model's state_dict
     print("Model's state_dict:")
@@ -72,8 +79,9 @@ def main():
     for var_name in optimizer.state_dict():
         print(var_name, "\t", optimizer.state_dict()[var_name])
 
-    for epoch in range(2):
+    for epoch in range(epochs):
         running_loss = 0.0
+        torch_model.train() 
         for i, data in enumerate(train_dataloader, 0):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data['image'], data['label']
@@ -100,7 +108,39 @@ def main():
             
             del inputs, labels
 
+        # validate the network
+        valid_loss = 0.0
+        torch_model.eval()
+        if os.path.isfile(options["validation_df_path"]):
+            for i, data in enumerate(val_dataloader, 0):
+                # get the inputs; data is a list of [inputs, labels]
+                inputs, labels = data['image'], data['label']
 
+                # Transfer to GPU
+                inputs, labels = inputs.to(device), labels.to(device)
+
+                # zero the parameter gradients
+                optimizer.zero_grad()
+
+                # forward + backward + optimize
+                outputs = torch_model(inputs)
+                loss = criterion(outputs, labels)
+            
+                # print statistics
+                valid_loss += loss.item()
+                if i % 10 == 9:    # print every 10 mini-batches
+                    print('[%d, %5d] loss: %.3f' %
+                        (epoch + 1, i + 1, valid_loss / 10))
+                    valid_loss = 0.0
+                
+                del inputs, labels
+
+        # Epoch statistics 
+        if os.path.isfile(options["validation_df_path"]):
+            print(f'Epoch {epoch+1} \t\t Training Loss: {running_loss / len(train_dataloader)} \t\t Validation Loss: {valid_loss / len(val_dataloader)}')
+            if min_valid_loss > valid_loss:
+                print(f'Validation Loss Decreased({min_valid_loss:.6f}--->{valid_loss:.6f})')
+                min_valid_loss = valid_loss
 
     print('Finished Training')
 
