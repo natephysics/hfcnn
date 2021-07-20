@@ -16,7 +16,8 @@ class TestDataSetClass_Good(unittest.TestCase):
     def test_HeatLoadDataset(self):
         """Testing the HeatLoadDataset class."""
         # Check __init__ method for both file import and manual import
-        dataset_file = HeatLoadDataset(self.df, 'tests')
+        data_settings = {'img_dir': 'tests'}
+        dataset_file = HeatLoadDataset(self.df, **data_settings)
 
         # Check __len__ method  
         self.assertEqual(dataset_file.__len__(), 2)
@@ -28,7 +29,7 @@ class TestDataSetClass_Good(unittest.TestCase):
 
         # check apply method
         dataset = dataset_file.apply(
-            filters.return_filter(*["data_selection", dataset_file.img_dir])
+            filters.return_filter(*["data_selection", dataset_file.settings['img_dir']])
             )
 
         self.assertEqual(dataset.__len__(), 1)
@@ -57,8 +58,9 @@ class TestDataSetClass_norm(unittest.TestCase):
     def test_norm(self):
         # test dataframe
         self.df = 'tests/resources/test_df.pkl'
-        dataset_file = HeatLoadDataset(self.df, 'tests')
+        data_settings = {'img_dir': 'tests'}
+        dataset_file = HeatLoadDataset(self.df, **data_settings)
         
-        x, y = dataset_file.normalize()
+        x, y = dataset_file.normalize_data()
         self.assertEqual(x, 27289.97265625)
 # %%

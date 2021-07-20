@@ -4,87 +4,85 @@ import pandas as pd  # needed for the df format
 from hfcnn import files
 from numpy import integer, issubdtype
 import os
+from mlxtend.preprocessing import standardize
 
-def make_dict(df: pd.DataFrame, drop_neg_values: bool, mean: float, std: float, transform: bool):
-    """Makes a dict from the following parameters.
 
-    Args:
-        df (str or pd.DataFrame): a dataframe object cotaining possible labels.
-
-        img_dir (str): link to the data directory
-
-        drop_neg_values (bool): Drops negative pixel values
-
-        mean (float): Standardization parameter for data.
-        std (float): Standardization parameter for data.
-
-    Returns:
-        dict: dict with the above parameters
+def check_defaults(source1, source2):
     """
-    my_dict = {
-        "img_labels": df,
-        "drop_neg_values": drop_neg_values,
-        "mean": mean,
-        "std": std,
-        "transform": transform
+    Checks the correct default settings. 
+    """
+    default_settings = {
+        'img_dir': './data/raw/',
+        'transform': None,
+        'drop_neg_values': True,
+        'label_list': ['PC1'],
+        'norm_param': {}
     }
-    return my_dict
+
+    for setting, value in default_settings.items():
+        # check to see if setting is in source1
+        if setting in source1:
+            default_settings[setting] = source1[setting]
+        # otherwise check to see if the setting is in source2
+        else:
+            if setting in source2:
+                default_settings[setting] = source2[setting]
+
+    return default_settings
 
 
 class HeatLoadDataset(Dataset):
     def __init__(
         self,
         df: str or pd.DataFrame,
-        img_dir: str,
-        drop_neg_values: bool = True,
-        mean: float = None,
-        std: float = None,
-        transform = None
+        **kwargs
     ):
         """Creates at HeatloadDatatset object from a dataframe or link to a dataframe
 
         Args:
             df (str or pd.DataFrame): a dataframe object cotaining possible labels
             or a directory for the dataframe object and dict stored in .hkl format.
-
+            
+        
+        kwargs: (kwargs will supersede any stored settings)
             img_dir (str): link to the data directory
+            Default: ./data/raw/
 
             transform: any transformations of the data (applied on get item)
-                Tranonformations are applied prior to standardization. 
+                Transformations are applied prior to standardization. 
+            Default: None
+
+            norm_param: the standardization parameters for any data or labels.
+            Default: {}
+
+            drop_neg_values: sets any pixels below zero to zero
+            Default: True
+
+            label_list: list of df column labels to use
+            Default: [PC1]
 
         Raises:
             TypeError: [description]
         """
-        if type(df) == str:
+        if isinstance(df, str):
             data = files.import_file_from_local_cache(df)
             if isinstance(data, dict):
                 self.img_labels = data.pop("img_labels")
                 self.img_labels = self.img_labels.reset_index(drop=True)
-                self.drop_neg_values = data.pop("drop_neg_values")
-                self.mean = data.pop("mean") if mean == None else mean
-                self.std = data.pop("std") if std == None else std
-                self.transform = data.pop("transform") if transform == None else transform
+                # default value check
+                self.settings = check_defaults(kwargs, data)
             elif isinstance(data, pd.DataFrame):
                 self.img_labels = data
                 self.img_labels = self.img_labels.reset_index(drop=True)
-                self.mean = mean
-                self.std = std
-                self.drop_neg_values = drop_neg_values
-                self.transform = transform
-        elif type(df) == pd.DataFrame:
+                # default value check
+                self.settings = check_defaults(kwargs, {})
+        elif isinstance(df, pd.DataFrame):
             self.img_labels = df.copy()
             self.img_labels = self.img_labels.reset_index(drop=True)
-            self.mean = mean
-            self.std = std
-            self.drop_neg_values = drop_neg_values
-            self.transform = transform
+            # default value check
+            self.settings = check_defaults(kwargs, {})
         else:
-            raise TypeError("Input must be a str or df")
-
-        if not os.path.isdir(img_dir):
-            raise ValueError("Expected path to directory from img_dir")
-
-        self.img_dir = img_dir
+            raise TypeError("Input must be a str (path) or df")
 
     def __len__(self):
         """Returns the number of data points in the set
@@ -129,22 +127,23 @@ class HeatLoadDataset(Dataset):
 
         # load the image from the local cache
         timestamp, port = row["times"].values[0], row["port"].values[0]
-        img_path = files.generate_file_path(timestamp, port, self.img_dir)
+        img_path = files.generate_file_path(timestamp, port, self.settings['img_dir'])
         image = files.import_file_from_local_cache(img_path)
         image = from_numpy(image)
         
         # set any pixels below zero to zero
-        if self.drop_neg_values:
+        if self.settings['drop_neg_values']:
             image = image.clip(min=0)
 
         # apply any provided transformations of the data
-        if not (self.transform == None):
-            image = self.transform(image)
+        if not (self.settings['transform'] == None):
+            image = self.settings['transform'](image)
         
         # standardize the data
-        if isinstance(self.mean, float) and isinstance(self.std, float):
-            image = (image - self.mean) / self.std
-
+        if 'image_labels' in self.settings['norm_param']:
+            image = (image - self.settings['norm_param']['image_labels'][0]) /\
+                 self.settings['norm_param']['image_labels'][1]
+        
         # add channel for tensor 
         if image.ndim < 3:
             image = image[None, :, :]
@@ -167,7 +166,7 @@ class HeatLoadDataset(Dataset):
             the self.img_labels dataframe (pd.Series) and return a Boolean.
         """
         filter_for_df = self.img_labels.apply(filter_fn, axis=1)
-        return HeatLoadDataset(self.img_labels[filter_for_df], self.img_dir)
+        return HeatLoadDataset(self.img_labels[filter_for_df], **self.settings)
 
     def program_nums(self):
         """Returns the unique program numbers from the data set
@@ -181,9 +180,11 @@ class HeatLoadDataset(Dataset):
             path_to_file ([type]): path to file (should end in .hkl)
         """
         # construct the dict
+        export_data = self.settings
+        export_data['img_labels'] = self.img_labels
 
         files.export_data_to_local_cache(
-            make_dict(self.img_labels, self.drop_neg_values, self.mean, self.std, self.transform),
+            export_data,
             path_to_file,
         )
         print("Export Complete")
@@ -200,9 +201,9 @@ class HeatLoadDataset(Dataset):
         """
         filter_for_df = self.img_labels.program_num.isin(prog_num_list)
 
-        return HeatLoadDataset(self.img_labels[filter_for_df], self.img_dir)
+        return HeatLoadDataset(self.img_labels[filter_for_df], **self.settings)
 
-    def normalize(self):
+    def normalize_data(self):
         """Calculates the normalization parameters of the dataset across all
         images. If drop_neg_values, will set all values below zero to zero
         before normalizing the data. The normalized version data can be saved if
@@ -211,14 +212,11 @@ class HeatLoadDataset(Dataset):
         Returns:
             float: mean and std
         """
-        if isinstance(self.mean, float) and isinstance(self.std, float):
-            print('The mean and std will be updated.')
-
         # get the total number of pixels in the entire data set
-
         _, x, y = self.__getitem__(1)["image"].size()
         num_of_pixels = self.__len__() * x * y
 
+        # set the batch size
         bs = min(50, self.__len__())
 
         # set up dataloader
@@ -228,22 +226,30 @@ class HeatLoadDataset(Dataset):
         total_sum = 0
         for batch in temploader:
             total_sum += batch["image"].sum()
-        self.mean = total_sum / num_of_pixels
-        self.mean = self.mean.item()
+        mean = total_sum / num_of_pixels
+        mean = mean.item()
 
         # solve for std
         sum_of_squared_error = 0
         for batch in temploader:
-            sum_of_squared_error += ((batch["image"] - self.mean).pow(2)).sum()
-        self.std = sqrt(sum_of_squared_error / num_of_pixels)
-        self.std = self.std.item()
+            sum_of_squared_error += ((batch["image"] - mean).pow(2)).sum()
+        std = sqrt(sum_of_squared_error / num_of_pixels)
+        std = std.item()
 
-        return self.mean, self.std
+        self.settings['norm_param']['image_labels'] = (mean, std)
 
-# def main():
-#     raw_data = HeatLoadDataset('data/raw/test_df.hkl', 'data/raw/')
-#     print('huh?')
+        return mean, std
 
+    def normalize_labels(self, labels):
+        """Calculates the standardization parameters of the dataset across all
+        labels.
 
-# if __name__ == "__main__":
-#     main()
+        Args:
+            labels (list): List of strings that reprepset the labels of the df.
+        """
+        norm_data = standardize(self.img_labels[labels], columns=labels, return_params=True)
+
+        self.img_labels[labels] = norm_data[0]
+
+        for label in labels:
+            self.settings['norm_param'][label] = (norm_data[1]['avgs'][label], norm_data[1]['stds'][label])

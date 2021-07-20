@@ -6,6 +6,8 @@ import logging
 # import the options
 options = config.construct_options_dict()
 
+label_list = ['IA', 'W_dia']
+
 logging.basicConfig(
     filename=options['pp_log_path'],
     filemode="a",
@@ -29,7 +31,7 @@ def main():
     parser.add_argument("--filter_list_path", help="Path to yaml containing the filters to be applied")
     
     train_ratio = parser.parse_args().train_ratio
-    # extract the train/test/validation split
+    # Extract the train/test/validation split
     train_test_split = [train_ratio/100]
     if parser.parse_args().test_ratio:
         train_test_split.append(parser.parse_args().test_ratio/100)
@@ -44,23 +46,28 @@ def main():
             list_of_filters = []
 
     #### Step 1. Import the raw the data ####
-    raw_data = dataset.HeatLoadDataset(options["raw_df_path"], options["raw_data_path"])
-    logging.info(f"Imported {raw_data.__len__()} images from the raw data set")
-    print(f"Imported {raw_data.__len__()} images from the raw data set")
+    data_settings = {
+        'img_dir': options["raw_data_path"],
+        'label_list': label_list
+        }
+    raw_data = dataset.HeatLoadDataset(options["raw_df_path"], **data_settings)
+    step_1_message = f"Imported {raw_data.__len__()} images from the raw data set"
+    
+    # Adding new columns for IA
+    raw_data.img_labels['IA'] = raw_data.img_labels['PC1'].div(raw_data.img_labels['NPC1'])
+    
+    logging.info(step_1_message)
+    print(step_1_message)
 
     #### Step 2. Allpying filter(s) to the data ####
     if len(list_of_filters) == 0:
         logging.info("No filters to apply. Skipping step")
     else:
         for filter in list_of_filters:
-            logging.info(f"Applying {filter[0]} filters")
             raw_data = raw_data.apply(filters.return_filter(*filter))
-            logging.info(
-                f"{raw_data.__len__()} images remain after applying {filter[0]} filter"
-            )
-            print(
-                f"{raw_data.__len__()} images remain after applying {filter[0]} filter"
-            )
+            step_2_message = f"{raw_data.__len__()} images remain after applying {filter[0]} filter"
+            logging.info(step_2_message)
+            print(step_2_message)
 
     #### Step 3. Test/Train/Val Split ####
     # Because data for a given program number is likely corolated we'll divide
@@ -86,16 +93,14 @@ def main():
             f"Validation dataset generated with {validation_data.__len__()} samples."
         )
 
-    #### Step 4. Normalized the training data. ####
-    training_data.normalize()
-    logging.info(
-        f"Training set standardization parameters. mean: {training_data.mean}, std: {training_data.std}."
-    )
-    print(
-        str(
-            f"Training set standardization parameters. mean: {training_data.mean}, std: {training_data.std}."
-        )
-    )
+    #### Step 4. Normalized the training data and labels. ####
+    training_data.normalize_data()
+    step_4_message = f"Training set standardization parameters. mean: {training_data.settings['norm_param']['image_labels'][0]}, \
+        std: {training_data.settings['norm_param']['image_labels'][1]}."
+    logging.info(step_4_message)
+    print(step_4_message)
+
+    training_data.normalize_labels(['PC1'])
 
     #### Step 5. Export the data sets and standardization parameters. ####
     training_data.to_file(options["train_df_path"])
@@ -106,6 +111,10 @@ def main():
         if os.path.isfile(options["validation_df_path"]):
             os.remove(options["validation_df_path"])
     logging.info(f"Datasets exported to disk.")
+
+    plot = training_data.img_labels['PC1'].plot.hist()
+    fig = plot.get_figure()
+    fig.savefig("output.png")
 
 if __name__ == "__main__":
     main()

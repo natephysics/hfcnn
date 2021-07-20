@@ -6,9 +6,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch
 import logging
+import torcheck
 import os 
-
-torch.cuda.empty_cache()
 
 # import the options
 options = config.construct_options_dict()
@@ -30,18 +29,18 @@ def main():
     torch_model.to(device)
 
     # Import the data
-    training_data = dataset.HeatLoadDataset(options["train_df_path"], options["raw_data_path"])
+    training_data = dataset.HeatLoadDataset(options["train_df_path"])
     logging.info(f"Imported {training_data.__len__()} images from the training data set")
     print(f"Imported {training_data.__len__()} images from the training data set")
     train_dataloader = DataLoader(training_data, batch_size=5, shuffle=True)
 
-    # test_data = dataset.HeatLoadDataset(options["test_df_path"], options["raw_data_path"])
+    # test_data = dataset.HeatLoadDataset(options["test_df_path"])
     # logging.info(f"Imported {test_data.__len__()} images from the test data set")
     # print(f"Imported {test_data.__len__()} images from the test data set")
     # test_dataloader = DataLoader(test_data, batch_size=5, shuffle=True)
 
     # if os.path.isfile(options["validation_df_path"]):
-    #     val_data = dataset.HeatLoadDataset(options["validation_df_path"], options["raw_data_path"])
+    #     val_data = dataset.HeatLoadDataset(options["validation_df_path"])
     #     logging.info(f"Imported {val_data.__len__()} images from the validation data set")
     #     print(f"Imported {val_data.__len__()} images from the validation data set")
     #     val_dataloader = DataLoader(val_data, batch_size=5, shuffle=True)
@@ -54,6 +53,19 @@ def main():
     # Initialize optimizer
     criterion = nn.L1Loss()
     optimizer = optim.SGD(torch_model.parameters(), lr=0.001, momentum=0.9)
+
+    # torcheck is a tool for preforming some sanity checked during training process.
+    # they will return errors if the following checks are violated.
+    torcheck.register(optimizer)
+
+    # check to see that model parameters change during training
+    torcheck.add_module_changing_check(torch_model, module_name="my_model")
+
+    # check whether model parameters become NaN or outputs contain NaN
+    torcheck.add_module_nan_check(torch_model)
+
+    # check whether model parameters become infinite or outputs contain infinite value
+    torcheck.add_module_inf_check(torch_model)
 
     # Print optimizer's state_dict
     print("Optimizer's state_dict:")
@@ -91,6 +103,8 @@ def main():
 
 
     print('Finished Training')
+
+    torch.save(torch_model.state_dict(), options['model_path'])
 
 if __name__ == "__main__":
     main()
