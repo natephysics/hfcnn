@@ -6,16 +6,15 @@ from numpy import integer, issubdtype
 import os
 from mlxtend.preprocessing import standardize
 
-
 def check_defaults(source1, source2):
     """
     Checks the correct default settings. 
     """
     default_settings = {
         'img_dir': './data/raw/',
+        'label_list': ['PC1'],
         'transform': None,
         'drop_neg_values': True,
-        'label_list': ['PC1'],
         'norm_param': {}
     }
 
@@ -92,17 +91,12 @@ class HeatLoadDataset(Dataset):
         """
         return self.img_labels.shape[0]
 
-    def __getitem__(self, idx: int, label_names: list = False):
+    def __getitem__(self, idx: int):
         """Returns a data point with "image" and "label" where the labels are
-        pulled from the label_names, a list of column names from the data frame.
+        pulled from the label_list, a list of column names from the data frame.
 
         Args:
             idx (int): the timestamp of the heatload image data OR an index.
-            
-            label_names (list, optional): A list containing data from the
-            corresponding column names of the dataframe to return as the "label"
-            in the sample.
-            Defaults to ['PC1'].
 
         Returns:
             Sample (dic): Returns a sample with "image" and "label"
@@ -110,10 +104,6 @@ class HeatLoadDataset(Dataset):
         # Assuming there is no more than max_number_of_samples worth of samples.
         # This is to help differentiate between timestamps and index values.
         max_number_of_samples = 9999999999
-
-        # Sets the default option if left blank (needed because list is permutable)
-        if not label_names:
-            label_names = ["PC1"]
 
         # If idx is too small to be a timestamp, find the timestamp that
         # corresponds to the index.
@@ -149,8 +139,16 @@ class HeatLoadDataset(Dataset):
             image = image[None, :, :]
 
         # generate the labels
-        label = row[label_names].values[0]
-        label = from_numpy(label)
+        label = row[self.settings['label_list']].copy()
+        for label_name in self.settings['label_list']:
+            if label_name in self.settings['norm_param'].keys():
+                rawvalue = label[label_name].values
+                label[label_name] = (rawvalue - self.settings['norm_param'][label_name][0]) /\
+                    self.settings['norm_param'][label_name][1]
+
+        label = label.to_numpy()
+        if len(label) == 1:
+            label = label.flatten()
 
         # return sample
         sample = {"image": image, "label": label}
@@ -248,8 +246,6 @@ class HeatLoadDataset(Dataset):
             labels (list): List of strings that reprepset the labels of the df.
         """
         norm_data = standardize(self.img_labels[labels], columns=labels, return_params=True)
-
-        self.img_labels[labels] = norm_data[0]
 
         for label in labels:
             self.settings['norm_param'][label] = (norm_data[1]['avgs'][label], norm_data[1]['stds'][label])

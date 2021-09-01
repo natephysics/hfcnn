@@ -9,8 +9,12 @@ class Net(image_claasfication_base.ImageClassificationBase):
         self.network = nn.Sequential(
             
             nn.Conv2d(1, 16, kernel_size = 12, padding = 1),
+            # nn.Conv2d(1, 16, kernel_size = 12, padding = 1, bias=False),
+            # nn.BatchNorm2d(16),
             nn.ReLU(),
             nn.Conv2d(16,32, kernel_size = 12, stride = 6, padding = 1),
+            # nn.Conv2d(16,32, kernel_size = 12, stride = 6, padding = 1, bias=False),
+            # nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(2,2),
         
@@ -27,11 +31,10 @@ class Net(image_claasfication_base.ImageClassificationBase):
             # nn.MaxPool2d(2,2),
             
             nn.Flatten(),
-            nn.Linear(89024, 1),
-            # nn.ReLU(),
-            # nn.Linear(1, 64),
-            # nn.ReLU(),
-            nn.Linear(1,1)
+            nn.Linear(89024, 20),
+            # nn.BatchNorm1d(20),
+            nn.ReLU(),
+            nn.Linear(20, 1),
         )
     
     def forward(self, x):

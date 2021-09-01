@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"name": "hfcnn",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true,
+		"python.testing.unittestArgs": [
+			"-v",
+			"-s",
+			"./tests",
+			"-p",
+			"test_*.py"
+		],
+		"python.testing.pytestEnabled": false,
+		"python.testing.nosetestsEnabled": false,
+		"python.testing.unittestEnabled": true,
+		"cSpell.words": [
+			"conv",
+			"datefmt",
+			"hfcnn",
+			"msecs",
+			"nums"
+		],
+		"files.associations": {
+			"*.dvc": "yaml",
+			"dvc.lock": "yaml"
+		},
+		"cSpell.ignoreWords": [
+			"datashare",
+			"mpcdf",
+			"webdav",
+			"webdavs"
+		]
+	}
+}

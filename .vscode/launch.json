@@ -10,7 +10,6 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["--train_ratio", "80","--test_ratio","10","--filter_list_path","./config/ds_filters.yaml"]
         }
     ]
 }

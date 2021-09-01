@@ -26,5 +26,6 @@
         "mpcdf",
         "webdav",
         "webdavs"
-    ]
+    ],
+    "nvidia-smi-plus.refresh.autoRefresh": true
 }

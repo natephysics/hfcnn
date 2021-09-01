@@ -184,4 +184,6 @@ logs/preprossing_data.txt
 # saved models
 models/*
 
-output.png
+# images
+*.png
+*.zip

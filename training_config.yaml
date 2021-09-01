@@ -1,8 +1,0 @@
-filters_to_apply: 
-processed_data_path: data/processed/
-test_df_path: data/processed/test.hkl
-train_df_path: data/processed/train.hkl
-validation_df_path: data/processed/validation.hkl
-raw_data_path: data/raw/
-raw_df_path: data/raw/test_df.hkl
-test: (1, 2)
