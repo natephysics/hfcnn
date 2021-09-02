@@ -51,7 +51,7 @@ def get_option(section: str, option: str, fallback=False):
     # Sets the order of the paths to check for a config file
     config_resolve_order = [
         rna.path.resolve(VARIABLES['PROJECT_ROOT'], "config", "config.cfg"),
-        rna.path.resolve(VARIABLES['HFCNN_PACKAGE'], "default_settings", "default.cfg"),
+        rna.path.resolve(VARIABLES['HFCNN_PACKAGE'], "default_settings", "default_config.cfg"),
     ]
     val = None
     for config_path in config_resolve_order:
@@ -132,7 +132,9 @@ def construct_options_dict():
         'tensorboard_dir',
         'model_params_path',
         'data_params_path',
-        'training_results'
+        'training_results',
+        'dvc_pipeline_path',
+        'dvc_template_path'
         ]
     options = {}
     # import the paths into the options dictonary
