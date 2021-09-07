@@ -1,7 +1,3 @@
-#!/usr/bin/env  # pylint: disable=missing-class-docstring,too-few-public-methods,abstract-method
-"""
-"""
-# %%
 import os
 import pathlib
 import configparser
@@ -17,6 +13,7 @@ DYNAMIC_OPTIONS = {}
 
 REGEX = r"[^${\}]+(?=})"
 
+package_path = os.path.basename(os.path.dirname(__file__))
 
 def get_config(config_path) -> configparser.ConfigParser:
     """
@@ -31,14 +28,6 @@ def get_config(config_path) -> configparser.ConfigParser:
             CONFIG_CACHE[config_path] = None
     return CONFIG_CACHE[config_path]
 
-
-VARIABLES = dict(
-    HOME = str(pathlib.Path.home()),
-    HFCNN_PACKAGE = os.path.dirname(__file__),
-)
-VARIABLES['PROJECT_ROOT'] = os.path.dirname(VARIABLES['HFCNN_PACKAGE'])
-
-
 def get_option(section: str, option: str, fallback=False):
     """
     Retrieve option from section.
@@ -50,8 +39,8 @@ def get_option(section: str, option: str, fallback=False):
     
     # Sets the order of the paths to check for a config file
     config_resolve_order = [
-        rna.path.resolve(VARIABLES['PROJECT_ROOT'], "config", "config.cfg"),
-        rna.path.resolve(VARIABLES['HFCNN_PACKAGE'], "default_settings", "default_config.cfg"),
+        rna.path.resolve("config", "config.cfg"),
+        rna.path.resolve(package_path, "default_settings", "default_config.cfg"),
     ]
     val = None
     for config_path in config_resolve_order:
@@ -67,10 +56,6 @@ def get_option(section: str, option: str, fallback=False):
             break
 
     if val is not None:
-        # replace explicit mentions of VARIABLES
-        for env_var, env_value in VARIABLES.items():
-            val = val.replace("$" + env_var, env_value)
-
         # replace by regex with recursive get_option
         # example:
         ## [global]
@@ -127,14 +112,13 @@ def construct_options_dict():
         'train_df_path',
         'validation_df_path',
         'log_path',
-        'model_path',
+        'untrained_model_path',
+        'training_model_path',
         'best_model_path',
         'tensorboard_dir',
-        'model_params_path',
         'data_params_path',
         'training_results',
         'dvc_pipeline_path',
-        'dvc_template_path'
         ]
     options = {}
     # import the paths into the options dictonary
@@ -145,5 +129,45 @@ def construct_options_dict():
         if option != None:
             options[path] = option
 
+    # Add links to prespecified paths for configuration files (which include resolution orders)
+    # path_list = (key, filename)
+    path_list = [
+        ('dvc_template_path', 'dvc.template.yaml'),
+        ('preprocessing_config_path', 'preprocessing.yaml'),
+        ('network_config_path', 'network_construction.yaml'),
+        ('training_config_path', 'training.yaml')
+    ]
+
+    for key, filename in path_list:
+        options[key] = resolve_path(filename)
+
     return options
-# %%
+
+def resolve_path(filename: str):
+    """Takes a filename and checks to see which paths it exists on in the resolve order.
+
+    Args:
+        filename (str): filename to check for.
+
+    Raises:
+        ValueError: Can't find an valid file for any possible paths.
+
+    Returns:
+        resolved_path (str): Returns the correct path.
+    """
+    # list of possible paths
+    template_resolve_order = [
+        os.path.join(get_option("global", "config"), filename).replace("\\","/"), # check the config folder
+        os.path.join(package_path, "default_settings", "default_" + filename).replace("\\","/") # otherwise use default
+    ]
+
+    # check to see if the file exists on those paths
+    template_path = None
+    for possible_dvc_template in template_resolve_order:
+        if os.path.exists(possible_dvc_template):
+            template_path = possible_dvc_template
+            break
+    # if no valid paths, return error
+    if template_path == None:
+        raise ValueError(f'Could not resolve working path to {filename}')
+    return template_path

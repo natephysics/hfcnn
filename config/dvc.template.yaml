@@ -1,3 +1,23 @@
 stages:
   preprocessing:
-    cmd: '${processed_data_path}'
+    cmd: python hfcnn/processing/preprossing_data.py
+    deps:
+      - ${raw_data_path}
+      - ${preprocessing_config_path}
+    outs:
+      - ${train_df_path}
+      - ${validation_df_path}
+      - ${test_df_path}
+  network_construction:
+    cmd: python hfcnn/processing/network_construction.py
+    deps:
+      - ${network_config_path}
+    outs:
+      - ${untrained_model_path}
+  training:
+    cmd: python hfcnn/processing/training.py
+    deps:
+      - ${untrained_model_path}
+    outs:
+      - ${training_model_path}
+      - ${best_model_path}

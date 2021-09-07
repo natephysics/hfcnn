@@ -14,7 +14,7 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-data_params = yaml_tools.import_configuration(options['data_params_path'])
+data_params = yaml_tools.import_configuration(options['preprocessing_config_path'])
 
 label_list = data_params['label_list']
 

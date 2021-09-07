@@ -15,4 +15,4 @@ print("Model's state_dict:")
 for param_tensor in torch_model.state_dict():
     print(param_tensor, "\t", torch_model.state_dict()[param_tensor].size())
 
-torch.save(torch_model.state_dict(), options['model_path'])
+torch.save(torch_model.state_dict(), options['untrained_model_path'])

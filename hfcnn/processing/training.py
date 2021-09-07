@@ -15,12 +15,13 @@ from datetime import datetime
 import pandas as pd
 from hyperopt import STATUS_OK, STATUS_FAIL
 from tqdm import tqdm
+import rna
 
 # import the default options
 options = config.construct_options_dict()
 
 # import the model parameters 
-model_params = yaml_tools.import_configuration(options['model_params_path'])
+model_params = yaml_tools.import_configuration(options['training_config_path'])
 
 # establish logging settings
 logging.basicConfig(
@@ -42,8 +43,12 @@ def main():
 
     options['device'] = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+    # set up model
+    rna.path.cp(options['untrained_model_path'], options['training_model_path'])
+
+
     torch_model = model_class.Net()
-    torch_model.load_state_dict(torch.load(options['model_path']), strict=False)
+    torch_model.load_state_dict(torch.load(options['training_model_path']), strict=False)
     torch_model.to(options['device'])
 
     # Import the data
