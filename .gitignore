@@ -1,7 +1,6 @@
 # DVC related ignores
 data/raw/51
 *.pkl
-dvc.yaml
 events.out.tfevents.*.0
 events.out.tfevents.*.1
 
