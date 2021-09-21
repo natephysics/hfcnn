@@ -22,4 +22,4 @@ filter_list:
 # Should only be used if len(train_ratio) = 1
 exclude_test: false
 
-test_value: false
+test_value: true

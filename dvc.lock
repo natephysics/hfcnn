@@ -10,3 +10,36 @@ stages:
     - path: models/untrained_model.pt
       md5: 14078da97d78598e83a283dda8de2128
       size: 7429487
+  preprocessing:
+    cmd: python hfcnn/processing/preprossing_data.py
+    deps:
+    - path: config/preprocessing.yaml
+      md5: d24bbf054226d31444b9329f6df0af6c
+      size: 545
+    - path: data/raw/
+      md5: a6915e5a6efd5d580a1e808106cc6597.dir
+      size: 47714934570
+      nfiles: 28237
+    outs:
+    - path: data/processed/test.pkl
+      md5: cba5d5e44fcda1d0603138dd7ef89057
+      size: 289598
+    - path: data/processed/train.pkl
+      md5: 29e4b7671961333ba6f95252d652012a
+      size: 2749575
+    - path: data/processed/validation.pkl
+      md5: 4270de05a1fd30e1b682be9cabf2eb56
+      size: 187948
+  training:
+    cmd: python hfcnn/processing/training.py
+    deps:
+    - path: models/untrained_model.pt
+      md5: 14078da97d78598e83a283dda8de2128
+      size: 7429487
+    outs:
+    - path: models/best_model.pt
+      md5: 4bf4854af7f68896660d21eac45a84bf
+      size: 7429071
+    - path: models/training_model.pt
+      md5: 14078da97d78598e83a283dda8de2128
+      size: 7429487
