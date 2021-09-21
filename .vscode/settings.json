@@ -1,5 +1,6 @@
 {
     "git.ignoreLimitWarning": true,
+    "python.terminal.activateEnviroment": true,
     "python.testing.unittestArgs": [
         "-v",
         "-s",

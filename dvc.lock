@@ -1,0 +1,12 @@
+schema: '2.0'
+stages:
+  network_construction:
+    cmd: python hfcnn/processing/network_construction.py
+    deps:
+    - path: hfcnn/default_settings/default_network_construction.yaml
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    outs:
+    - path: models/untrained_model.pt
+      md5: 14078da97d78598e83a283dda8de2128
+      size: 7429487

@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true,
+		"files.associations": {
+			"*.dvc": "yaml",
+			"dvc.lock": "yaml"
+		},
+		"nvidia-smi-plus.refresh.autoRefresh": true
+	}
+}

@@ -2,7 +2,7 @@
 from hfcnn import config, yaml_tools
 import rna
 import re
-from typing import Iterator, Union
+from typing import Union
 
 options = config.construct_options_dict()
 
@@ -64,7 +64,3 @@ def variable_replace(dvc_template: Union[dict, list]):
                 else:
                     raise ValueError(f'The path {match.group()} was not found in the config.')
     return 
-
-
-
-generate_dvc_pipeline()

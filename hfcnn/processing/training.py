@@ -62,11 +62,8 @@ def main():
         pin_memory=torch.cuda.is_available()
         )
 
-    # Use the same settings for the validation and test data set
-    data_settings = training_data.settings
-
     # import the validation data
-    val_data = dataset.HeatLoadDataset(options["validation_df_path"], **data_settings)
+    val_data = dataset.HeatLoadDataset(options["validation_df_path"])
     logging.info(f"Imported {val_data.__len__()} images from the validation data set")
     print(f"Imported {val_data.__len__()} images from the validation data set")
 
@@ -84,7 +81,7 @@ def main():
 
     # import the test data
     if os.path.isfile(options["test_df_path"]):
-        test_data = dataset.HeatLoadDataset(options["test_df_path"], **data_settings)
+        test_data = dataset.HeatLoadDataset(options["test_df_path"])
         logging.info(f"Imported {test_data.__len__()} images from the test data set")
         print(f"Imported {test_data.__len__()} images from the test data set")
 

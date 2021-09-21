@@ -1,5 +1,4 @@
 import os
-import pathlib
 import configparser
 import re
 import rna
@@ -73,7 +72,7 @@ def get_option(section: str, option: str, fallback=False):
                 + get_option(*match.group().rsplit(".", 1))
                 + val[end + 1 :]
             )
-    # impliments an inheritance between a parent and child class
+    # implements an inheritance between a parent and child class
     # example:
     ## [parent]
     ## att1 = 3
@@ -121,7 +120,7 @@ def construct_options_dict():
         'dvc_pipeline_path',
         ]
     options = {}
-    # import the paths into the options dictonary
+    # import the paths into the options dictionary
     for path in paths_list:
         # grab the option from the .cfg file
         option = get_option("paths", path)
@@ -171,3 +170,5 @@ def resolve_path(filename: str):
     if template_path == None:
         raise ValueError(f'Could not resolve working path to {filename}')
     return template_path
+
+construct_options_dict()

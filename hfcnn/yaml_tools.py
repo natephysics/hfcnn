@@ -1,5 +1,4 @@
 from ruamel.yaml import YAML
-from hfcnn import config
 
 def import_configuration(params_path: str):
     """Imports the processing and training parameter yaml file.

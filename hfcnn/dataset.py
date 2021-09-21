@@ -3,8 +3,8 @@ from torch import from_numpy, sqrt
 import pandas as pd  # needed for the df format
 from hfcnn import files
 from numpy import integer, issubdtype
-import os
 from mlxtend.preprocessing import standardize
+from tqdm import tqdm
 
 def check_defaults(source1, source2):
     """
@@ -163,7 +163,8 @@ class HeatLoadDataset(Dataset):
             filter_fn (function): A function designed to take in a row from
             the self.img_labels dataframe (pd.Series) and return a Boolean.
         """
-        filter_for_df = self.img_labels.apply(filter_fn, axis=1)
+        tqdm.pandas()
+        filter_for_df = self.img_labels.progress_apply(filter_fn, axis=1)
         return HeatLoadDataset(self.img_labels[filter_for_df], **self.settings)
 
     def program_nums(self):
@@ -215,21 +216,23 @@ class HeatLoadDataset(Dataset):
         num_of_pixels = self.__len__() * x * y
 
         # set the batch size
-        bs = min(50, self.__len__())
+        bs = min(12, self.__len__())
 
         # set up dataloader
         temploader = DataLoader(self, batch_size=bs, num_workers=12)
 
         # solve for mean
         total_sum = 0
-        for batch in temploader:
+        print('Calculating mean of dataset')
+        for batch in tqdm(temploader):
             total_sum += batch["image"].sum()
         mean = total_sum / num_of_pixels
         mean = mean.item()
 
         # solve for std
+        print('Calculating std. of dataset')
         sum_of_squared_error = 0
-        for batch in temploader:
+        for batch in tqdm(temploader):
             sum_of_squared_error += ((batch["image"] - mean).pow(2)).sum()
         std = sqrt(sum_of_squared_error / num_of_pixels)
         std = std.item()
@@ -249,3 +252,11 @@ class HeatLoadDataset(Dataset):
 
         for label in labels:
             self.settings['norm_param'][label] = (norm_data[1]['avgs'][label], norm_data[1]['stds'][label])
+
+    def import_settings(self, settings: dict):
+        """Imports the settings.
+
+        Args:
+            settings (dict): self.settings from a Heatloaddataset object. 
+        """
+        self.settings = settings
