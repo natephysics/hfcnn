@@ -2,8 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from hfcnn.models import helper_functions
+from pytorch_lightning.core.lightning import LightningModule
 
-class ImageClassificationBase(nn.Module):
+class ImageClassificationBase(LightningModule):
     
     def training_step(self, batch):
         images, labels = batch 

@@ -3,7 +3,6 @@ stages:
     cmd: python hfcnn/processing/preprossing_data.py
     deps:
     - data/raw/
-    - config/preprocessing.yaml
     outs:
     - data/processed/train.pkl
     - data/processed/validation.pkl

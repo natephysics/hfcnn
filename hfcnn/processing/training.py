@@ -16,6 +16,8 @@ import pandas as pd
 from hyperopt import STATUS_OK, STATUS_FAIL
 from tqdm import tqdm
 import rna
+import mlflow.pytorch
+from mlflow.tracking import MlflowClient
 
 # import the default options
 options = config.construct_options_dict()
@@ -189,7 +191,7 @@ def main():
                 break
         if error_count >= max_errors:
                 break
-    
+
     if error_count > 0:
         logging.error(f'There have beee {error_count} RuntimeErrors recorded. The max errors before break is {max_errors}.')    
 

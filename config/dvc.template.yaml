@@ -3,6 +3,7 @@ stages:
     cmd: python hfcnn/processing/preprossing_data.py
     deps:
       - ${raw_data_path}
+    prams:
       - ${preprocessing_config_path}
     outs:
       - ${train_df_path}

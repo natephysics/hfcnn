@@ -64,3 +64,5 @@ def variable_replace(dvc_template: Union[dict, list]):
                 else:
                     raise ValueError(f'The path {match.group()} was not found in the config.')
     return 
+
+generate_dvc_pipeline()
