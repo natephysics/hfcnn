@@ -11,31 +11,33 @@ import torcheck
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime
 import pandas as pd
 from hyperopt import STATUS_OK, STATUS_FAIL
 from tqdm import tqdm
 import rna
 import mlflow.pytorch
 from mlflow.tracking import MlflowClient
+import hydra
+from omegaconf import DictConfig
 
 # import the default options
 options = config.construct_options_dict()
 
 # import the model parameters 
-model_params = yaml_tools.import_configuration(options['training_config_path'])
+# model_params = yaml_tools.import_configuration(options['training_config_path'])
 
 # establish logging settings
-logging.basicConfig(
-    filename=options['log_path'],
-    filemode="a",
-    force=True,
-    format="%(asctime)s %(msecs)d- %(process)d -%(levelname)s -" + str(model_params['session_name']) + " -%(message)s",
-    datefmt="%d-%b-%y %H:%M:%S %p",
-    level=logging.DEBUG,
-)
+# logging.basicConfig(
+#     filename=options['log_path'],
+#     filemode="a",
+#     force=True,
+#     format="%(asctime)s %(msecs)d- %(process)d -%(levelname)s -" + str(model_params['session_name']) + " -%(message)s",
+#     datefmt="%d-%b-%y %H:%M:%S %p",
+#     level=logging.DEBUG,
+# )
 
-def main():
+@hydra.main(config_path='../../config', config_name="training.yaml")
+def main(model_params: DictConfig):
     # timestamp start of training loop
     status = STATUS_OK
 
