@@ -13,6 +13,7 @@
             "env": { 
                 "PYTHONPATH": "${workspaceFolder}"
             },
+            "args": ["hydra.run.dir=."],
         }
     ]
 }

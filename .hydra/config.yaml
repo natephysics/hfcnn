@@ -1,0 +1,5 @@
+session_name: Batch_32_NO_BN
+batch_size: 32
+epochs: 6
+learning_rate: 0.001
+momentum: 0.9

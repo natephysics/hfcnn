@@ -2,6 +2,7 @@
 import os
 import pickle as pkl
 import pandas as pd
+import functools 
 
 def export_data_to_local_cache(data, path: str):
     """Exports data to the local drive cache in the plk format.
@@ -39,7 +40,6 @@ def import_file_from_local_cache(file_path):
     with open(file_path, 'rb') as handle:
         data = pkl.load(handle)
     return data
-
 
 def export_and_merge_data_frame(data_frame, path='./data/df.pkl', return_merged=False):
     """Merges the data_frame into the local cached version of the data frame.
