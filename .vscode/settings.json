@@ -11,6 +11,7 @@
     "python.testing.pytestEnabled": false,
     "python.testing.nosetestsEnabled": false,
     "python.testing.unittestEnabled": true,
+    "terminal.integrated.windowsEnableConpty": true,
     "cSpell.words": [
         "conv",
         "datefmt",
@@ -28,5 +29,7 @@
         "webdav",
         "webdavs"
     ],
-    "nvidia-smi-plus.refresh.autoRefresh": true
+    "nvidia-smi-plus.refresh.autoRefresh": true,
+    "terminal.integrated.shell.windows": "c:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
+    "terminal.integrated.shellArgs.windows": ["-NoLogo", "-NoExit", "-Command", "& { Write-Host }"],
 }

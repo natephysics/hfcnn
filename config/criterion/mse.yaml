@@ -1,0 +1,3 @@
+# docs: https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html
+
+_target_: torch.nn.MSELoss
