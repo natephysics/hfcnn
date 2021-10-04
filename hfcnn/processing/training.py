@@ -20,15 +20,15 @@ from mlflow.tracking import MlflowClient
 import hydra
 from omegaconf import DictConfig
 
-# import the default options
-options = config.construct_options_dict()
+# import the default path_options
+path_options = config.construct_options_dict()
 
 # import the model parameters 
-# model_params = yaml_tools.import_configuration(options['training_config_path'])
+# model_params = yaml_tools.import_configuration(path_options['training_config_path'])
 
 # establish logging settings
 # logging.basicConfig(
-#     filename=options['log_path'],
+#     filename=path_options['log_path'],
 #     filemode="a",
 #     force=True,
 #     format="%(asctime)s %(msecs)d- %(process)d -%(levelname)s -" + str(model_params['session_name']) + " -%(message)s",
@@ -42,21 +42,21 @@ def main(model_params: DictConfig):
     status = STATUS_OK
 
     # set up tensorboard writer
-    folder = os.path.join(options['tensorboard_dir'], model_params['session_name'])
+    folder = os.path.join(path_options['tensorboard_dir'], model_params['session_name'])
     writer = SummaryWriter(folder)
 
-    options['device'] = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    path_options['device'] = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # set up model
-    rna.path.cp(options['untrained_model_path'], options['training_model_path'])
+    rna.path.cp(path_options['untrained_model_path'], path_options['training_model_path'])
 
 
     torch_model = model_class.Net()
-    torch_model.load_state_dict(torch.load(options['training_model_path']), strict=False)
-    torch_model.to(options['device'])
+    torch_model.load_state_dict(torch.load(path_options['training_model_path']), strict=False)
+    torch_model.to(path_options['device'])
 
     # Import the data
-    training_data = dataset.HeatLoadDataset(options["train_df_path"])
+    training_data = dataset.HeatLoadDataset(path_options["train_df_path"])
     logging.info(f"Imported {training_data.__len__()} images from the training data set")
     print(f"Imported {training_data.__len__()} images from the training data set")
     train_dataloader = DataLoader(
@@ -67,7 +67,7 @@ def main(model_params: DictConfig):
         )
 
     # import the validation data
-    val_data = dataset.HeatLoadDataset(options["validation_df_path"])
+    val_data = dataset.HeatLoadDataset(path_options["validation_df_path"])
     logging.info(f"Imported {val_data.__len__()} images from the validation data set")
     print(f"Imported {val_data.__len__()} images from the validation data set")
 
@@ -84,8 +84,8 @@ def main(model_params: DictConfig):
         )
 
     # import the test data
-    if os.path.isfile(options["test_df_path"]):
-        test_data = dataset.HeatLoadDataset(options["test_df_path"])
+    if os.path.isfile(path_options["test_df_path"]):
+        test_data = dataset.HeatLoadDataset(path_options["test_df_path"])
         logging.info(f"Imported {test_data.__len__()} images from the test data set")
         print(f"Imported {test_data.__len__()} images from the test data set")
 
@@ -98,7 +98,7 @@ def main(model_params: DictConfig):
 
     # grab some images for tensorboard
     temp_data = next(iter(train_dataloader))
-    temp_data = temp_data['image'].to(options['device'])
+    temp_data = temp_data['image'].to(path_options['device'])
     writer.add_graph(torch_model, temp_data)
     del temp_data
     writer.close()
@@ -153,7 +153,7 @@ def main(model_params: DictConfig):
             inputs, labels = data['image'], data['label']
 
             # Transfer to GPU
-            inputs, labels = inputs.to(options['device']), labels.to(options['device'])
+            inputs, labels = inputs.to(path_options['device']), labels.to(path_options['device'])
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -176,7 +176,7 @@ def main(model_params: DictConfig):
             writer.add_scalar("Loss", loss.item(), i) 
             
             if i % 50 == 49:
-                validation_loss = validate(val_dataloader, torch_model, criterion, 10, **options)
+                validation_loss = validate(val_dataloader, torch_model, criterion, 10, **path_options)
                 # validate the network
                 writer.add_scalar(
                     "Validation.Loss",
@@ -185,7 +185,7 @@ def main(model_params: DictConfig):
                     )
                 if validation_loss < best_val_batch_loss:
                     best_val_batch_loss = validation_loss
-                    torch.save(torch_model.state_dict(), options['best_model_path'])
+                    torch.save(torch_model.state_dict(), path_options['best_model_path'])
             
             # break out of both loops if there's too many errors
             max_errors = 10
@@ -199,11 +199,11 @@ def main(model_params: DictConfig):
 
     if status == STATUS_OK:
         best_model = model_class.Net()
-        best_model.load_state_dict(torch.load(options['best_model_path']), strict=False)
-        best_model.to(options['device'])
+        best_model.load_state_dict(torch.load(path_options['best_model_path']), strict=False)
+        best_model.to(path_options['device'])
 
         # Append the results to a dataframe
-        validation_loss = validate(val_dataloader, best_model, criterion, 10, **options)
+        validation_loss = validate(val_dataloader, best_model, criterion, 10, **path_options)
 
     else:
         validation_loss = np.nan
@@ -214,16 +214,16 @@ def main(model_params: DictConfig):
         'status': [status]
     }
 
-    if os.path.isfile(options["training_results"]):
-        training_results = files.import_file_from_local_cache(options["training_results"])
+    if os.path.isfile(path_options["training_results"]):
+        training_results = files.import_file_from_local_cache(path_options["training_results"])
         training_results.append(results, ignore_index=True)
     else:
         training_results = pd.DataFrame(results)
-    files.export_data_to_local_cache(training_results, options["training_results"])
+    files.export_data_to_local_cache(training_results, path_options["training_results"])
 
     print('Complete')
 
-def validate(val_loader, model, criterion, loop_lim=False, **options):
+def validate(val_loader, model, criterion, loop_lim=False, **path_options):
     valid_loss = 0
     model.eval()
     with torch.no_grad():
@@ -232,7 +232,7 @@ def validate(val_loader, model, criterion, loop_lim=False, **options):
             val_inputs, val_labels = data['image'], data['label']
 
             # Transfer to GPU
-            val_inputs, val_labels = val_inputs.to(options['device']), val_labels.to(options['device'])
+            val_inputs, val_labels = val_inputs.to(path_options['device']), val_labels.to(path_options['device'])
 
             # forward and get loss
             outputs = model(val_inputs)
@@ -254,7 +254,7 @@ def validate(val_loader, model, criterion, loop_lim=False, **options):
     return valid_loss / norm
 
 
-def expected_vs_estimated(test_loader, model, **options):
+def expected_vs_estimated(test_loader, model, **path_options):
     model.eval()
     expected = []
     estimated = []
@@ -264,7 +264,7 @@ def expected_vs_estimated(test_loader, model, **options):
             test_inputs, test_labels = data['image'], data['label']
 
             # Transfer to GPU
-            test_inputs, test_labels = test_inputs.to(options['device']), test_labels.to(options['device'])
+            test_inputs, test_labels = test_inputs.to(path_options['device']), test_labels.to(path_options['device'])
 
             # get the predicted values
             outputs = model(test_inputs)
@@ -280,7 +280,7 @@ def expected_vs_estimated(test_loader, model, **options):
 if __name__ == "__main__":
     main()
 # %%
-    # expected, estimated = expected_vs_estimated(test_dataloader, best_model, **options)
+    # expected, estimated = expected_vs_estimated(test_dataloader, best_model, **path_options)
 
     # plt.figure(figsize=(10,10))
     # plt.scatter(expected, estimated, c='crimson')

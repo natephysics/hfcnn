@@ -1,59 +1,77 @@
-import torch.nn as nn
-import torch.functional as F
-from hfcnn.models import image_claasfication_base
-from hfcnn import yaml_tools, config
-import torch.optim as optim
+from typing import Optional
+import pytorch_lightning as pl
+from omegaconf import DictConfig
+from hydra.utils import instantiate
+from torchmetrics import MetricCollection
+from hfcnn.utils import instantiate_list
+from torch import Tensor
 
-# 
 
-# import the default options
-options = config.construct_options_dict()
+class ImageClassificationBase(pl.LightningModule):
+    """[summary]
 
-# import the model parameters 
-model_params = yaml_tools.import_configuration(options['training_config_path'])
-
-class Net(image_claasfication_base.ImageClassificationBase):
-    def __init__(self):
+    Args:
+        pl ([type]): [description]
+    """
+    def __init__(
+        self,
+        criterion: Optional[DictConfig] = {},
+        optimizer: Optional[DictConfig] = {},
+        metrics: Optional[DictConfig] = {}
+        ) -> None:
         super().__init__()
-
-        self.loss = nn.MSELoss()
-
-        self.network = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size = 12, padding = 1),
-            nn.ReLU(),
-            nn.Conv2d(16,32, kernel_size = 12, stride = 6, padding = 1),
-            nn.ReLU(),
-            nn.MaxPool2d(2,2),
-            nn.Flatten(),
-            nn.Linear(89024, 20),
-            nn.ReLU(),
-            nn.Linear(20, 1),
+        self.save_hyperparameters(
+            "input_features", "criterion", "optimizer", "metrics"
         )
-    
-    def forward(self, x):
+        self.network = None
+        self.criterion = instantiate(criterion)
+        self.optimizer = optimizer
+
+        metrics = instantiate_list(metrics)
+        metrics = MetricCollection(metrics)
+        self.val_metrics = metrics.clone(prefix="val/")
+        self.test_metrics = metrics.clone(prefix="test/")
+
+    def forward(self, *args, **kwargs) -> Tensor:
         for layer in self.network:
             x = layer(x)
-            # print(x.size())
         return x
 
-    def training_step(self, batch):
-        # get the inputs; data is a list of [inputs, labels]
-        inputs, labels = batch['image'], batch['label']
-        output = self.forward(inputs)
-        loss = self.loss(output, labels)
+    def step(self, batch: any, batch_idx: int):
+        x, y = batch
+        y_hat = self(x)
+        loss = self.criterion(y_hat, y)
+        return loss, y_hat, y
+
+    def training_step(self, batch: any, batch_idx: int):
+        loss, _, y = self.step(batch, batch_idx)
+        self.log("train/loss", loss)
+        if batch_idx != 0:
+            for layer, param in self.named_parameters():
+                self.log(f"train/{layer}.max_grad", torch.max(param.grad))
         return loss
 
-    def validation_step(self, valid_batch):
-        inputs, labels = valid_batch['image'], valid_batch['label']
-        output = self.forward(inputs)
-        loss = self.loss(output, labels)
+    def validation_step(self, batch: any, batch_idx: int):
+        loss, y_hat, y = self.step(batch, batch_idx)
+        self.log("val/loss", loss)
+        self.val_metrics(y_hat, y)
+        self.log_dict(self.val_metrics)
+        return loss
 
+    def test_step(self, batch: any, batch_idx: int):
+        loss, y_hat, y = self.step(batch, batch_idx)
+        self.log("test/loss", loss)
+        self.test_metrics(y_hat, y)
+        self.log_dict(self.test_metrics)
+        return loss
 
+    def predict_step(self, batch: any, batch_idx: int):
+        x, _ = batch
+        return self(x)
 
     def configure_optimizers(self):
-        optimizer = optim.SGD(
-            self.parameters(), 
-            lr=model_params['learning_rate'], 
-            momentum=model_params['momentum']
-            )
+        optimizer = instantiate(self.optimizer, self.parameters())
         return optimizer
+    
+    def _forward(self, x: Tensor) -> Tensor:
+        raise NotImplementedError

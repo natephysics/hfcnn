@@ -2,8 +2,11 @@ import os
 import logging
 import warnings
 import torch
+from typing import List
+from hydra.utils import instantiate
 from pytorch_lightning import seed_everything as seed_everthing
 from pytorch_lightning.utilities import rank_zero_only
+from omegaconf import DictConfig
 
 
 def get_logger(name=__name__, level=logging.INFO) -> logging.Logger:
@@ -39,10 +42,21 @@ def seed_everything(seed: int) -> None:
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
     os.environ["PYTHONHASHSEED"] = str(seed)
-
+    
 
 def disable_warnings() -> None:
     """Disable python warnings."""
     warnings.filterwarnings("ignore")
     log = get_logger(__name__)
     log.info("Python warnings are disabled")
+
+
+def instantiate_list(cfg: DictConfig, **kwargs) -> List[any]:
+    """Instatiate a list through hydra instantiate."""
+    objects: List[any] = []
+    for _, cfg_ in cfg.items():
+        if "_target_" in cfg_:
+            #  Add kwargs if found under configuration
+            kwargs_ = {k: v for k, v in kwargs.items() if k in cfg_}
+            objects.append(instantiate(cfg_, **kwargs_))
+    return objects

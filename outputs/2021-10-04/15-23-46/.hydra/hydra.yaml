@@ -1,6 +1,6 @@
 hydra:
   run:
-    dir: output/
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
   sweep:
     dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
     subdir: ${hydra.job.num}
@@ -107,8 +107,7 @@ hydra:
   callbacks: {}
   output_subdir: .hydra
   overrides:
-    hydra:
-    - hydra.run.dir=.
+    hydra: []
     task: []
   job:
     name: training
