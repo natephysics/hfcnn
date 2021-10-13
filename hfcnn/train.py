@@ -1,5 +1,6 @@
 import os
 import torch
+from  shutil import copyfile
 import hydra
 import pytorch_lightning as pl
 from typing import List
@@ -8,7 +9,7 @@ from hfcnn.utils import get_logger, instantiate_list
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer, Callback
 from pytorch_lightning.loggers import LightningLoggerBase
 
-def train(cfg: DictConfig) -> None:
+def train(cfg: DictConfig, **kwargs) -> None:
 
     log = get_logger(__name__)
 
@@ -16,8 +17,13 @@ def train(cfg: DictConfig) -> None:
     # Datamodule #
     ##############
 
-    root = os.path.join(cfg.orig_cwd, cfg.datamodule.root)
-    params_file_path = os.path.join(cfg.orig_cwd, cfg.datamodule.params_file_path)
+    processed_data_root = os.path.join(cfg.orig_wd, cfg.data_folder)
+    
+    ## TODO: add param files
+    if cfg.datamodule.params_file_path:
+        params_file_path = os.path.join(cfg.orig_wd, cfg.datamodule.params_file_path)
+    else:
+        params_file_path = False
 
     num_workers = os.cpu_count()
     pin_memory = False
@@ -28,13 +34,20 @@ def train(cfg: DictConfig) -> None:
     #  Instatiate datamodule
     datamodule: LightningDataModule = hydra.utils.instantiate(
         cfg.datamodule,
-        root=root,
+        data_root=processed_data_root,
         params_file_path=params_file_path,
         pin_memory=pin_memory,
-        num_workers=num_workers,
-        zeros_input=cfg.zeros_input,
+        num_workers=num_workers
     )
+    
+    # Setup the data set
+    datamodule.setup()
+
+    # Save a copy of the data in the wd
+    datamodule.save_data(cfg.data_folder)
+
     log.info("DataModule: %s" % datamodule)
+
 
     #########
     # Model #
@@ -42,16 +55,15 @@ def train(cfg: DictConfig) -> None:
 
     model: LightningModule = hydra.utils.instantiate(
         cfg.model,
-        input_features=input_features,
         criterion=cfg.criterion,
         optimizer=cfg.optimizer,
         metrics=cfg.metric,
-        _recursive_=False,
+        _recursive_=False, # for hydra (won't recursively instantiate criterion)
     )
     log.info("Model: %s" % model)
 
-    if cfg.zeros_weight:
-        model.zeros_all_trainable_parameters()
+    # if cfg.zeros_weight:
+    #     model.zeros_all_trainable_parameters()
 
     ###########
     # Trainer #
@@ -75,8 +87,6 @@ def train(cfg: DictConfig) -> None:
     # Hyperparameters #
     ###################
 
-    datamodule.setup()
-
     hparams = {}
 
     hparams["datamodule"] = cfg.datamodule
@@ -96,18 +106,15 @@ def train(cfg: DictConfig) -> None:
     hparams["datamodule/num_val"] = len(datamodule.val_data)
     hparams["datamodule/num_test"] = len(datamodule.test_data)
 
-    #  Add model metrics
-    hparams["model/nparams"] = model.num_trainable_parameters
-
     #  Add hp metrics
     hp_metrics = {}
-    hp_metrics["model/nparams"] = model.num_trainable_parameters
     hp_metrics["val/loss"] = 0
 
     #  Log hparams
     #  TensorBoard requires metrics to be defined with hyperparameters
     if isinstance(logger, pl.loggers.tensorboard.TensorBoardLogger):
-        logger.log_hyperparams(hparams, hp_metrics)
+        pass
+        # logger.log_hyperparams(hparams, hp_metrics)
     else:
         logger.log_hyperparams(hparams)
         logger.log_metrics(hp_metrics)
@@ -124,10 +131,10 @@ def train(cfg: DictConfig) -> None:
     log.info("Num of train samples: %d" % len(datamodule.train_data))
     log.info("Num of validation samples: %d" % len(datamodule.val_data))
     log.info("Num of test samples: %d" % len(datamodule.test_data))
-    log.info("Train transforms: %s" % datamodule.train_data.dataset.dataset.transforms)
+    log.info("Train transforms: %s" % datamodule.train_data.settings['transforms'])
 
-    if cfg.dry_run:
-        return
+
+
 
     #########
     # Train #
@@ -138,7 +145,6 @@ def train(cfg: DictConfig) -> None:
 
     log.info("Start training ...")
     trainer.fit(model, datamodule=datamodule)
-
 
     ########
     # Test #

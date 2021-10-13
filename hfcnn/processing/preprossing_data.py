@@ -1,10 +1,11 @@
 from hfcnn import dataset, filters, yaml_tools, config
 import logging
+import os
 
 ## TODO: Break out test generation  
 
 # import the options
-options = config.construct_options_dict()
+options = config.build_default_paths(os.getcwd())
 
 logging.basicConfig(
     filename=options['log_path'],
@@ -15,14 +16,14 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-data_params = yaml_tools.import_configuration(options['preprocessing_config_path'])
+options["raw_data_path"]
 
 label_list = data_params['label_list']
 
 def main():
     #### Step 1. Import the raw the data ####
     data_settings = {
-        'img_dir': options["raw_data_path"],
+        'img_dir': os.path.join(options["raw_data_path"]),
         'label_list': label_list
         }
     raw_data = dataset.HeatLoadDataset(options["raw_df_path"], **data_settings)

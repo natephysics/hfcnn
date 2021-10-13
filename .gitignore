@@ -5,6 +5,9 @@ data/raw/*.pkl
 events.out.tfevents.*.0
 events.out.tfevents.*.1
 
+# outputs
+outputs/*
+
 # user defined config files
 config/config.cfg
 config/ds_filters.yaml

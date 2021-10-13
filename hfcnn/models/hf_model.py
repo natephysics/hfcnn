@@ -3,9 +3,9 @@ from hfcnn.models import model_class
 from torch import Tensor
 
 
-class Net(model_class.ImageClassificationBase):
-    def __init__(self):
-        super().__init__()
+class HF_Model(model_class.ImageClassificationBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.network = nn.Sequential(
             nn.Conv2d(1, 16, kernel_size = 12, padding = 1),

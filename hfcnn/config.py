@@ -12,7 +12,7 @@ DYNAMIC_OPTIONS = {}
 
 REGEX = r"[^${\}]+(?=})"
 
-package_path = os.path.basename(os.path.dirname(__file__))
+cwd = os.path.basename(os.path.dirname(__file__))
 
 def get_config(config_path) -> configparser.ConfigParser:
     """
@@ -27,7 +27,7 @@ def get_config(config_path) -> configparser.ConfigParser:
             CONFIG_CACHE[config_path] = None
     return CONFIG_CACHE[config_path]
 
-def get_option(section: str, option: str, fallback=False):
+def get_option(section: str, option: str, owd: str=cwd, fallback=False):
     """
     Retrieve option from section.
     """
@@ -38,8 +38,8 @@ def get_option(section: str, option: str, fallback=False):
     
     # Sets the order of the paths to check for a config file
     config_resolve_order = [
-        rna.path.resolve("config", "config.cfg"),
-        rna.path.resolve(package_path, "default_settings", "default_config.cfg"),
+        rna.path.resolve(owd, "configs", "config.cfg"),
+        rna.path.resolve(owd, "default_settings", "default_config.cfg"),
     ]
     val = None
     for config_path in config_resolve_order:
@@ -69,7 +69,7 @@ def get_option(section: str, option: str, fallback=False):
             # recursively replace the match by get_option
             val = (
                 val[: start - 2]
-                + get_option(*match.group().rsplit(".", 1))
+                + get_option(*match.group().rsplit(".", 1), owd=owd)
                 + val[end + 1 :]
             )
     # implements an inheritance between a parent and child class
@@ -82,7 +82,7 @@ def get_option(section: str, option: str, fallback=False):
     #
     # parent.child will have both attributes, parent will only have att1.
     elif val is None and fallback:
-        val = get_option(section.rpartition(".")[0], option, fallback=fallback)
+        val = get_option(section.rpartition(".")[0], option, owd=owd, fallback=fallback)
 
     return val
 
@@ -99,54 +99,56 @@ def unset_option(section: str, option: str):
     """Removes an option already set in the DYNAMIC_OPTIONS."""
     del DYNAMIC_OPTIONS[section][option]
 
-def construct_options_dict():
-    """Creates a diction of the options available in the config file.
+def build_default_paths(owd: str=None):
+    """Builds a dictionary of default paths. 
+
+    Args:
+        owd (str): the working directory that the path is relative to. 
+
+    Returns:
+        [dict]: Dict with the default paths. 
     """
+    if owd is None:
+        # check for an original working directory
+        if 'OWD' in os.environ.keys():
+            owd = os.environ['OWD']
+        else:
+            owd = os.getcwd()
+
     # List of paths to parse .cfg file for
     paths_list = [
-        'raw_data_path', 
-        'raw_df_path', 
-        'processed_data_path', 
-        'test_df_path',
-        'train_df_path',
-        'validation_df_path',
-        'log_path',
-        'untrained_model_path',
-        'training_model_path',
-        'best_model_path',
-        'tensorboard_dir',
-        'data_params_path',
-        'training_results',
         'dvc_pipeline_path',
+        'train',
+        'validation',
+        'test',
+        'raw_folder'
         ]
     options = {}
     # import the paths into the options dictionary
     for path in paths_list:
         # grab the option from the .cfg file
-        option = get_option("paths", path)
+        option = get_option("paths", path, owd=owd)
         # verify the option is set in the config file
         if option != None:
             options[path] = option
 
-    # Add links to prespecified paths for configuration files (which include resolution orders)
+    # Add links to prespecified paths for configuration files
     # path_list = (key, filename)
     path_list = [
-        ('dvc_template_path', 'dvc.template.yaml'),
-        ('preprocessing_config_path', 'preprocessing.yaml'),
-        ('network_config_path', 'network_construction.yaml'),
-        ('training_config_path', 'training.yaml')
+        ('dvc_template_path', 'dvc.template.yaml')
     ]
 
     for key, filename in path_list:
-        options[key] = resolve_path(filename)
+        options[key] = resolve_path(filename, owd=owd)
 
     return options
 
-def resolve_path(filename: str):
+def resolve_path(filename: str, owd: str=cwd):
     """Takes a filename and checks to see which paths it exists on in the resolve order.
 
     Args:
         filename (str): filename to check for.
+        owd (str): the working directory that the path is relative to. 
 
     Raises:
         ValueError: Can't find an valid file for any possible paths.
@@ -155,9 +157,10 @@ def resolve_path(filename: str):
         resolved_path (str): Returns the correct path.
     """
     # list of possible paths
+    print(get_option("global", "config", owd=owd))
     template_resolve_order = [
-        os.path.join(get_option("global", "config"), filename).replace("\\","/"), # check the config folder
-        os.path.join(package_path, "default_settings", "default_" + filename).replace("\\","/") # otherwise use default
+        os.path.join(owd, get_option("global", "config", owd=owd), filename).replace("\\","/"), # check the config folder
+        os.path.join(owd, "default_settings", "default_" + filename).replace("\\","/") # otherwise use default
     ]
 
     # check to see if the file exists on those paths
@@ -170,5 +173,3 @@ def resolve_path(filename: str):
     if template_path == None:
         raise ValueError(f'Could not resolve working path to {filename}')
     return template_path
-
-construct_options_dict()

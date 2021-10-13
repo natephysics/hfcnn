@@ -5,13 +5,11 @@ from hydra.utils import instantiate
 from torchmetrics import MetricCollection
 from hfcnn.utils import instantiate_list
 from torch import Tensor
+import torch
 
 
 class ImageClassificationBase(pl.LightningModule):
     """[summary]
-
-    Args:
-        pl ([type]): [description]
     """
     def __init__(
         self,
@@ -21,7 +19,7 @@ class ImageClassificationBase(pl.LightningModule):
         ) -> None:
         super().__init__()
         self.save_hyperparameters(
-            "input_features", "criterion", "optimizer", "metrics"
+            "criterion", "optimizer", "metrics"
         )
         self.network = None
         self.criterion = instantiate(criterion)
@@ -32,13 +30,13 @@ class ImageClassificationBase(pl.LightningModule):
         self.val_metrics = metrics.clone(prefix="val/")
         self.test_metrics = metrics.clone(prefix="test/")
 
-    def forward(self, *args, **kwargs) -> Tensor:
+    def forward(self, x: Tensor, *args, **kwargs) -> Tensor:
         for layer in self.network:
             x = layer(x)
         return x
 
     def step(self, batch: any, batch_idx: int):
-        x, y = batch
+        x, y = batch['image'], batch['label']
         y_hat = self(x)
         loss = self.criterion(y_hat, y)
         return loss, y_hat, y
@@ -46,9 +44,6 @@ class ImageClassificationBase(pl.LightningModule):
     def training_step(self, batch: any, batch_idx: int):
         loss, _, y = self.step(batch, batch_idx)
         self.log("train/loss", loss)
-        if batch_idx != 0:
-            for layer, param in self.named_parameters():
-                self.log(f"train/{layer}.max_grad", torch.max(param.grad))
         return loss
 
     def validation_step(self, batch: any, batch_idx: int):

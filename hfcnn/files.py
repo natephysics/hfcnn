@@ -13,6 +13,9 @@ def export_data_to_local_cache(data, path: str):
 
     path : string with path
     """
+    # make sure the path exists
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
     # export the data
     if isinstance(data, pd.DataFrame):
         data.to_pickle(path)

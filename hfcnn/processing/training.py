@@ -160,7 +160,7 @@ def main(model_params: DictConfig):
 
             # forward + backward + optimize
             outputs = torch_model(inputs)
-            loss = criterion(outputs.float(), labels.float())
+            loss = criterion(outputs, labels)
             loss.backward()
             try:
                 optimizer.step()

@@ -1,6 +1,6 @@
 hydra:
   run:
-    dir: output/
+    dir: .
   sweep:
     dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
     subdir: ${hydra.job.num}
@@ -111,11 +111,11 @@ hydra:
     - hydra.run.dir=.
     task: []
   job:
-    name: training
+    name: __main__
     override_dirname: ''
     id: ???
     num: ???
-    config_name: training.yaml
+    config_name: config.yaml
     env_set: {}
     env_copy: []
     config:
@@ -130,13 +130,22 @@ hydra:
     - path: hydra.conf
       schema: pkg
       provider: hydra
-    - path: Y:\projects\hfcnn\config
+    - path: Y:\projects\hfcnn\configs
       schema: file
       provider: main
     - path: ''
       schema: structured
       provider: schema
     choices:
+      logger: tensorboard
+      callback: default
+      metric: default
+      trainer: default
+      criterion: mse
+      optimizer: adam
+      model: cnn
+      datamodule: heat_load
+      action: train
       hydra/env: default
       hydra/callbacks: null
       hydra/job_logging: default

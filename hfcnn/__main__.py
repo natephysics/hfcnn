@@ -1,6 +1,8 @@
 import hydra
-from omegaconf import DictConfig
-
+from omegaconf import DictConfig, OmegaConf
+import omegaconf
+import os
+OmegaConf.register_new_resolver("dict", lambda x, y: x.get(y))
 
 @hydra.main(config_path="../configs/", config_name="config.yaml")
 def main(cfg: DictConfig):
@@ -14,6 +16,9 @@ def main(cfg: DictConfig):
 
     if cfg.seed is not None:
         seed_everything(cfg.seed)
+
+    if cfg.orig_wd is not None:
+        os.environ['OWD'] = cfg.orig_wd
 
     #  Start action
     return hydra.utils.instantiate(cfg.action, cfg)

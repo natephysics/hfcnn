@@ -1,0 +1,3 @@
+_target_: hfcnn.preprocessing.prepare_data
+
+name: prepare_data 

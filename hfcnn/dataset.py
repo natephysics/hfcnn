@@ -1,10 +1,12 @@
 from torch.utils.data import Dataset, DataLoader
-from torch import from_numpy, sqrt
+from torch import sqrt, Tensor
 import pandas as pd  # needed for the df format
 from hfcnn import files
 from numpy import integer, issubdtype
 from mlxtend.preprocessing import standardize
 from tqdm import tqdm
+
+## TODO: Fix generate_file_path to generate correct path
 
 def check_defaults(source1, source2):
     """
@@ -13,7 +15,7 @@ def check_defaults(source1, source2):
     default_settings = {
         'img_dir': './data/raw/',
         'label_list': ['PC1'],
-        'transform': None,
+        'transforms': None,
         'drop_neg_values': True,
         'norm_param': {}
     }
@@ -47,7 +49,7 @@ class HeatLoadDataset(Dataset):
             img_dir (str): link to the data directory
             Default: ./data/raw/
 
-            transform: any transformations of the data (applied on get item)
+            transforms: any transformations of the data (applied on get item)
                 Transformations are applied prior to standardization. 
             Default: None
 
@@ -82,6 +84,7 @@ class HeatLoadDataset(Dataset):
             self.settings = check_defaults(kwargs, {})
         else:
             raise TypeError("Input must be a str (path) or df")
+
 
     def __len__(self):
         """Returns the number of data points in the set
@@ -119,15 +122,15 @@ class HeatLoadDataset(Dataset):
         timestamp, port = row["times"].values[0], row["port"].values[0]
         img_path = files.generate_file_path(timestamp, port, self.settings['img_dir'])
         image = files.import_file_from_local_cache(img_path)
-        image = from_numpy(image)
+        image = Tensor(image)
         
         # set any pixels below zero to zero
         if self.settings['drop_neg_values']:
             image = image.clip(min=0)
 
         # apply any provided transformations of the data
-        if not (self.settings['transform'] == None):
-            image = self.settings['transform'](image)
+        if not (self.settings['transforms'] == None):
+            image = self.settings['transforms'](image)
         
         # standardize the data
         if 'image_labels' in self.settings['norm_param']:
@@ -149,9 +152,12 @@ class HeatLoadDataset(Dataset):
         label = label.to_numpy()
         if len(label) == 1:
             label = label.flatten()
+        
+        label = Tensor(label)
+
 
         # return sample
-        sample = {"image": image, "label": label}
+        sample = {'image': image, 'label': label}
         return sample
 
     def apply(self, filter_fn):
@@ -216,10 +222,10 @@ class HeatLoadDataset(Dataset):
         num_of_pixels = self.__len__() * x * y
 
         # set the batch size
-        bs = min(12, self.__len__())
+        bs = min(50, self.__len__())
 
         # set up dataloader
-        temploader = DataLoader(self, batch_size=bs, num_workers=12)
+        temploader = DataLoader(self, batch_size=bs)
 
         # solve for mean
         total_sum = 0

@@ -1,0 +1,43 @@
+defaults:
+  - _self_
+  - action: train
+  - datamodule: heat_load
+  - model: cnn
+  - optimizer: adam
+  - criterion: mse
+  - trainer: default
+  - metric: default
+  - callback: default
+  - logger: tensorboard
+
+hydra:
+  run:
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-${dict:${action},name}
+
+# disable python warnings
+ignore_warnings: false
+
+# global seed
+seed: null
+
+# path to original working directory
+# learn more here: https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
+orig_wd: ${hydra:runtime.cwd}
+
+# dataframe column names to use for image labels
+label_names:
+  - 'PC1'
+
+# Location of the processes data. Because of the use of DVC it makes sense to store the data in the
+# original working directory.
+
+# If true: the data paths are from the original working directory. 
+use_orig_cwd: true
+# raw data path ##TODO: Update data import process. 
+raw_data_path: data/raw/df.pkl
+# processed data path
+processed_path: data
+
+data_folder: data
+data_file: df.pkl
+
