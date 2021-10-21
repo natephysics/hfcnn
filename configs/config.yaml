@@ -1,6 +1,7 @@
 defaults:
   - _self_
-  - action: train
+  - action: prepare_data
+  - filters: data_selection
   - datamodule: heat_load
   - model: cnn
   - optimizer: adam
@@ -13,6 +14,8 @@ defaults:
 hydra:
   run:
     dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-${dict:${action},name}
+
+test_strategy: train
 
 # disable python warnings
 ignore_warnings: false
@@ -28,16 +31,20 @@ orig_wd: ${hydra:runtime.cwd}
 label_names:
   - 'PC1'
 
-# Location of the processes data. Because of the use of DVC it makes sense to store the data in the
-# original working directory.
+# List of filters use to select the data
+filter_list:
+- - data_selection
+  - data/raw
 
-# If true: the data paths are from the original working directory. 
-use_orig_cwd: true
-# raw data path ##TODO: Update data import process. 
-raw_data_path: data/raw/df.pkl
-# processed data path
-processed_path: data
+# validation ratio
+val_split: 0.2
 
+# generate the standardization parameters for the inputs of the training set
+normalize_labels: true
+
+# Because of the use of DVC it makes sense to store the data in the original working directory.
+# The folder the contains the raw and processed data
 data_folder: data
-data_file: df.pkl
 
+# The name of the file that contains the data table (should be in root of data folder)
+data_file: df.pkl

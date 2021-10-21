@@ -1,10 +1,13 @@
+from typing import Callable, Union, List
 from torch.utils.data import Dataset, DataLoader
 from torch import sqrt, Tensor
 import pandas as pd  # needed for the df format
-from hfcnn import files
+from hfcnn import files, filters
 from numpy import integer, issubdtype
 from mlxtend.preprocessing import standardize
 from tqdm import tqdm
+
+
 
 ## TODO: Fix generate_file_path to generate correct path
 
@@ -160,17 +163,28 @@ class HeatLoadDataset(Dataset):
         sample = {'image': image, 'label': label}
         return sample
 
-    def apply(self, filter_fn):
-        """Applies a filter to the dataset and removes any elements that
+    def apply(self, filter_fn: Union[Callable, list]):
+        """Applies a list of filter to the dataset and removes any elements that
         don't pass the filter criteria. Filters do no change the content of the
         images. Returns a HeatLoadDataset object with the filtered dataset.
 
         Args:
-            filter_fn (function): A function designed to take in a row from
+            filter_fn (Callable or list): A Callable (or list of Callables) designed to take in a row from
             the self.img_labels dataframe (pd.Series) and return a Boolean.
         """
+        if isinstance(filter_fn, Callable):
+            filter_fn = [filter_fn]
+        num_of_filters = len(filter_fn)
+
         tqdm.pandas()
-        filter_for_df = self.img_labels.progress_apply(filter_fn, axis=1)
+        for i, filter in enumerate(filter_fn):  
+            print(f'Applying filter {i+1}/{num_of_filters}:')
+
+            # Pass the img path to the filter
+            filter.set_img_path(self.settings['img_dir'])
+
+            # apply the filter to the dataframe 
+            filter_for_df = self.img_labels.progress_apply(filter.row_filter(), axis=1)
         return HeatLoadDataset(self.img_labels[filter_for_df], **self.settings)
 
     def program_nums(self):
@@ -194,7 +208,7 @@ class HeatLoadDataset(Dataset):
         )
         print("Export Complete")
 
-    def split_by_program_num(self, prog_num_list: list):
+    def split_by_program_num(self, prog_num_list: List[int]):
         """Generates a new copy of the data set with the subset of data that
         whose program_nums match the ones in the prog_num_list.
 
@@ -207,6 +221,19 @@ class HeatLoadDataset(Dataset):
         filter_for_df = self.img_labels.program_num.isin(prog_num_list)
 
         return HeatLoadDataset(self.img_labels[filter_for_df], **self.settings)
+
+    def validation_split(self, ratio: float):
+        """Takes in a training ratio for train/validation(or test) and returns
+        two HeatLoadDatasets with the corresponding ratios of programs. 
+
+        Args:
+            ratio (float): Ratio of the validation(train). (0-1)
+        """
+        # genarate the two sets of program numbers to use
+        program_num_split = filters.split(self.program_nums(), 1 - ratio)
+
+        # generate two datasets from the program numbers. 
+        return self.split_by_program_num(program_num_split[0]), self.split_by_program_num(program_num_split[1])
 
     def normalize_data(self):
         """Calculates the normalization parameters of the dataset across all

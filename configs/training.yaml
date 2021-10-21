@@ -1,8 +1,0 @@
-# training parameters 
-# batch_size: 32
-epochs: 6
-
-# optimizer parameters 
-# learning_rate: 0.001
-# momentum: 0.9
-

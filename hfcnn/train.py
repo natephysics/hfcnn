@@ -1,8 +1,10 @@
 import os
-import torch
 from  shutil import copyfile
 import hydra
 import pytorch_lightning as pl
+import torch
+from tqdm import tqdm
+from torch.utils.data import DataLoader
 from typing import List
 from omegaconf import DictConfig
 from hfcnn.utils import get_logger, instantiate_list
@@ -134,8 +136,6 @@ def train(cfg: DictConfig, **kwargs) -> None:
     log.info("Train transforms: %s" % datamodule.train_data.settings['transforms'])
 
 
-
-
     #########
     # Train #
     #########
@@ -168,4 +168,21 @@ def train(cfg: DictConfig, **kwargs) -> None:
     else:
         raise ValueError("%s test strategy is not supported" % cfg.test_strategy)
 
-    
+    #  Test first data with trainer
+    dataloader = DataLoader(
+        dataset,
+        batch_size=64,
+        shuffle=False,
+        pin_memory=pin_memory,
+        num_workers=num_workers,
+        persistent_workers=True,
+    )
+    trainer.test(model, dataloaders=dataloader)
+
+    ############
+    # Finalize #
+    ############
+
+    #  Finalize objects
+    logger.finalize(status="FINISHED")
+
