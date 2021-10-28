@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - action: prepare_data
+  - action: train
   - filters: data_selection
   - datamodule: heat_load
   - model: cnn
@@ -42,9 +42,9 @@ val_split: 0.2
 # generate the standardization parameters for the inputs of the training set
 normalize_labels: true
 
-# Because of the use of DVC it makes sense to store the data in the original working directory.
-# The folder the contains the raw and processed data
-data_folder: data
-
-# The name of the file that contains the data table (should be in root of data folder)
+# Name of the file that contains the raw data set labels (original working directory)
+# File must be in the root of 'data/raw' by default 
 data_file: df.pkl
+
+# Path to the folder that copies of the data used to train will be saved to (hydra wd)
+save_data_folder: data
