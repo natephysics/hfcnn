@@ -1,24 +1,24 @@
 import os
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
-from hfcnn import dataset, config
+from hfcnn import dataset
 from typing import Optional
 from pytorch_lightning.utilities.types import TRAIN_DATALOADERS, EVAL_DATALOADERS
 
-default_paths = config.build_default_paths()
-
 class HeatLoadDataModule(LightningDataModule):
     def __init__(
-        self, 
-        # Data root should be the path to the data folder, which contains raw and processed.
-        data_root, 
+        self,
+        train_data_path: str,
+        val_data_path: str,
+        test_data_path: str=None,
+        data_root=None,
         params_file_path=None,
         train_transforms=None, 
         val_transforms=None, 
         test_transforms=None, 
         batch_size: Optional[int] = 32,
         pin_memory: Optional[bool] = True,
-        num_workers: Optional[int] = 1,
+        num_workers: Optional[int] = 4,
         shuffle: Optional[bool] = True,
         ):
         super().__init__(
@@ -26,6 +26,9 @@ class HeatLoadDataModule(LightningDataModule):
             val_transforms=val_transforms, 
             test_transforms=test_transforms, 
             )
+        self.train_data_path = train_data_path
+        self.val_data_path = val_data_path
+        self.test_data_path = test_data_path
         self.data_root = data_root
         self.pin_memory = pin_memory
         self.num_workers = num_workers
@@ -39,22 +42,23 @@ class HeatLoadDataModule(LightningDataModule):
     def setup(self, stage: Optional[str] = None) -> None:
         """ Method to import the datasets.
         """
+        # TODO: Add options to specify data_root
         if stage == "fit" or stage is None:
             self.train_data = dataset.HeatLoadDataset(
                 # Path to processed dataframe
-                os.path.join(self.data_root, default_paths['train']),
+                self.test_data_path,
                 # Path to the raw image files
-                img_dir = os.path.join(self.data_root, default_paths['raw_folder'])
+                img_dir = self.data_root
                 )
             self.val_data = dataset.HeatLoadDataset(
-                os.path.join(self.data_root, default_paths['validation']),
-                img_dir = os.path.join(self.data_root, default_paths['raw_folder'])
+                self.val_data_path,
+                img_dir = self.data_root
                 )
 
         if stage == "test" or stage is None:
             self.test_data = dataset.HeatLoadDataset(
-                os.path.join(self.data_root, default_paths['test']),
-                img_dir = os.path.join(self.data_root, default_paths['raw_folder'])
+                self.test_data_path,
+                img_dir = self.data_root
                 )
 
 
@@ -88,7 +92,6 @@ class HeatLoadDataModule(LightningDataModule):
     def __repr__(self) -> str:
         return (
             self.__class__.__name__
-            + f"(root={self.data_root}, "
             + f"batch_size={self.batch_size}, "
             + f"params_file_path={self.params_file_path}, "
             + f"pin_memory={self.pin_memory}, "
@@ -98,8 +101,9 @@ class HeatLoadDataModule(LightningDataModule):
     def save_data(self, directory: str) -> None:
         """Saves a copy of the data sets to the path. 
         """
-        self.train_data.to_file(os.path.join(directory, default_paths['train']))
-        self.val_data.to_file(os.path.join(directory, default_paths['validation']))
+        self.train_data.to_file(os.path.join(directory, 'train.pkl'))
+        self.val_data.to_file(os.path.join(directory, 'vaildation.pkl'))
 
-        if os.path.isfile(os.path.join(directory, default_paths['test'])):       
-            self.test_data.to_file(os.path.join(directory, default_paths['test']))
+        # if test set exists, copy as well. 
+        if self.test_data_path is not None:       
+            self.test_data.to_file(os.path.join(directory, 'test.pkl'))

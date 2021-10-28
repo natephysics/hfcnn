@@ -1,0 +1,6 @@
+train:  data/processed/train.pkl
+validation: data/processed/validation.pkl
+test: data/processed/test.pkl
+raw_folder: data/raw
+dvc_template_path: configs/dvc.template.yaml
+dvc_pipeline_path: dvc.yaml

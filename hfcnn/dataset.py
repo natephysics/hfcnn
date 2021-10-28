@@ -1,15 +1,14 @@
-from typing import Callable, Union, List
+from __future__ import annotations
+import pandas as pd  # needed for the df format
+from numpy import integer, issubdtype
+from typing import Callable, Tuple, Union, List
 from torch.utils.data import Dataset, DataLoader
 from torch import sqrt, Tensor
-import pandas as pd  # needed for the df format
 from hfcnn import files, filters
-from numpy import integer, issubdtype
 from mlxtend.preprocessing import standardize
 from tqdm import tqdm
 
 
-
-## TODO: Fix generate_file_path to generate correct path
 
 def check_defaults(source1, source2):
     """
@@ -89,7 +88,7 @@ class HeatLoadDataset(Dataset):
             raise TypeError("Input must be a str (path) or df")
 
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Returns the number of data points in the set
 
         Returns:
@@ -97,7 +96,7 @@ class HeatLoadDataset(Dataset):
         """
         return self.img_labels.shape[0]
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx: int) -> dict:
         """Returns a data point with "image" and "label" where the labels are
         pulled from the label_list, a list of column names from the data frame.
 
@@ -163,7 +162,7 @@ class HeatLoadDataset(Dataset):
         sample = {'image': image, 'label': label}
         return sample
 
-    def apply(self, filter_fn: Union[Callable, list]):
+    def apply(self, filter_fn: Union[Callable, list]) -> HeatLoadDataset:
         """Applies a list of filter to the dataset and removes any elements that
         don't pass the filter criteria. Filters do no change the content of the
         images. Returns a HeatLoadDataset object with the filtered dataset.
@@ -192,7 +191,7 @@ class HeatLoadDataset(Dataset):
         """
         return self.img_labels["program_num"].unique()
 
-    def to_file(self, path_to_file):
+    def to_file(self, path_to_file: str) -> None:
         """Exports the data set as a Pandas dataframe and a dict to hkl.
 
         Args:
@@ -208,7 +207,7 @@ class HeatLoadDataset(Dataset):
         )
         print("Export Complete")
 
-    def split_by_program_num(self, prog_num_list: List[int]):
+    def split_by_program_num(self, prog_num_list: List[int]) -> HeatLoadDataset:
         """Generates a new copy of the data set with the subset of data that
         whose program_nums match the ones in the prog_num_list.
 
@@ -222,20 +221,23 @@ class HeatLoadDataset(Dataset):
 
         return HeatLoadDataset(self.img_labels[filter_for_df], **self.settings)
 
-    def validation_split(self, ratio: float):
+    def validation_split(self, ratio: float) -> Tuple[HeatLoadDataset, HeatLoadDataset]:
         """Takes in a training ratio for train/validation(or test) and returns
         two HeatLoadDatasets with the corresponding ratios of programs. 
 
         Args:
             ratio (float): Ratio of the validation(train). (0-1)
+
+        Returns:
+            Training_data (HeatLoadDataset), Validation_data (HeatLoadDataset)
         """
         # genarate the two sets of program numbers to use
-        program_num_split = filters.split(self.program_nums(), 1 - ratio)
+        program_num_split = filters.split(self.program_nums(), ratio)
 
         # generate two datasets from the program numbers. 
-        return self.split_by_program_num(program_num_split[0]), self.split_by_program_num(program_num_split[1])
+        return self.split_by_program_num(program_num_split[1]), self.split_by_program_num(program_num_split[0])
 
-    def normalize_data(self):
+    def normalize_data(self) -> Tuple[float, float]:
         """Calculates the normalization parameters of the dataset across all
         images. If drop_neg_values, will set all values below zero to zero
         before normalizing the data. The normalized version data can be saved if
@@ -274,19 +276,19 @@ class HeatLoadDataset(Dataset):
 
         return mean, std
 
-    def normalize_labels(self, labels):
+    def normalize_labels(self, labels: list[str]) -> None:
         """Calculates the standardization parameters of the dataset across all
         labels.
 
         Args:
-            labels (list): List of strings that reprepset the labels of the df.
+            labels (list[str]): List of strings that reprepset the labels of the df.
         """
         norm_data = standardize(self.img_labels[labels], columns=labels, return_params=True)
 
         for label in labels:
             self.settings['norm_param'][label] = (norm_data[1]['avgs'][label], norm_data[1]['stds'][label])
 
-    def import_settings(self, settings: dict):
+    def import_settings(self, settings: dict) -> None:
         """Imports the settings.
 
         Args:

@@ -1,13 +1,10 @@
 import os
-from  shutil import copyfile
 import hydra
 import pytorch_lightning as pl
-import torch
-from tqdm import tqdm
 from torch.utils.data import DataLoader
 from typing import List
 from omegaconf import DictConfig
-from hfcnn.utils import get_logger, instantiate_list
+from hfcnn.utils import get_logger, instantiate_list, build_default_paths
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer, Callback
 from pytorch_lightning.loggers import LightningLoggerBase
 
@@ -15,11 +12,11 @@ def train(cfg: DictConfig, **kwargs) -> None:
 
     log = get_logger(__name__)
 
+    default_paths = build_default_paths(cfg)
+
     ##############
     # Datamodule #
     ##############
-
-    processed_data_root = os.path.join(cfg.orig_wd, cfg.data_folder)
     
     ## TODO: add param files
     if cfg.datamodule.params_file_path:
@@ -27,26 +24,26 @@ def train(cfg: DictConfig, **kwargs) -> None:
     else:
         params_file_path = False
 
-    num_workers = os.cpu_count()
     pin_memory = False
     if cfg.trainer.gpus is not None and cfg.trainer.gpus != 0:
-        num_workers = 1
         pin_memory = True
 
     #  Instatiate datamodule
     datamodule: LightningDataModule = hydra.utils.instantiate(
         cfg.datamodule,
-        data_root=processed_data_root,
+        train_data_path=default_paths['train'],
+        val_data_path=default_paths['validation'],
+        test_data_path=default_paths['test'],
+        data_root=default_paths['raw_folder'],
         params_file_path=params_file_path,
         pin_memory=pin_memory,
-        num_workers=num_workers
     )
     
     # Setup the data set
     datamodule.setup()
 
-    # Save a copy of the data in the wd
-    datamodule.save_data(cfg.data_folder)
+    # Save a copy of the data in the hydra wd
+    datamodule.save_data(cfg.save_data_folder)
 
     log.info("DataModule: %s" % datamodule)
 
@@ -174,8 +171,8 @@ def train(cfg: DictConfig, **kwargs) -> None:
         batch_size=64,
         shuffle=False,
         pin_memory=pin_memory,
-        num_workers=num_workers,
         persistent_workers=True,
+        num_workers=cfg.datamodule.num_workers
     )
     trainer.test(model, dataloaders=dataloader)
 
