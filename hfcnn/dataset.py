@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import pandas as pd  # needed for the df format
 from numpy import integer, issubdtype
 from typing import Callable, Tuple, Union, List
@@ -67,6 +68,7 @@ class HeatLoadDataset(Dataset):
         Raises:
             TypeError: [description]
         """
+        # TODO: add excel support
         if isinstance(df, str):
             data = files.import_file_from_local_cache(df)
             if isinstance(data, dict):

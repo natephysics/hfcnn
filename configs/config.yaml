@@ -39,6 +39,9 @@ filter_list:
 # validation ratio
 val_split: 0.2
 
+# test ratio
+test_split: 0.2
+
 # generate the standardization parameters for the inputs of the training set
 normalize_labels: true
 
