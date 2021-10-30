@@ -54,7 +54,7 @@ def prepare_test_data(cfg: DictConfig, **kwargs) -> None:
 
     _, test_data = raw_data.validation_split(cfg.test_split)
 
-    log.info(f"Preprocseeing Data: Test dataset generated with {validation_data.__len__()} samples.")
+    log.info(f"Preprocseeing Data: Test dataset generated with {test_data.__len__()} samples.")
 
     # Save the data
     test_data.to_file(default_paths['test'])
