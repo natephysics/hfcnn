@@ -178,6 +178,7 @@ class HeatLoadDataset(Dataset):
         num_of_filters = len(filter_fn)
 
         tqdm.pandas()
+        temp_df = self.img_labels.copy()
         for i, filter in enumerate(filter_fn):  
             print(f'Applying filter {i+1}/{num_of_filters}:')
 
@@ -185,8 +186,11 @@ class HeatLoadDataset(Dataset):
             filter.set_img_path(self.settings['img_dir'])
 
             # apply the filter to the dataframe 
-            filter_for_df = self.img_labels.progress_apply(filter.row_filter(), axis=1)
-        return HeatLoadDataset(self.img_labels[filter_for_df], **self.settings)
+            filter_for_df = temp_df.progress_apply(filter.row_filter(), axis=1)
+
+            # save the file
+            temp_df = temp_df[filter_for_df]
+        return HeatLoadDataset(temp_df, **self.settings)
 
     def program_nums(self):
         """Returns the unique program numbers from the data set

@@ -1,3 +1,6 @@
+is_available:
+  _target_: hfcnn.filters.Missing_Data_Filter
+
 data_selection:
   _target_: hfcnn.filters.Data_Selection_Filter
   int_threshold: 5

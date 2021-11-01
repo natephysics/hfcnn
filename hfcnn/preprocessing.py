@@ -144,7 +144,6 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
     log.info(f"Preprocseeing Data: Training set standardization parameters.")
     log.info(f"mean: {training_data.settings['norm_param']['image_labels'][0]}")
     log.info(f"std: {training_data.settings['norm_param']['image_labels'][1]}")
-
     
 
     if cfg.normalize_labels == True:

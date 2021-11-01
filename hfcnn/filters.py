@@ -88,6 +88,10 @@ def load_and_filter(row: pd.Series, raw_img_folder):
     image = files.import_file_from_local_cache(path)
     return image
 
+def check_file_available(row: pd.Series, raw_img_folder):
+    path = files.generate_file_path(row['times'], row['port'], raw_img_folder)
+    return os.path.exists(path)
+
 
 ####################################
 # filters at the data sample level #
@@ -150,6 +154,37 @@ class Data_Selection_Filter(Filter):
             return True
         else:
             return False
+
+    def row_filter(self) -> Callable:
+        """Returns a function that takes a row from a data frame as an input
+        and returns True or False.
+
+        If a raw_img_folder is not None, will return a function 
+
+        Returns:
+            [Callable]
+        """                
+        return lambda x: self.filter_fn(x)
+
+
+class Missing_Data_Filter(Filter):
+    def __init__(
+        self, 
+        raw_img_folder: str = False,  
+        **kwargs
+        ):
+        super().__init__(
+            fn_req_imgs=True, 
+            raw_img_folder=raw_img_folder, 
+            **kwargs
+            )
+        self.raw_img_folder = raw_img_folder
+
+
+    def filter_fn(self, row: pd.Series):
+        """Filters if the file is unavailable."""
+        return check_file_available(row, self.raw_img_folder)
+
 
     def row_filter(self) -> Callable:
         """Returns a function that takes a row from a data frame as an input
