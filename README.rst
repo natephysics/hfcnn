@@ -12,6 +12,15 @@ Features
 * The Heat Flux NN package is built using the Hydra framework and uses PyTorchLightning.
 
 
+Setup
+-----
+The enviroment used to run the code can be reproduced with the enviroment.yaml file in the root directory. This will create a conda enviroment called PyTorch. To install this enviroment simply install anacdona and run the following command:
+
+.. code-block:: console
+    $ conda env create -f enviroment.yaml
+        ...
+In the future this will be better handeled but this is a placeholder for now.
+
 Data:
 -----
 
@@ -35,61 +44,55 @@ The processed data is generated when running the proprocessing actions.
 Configuration:
 --------------
 
-All of the relevant settings are stored in the yaml config files in the configs folder. 
+The code is designed with modular yaml config files. Instead of directly modifying each file per run it's suggested to create experiments which are run. Experiments will use the default settings unless a setting is overrided. (see Use Example)
 
+By default, confg files are stored in the following directory structure:
 
-Data prep:
+config/
+    actions/
+    callbacks/
+    criterion/
+    datamodule/
+    experiments/
+    filters/
+    logger/
+    metric/
+    model/
+    optimizer/
+    trainer/
+    config.yaml
+
+Each folder contains optional modules that can be called easily from the command line or an experiment. The core config file is the config.yaml in the root of the configs folder. 
+
+Use Example:
 ----------
 
-There are data preprocessing operations for test data, and traing+vaildation data. These actions can be defined by actions in the config.yaml. 
+Let's start with a simple example. If you want to prepare the test set by itself you can run the action prepare_test. Actions like this can be defined by actions contained in the /config/actions folder. Instead of using the default action of info, we want to change the default action to prepare_test. 
 
-For example, generating the test set would involve setting the action to prepare_test.
-
-.. code-block:: yaml
-    defaults:
-        - _self_
-        - action: prepare_test
-        - filters: data_selection
-        - datamodule: heat_load
-        - model: cnn
-        - optimizer: adam
-        - criterion: mse
-        - trainer: default
-        - metric: default
-        - callback: default
-        - logger: tensorboard
-
+One method for doing this is directly from the command line.
+.. code-block:: console
+    $ python hfcnn action=prepare_test
         ...
 
+You can set any number of settings using command line arguments. But if you have a operation that requires setting many different parameters it's better to use experiments. You can create a new experiment in the config/experiments folder. Inside these yaml files you can override any of the default settings. For example, if you wanted to prepare_test data using a different default filename:
 
-Once the action is defined, all that is required is running the package
+experiments/prepare_test_new_file_path
+.. code-block:: yaml
+    stuff goes here
+        ...
 
+Then you'd simply run it using the following command:
 .. code-block:: console
+    $ python hfcnn experiment=prepare_test_new_file_path
+        ...
 
-    $ python hfcnn
 
 Training:
 ---------
 Training is no different than other actions. Simply set the action to train.
 
-.. code-block:: yaml
-    defaults:
-        - _self_
-        - action: train
-        - filters: data_selection
-        - datamodule: heat_load
-        - model: cnn
-        - optimizer: adam
-        - criterion: mse
-        - trainer: default
-        - metric: default
-        - callback: default
-        - logger: tensorboard
-
+.. code-block:: console
+    $ python hfcnn action=train
         ...
 
-Then run the package.
 
-.. code-block:: console
-
-    $ python hfcnn
