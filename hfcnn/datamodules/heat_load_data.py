@@ -38,7 +38,7 @@ class HeatLoadDataModule(LightningDataModule):
         self.train_data = None
         self.val_data = None
         self.test_data = None
-
+    
     def setup(self, stage: Optional[str] = None) -> None:
         """ Method to import the datasets.
         """
@@ -68,7 +68,8 @@ class HeatLoadDataModule(LightningDataModule):
         batch_size=self.batch_size, 
         shuffle=self.shuffle, 
         pin_memory=self.pin_memory,
-        num_workers=self.num_workers
+        num_workers=self.num_workers,
+        persistent_workers=bool(self.num_workers)
         )
 
     def val_dataloader(self) -> EVAL_DATALOADERS:
@@ -77,7 +78,8 @@ class HeatLoadDataModule(LightningDataModule):
         batch_size=self.batch_size, 
         shuffle=False, 
         pin_memory=self.pin_memory,
-        num_workers=self.num_workers
+        num_workers=self.num_workers,
+        persistent_workers=bool(self.num_workers)
         )
 
     def test_dataloader(self) -> EVAL_DATALOADERS:
@@ -86,7 +88,8 @@ class HeatLoadDataModule(LightningDataModule):
         batch_size=self.batch_size, 
         shuffle=False, 
         pin_memory=self.pin_memory,
-        num_workers=self.num_workers
+        num_workers=self.num_workers,
+        persistent_workers=bool(self.num_workers)
         )
 
     def __repr__(self) -> str:

@@ -2,6 +2,6 @@ _target_: hfcnn.datamodules.heat_load_data.HeatLoadDataModule
 
 batch_size: 32
 pin_memory: true
-num_workers: 4
+num_workers: 0
 shuffle: true
 params_file_path: false

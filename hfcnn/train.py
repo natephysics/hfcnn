@@ -72,14 +72,22 @@ def train(cfg: DictConfig, **kwargs) -> None:
     for c in callbacks:
         log.info("Callback: %s" % c.__class__.__name__)
 
-    #  Instantiate logger
-    logger: LightningLoggerBase = hydra.utils.instantiate(cfg.logger)
-    log.info("Logger: %s" % logger.__class__.__name__)
+    # Instantiate logger
+    loggers: LightningLoggerBase = hydra.utils.instantiate(cfg.logger)
 
     deterministic = True if cfg.seed is not None else False
+
+    if not isinstance(loggers, list):
+        loggers = [loggers]
+
+    # Instantate trainer 
     trainer: Trainer = hydra.utils.instantiate(
-        cfg.trainer, logger=logger, callbacks=callbacks, deterministic=deterministic
+        cfg.trainer, logger=loggers, callbacks=callbacks, deterministic=deterministic
     )
+    
+    for i, logger in enumerate(loggers):
+        log.info(f"Logger {i}: {logger.__class__.__name__} instantiated.")
+
     log.info("Trainer: %s" % trainer.__class__.__name__)
 
     ###################
@@ -106,25 +114,28 @@ def train(cfg: DictConfig, **kwargs) -> None:
     hparams["datamodule/num_test"] = len(datamodule.test_data)
 
     #  Add hp metrics
-    hp_metrics = {}
-    hp_metrics["val/loss"] = 0
+    # hp_metrics = {}
+    # hp_metrics["val/loss"] = 0
 
     #  Log hparams
     #  TensorBoard requires metrics to be defined with hyperparameters
-    if isinstance(logger, pl.loggers.tensorboard.TensorBoardLogger):
-        pass
-        # logger.log_hyperparams(hparams, hp_metrics)
-    else:
+    for key, logger in iter(loggers):
         logger.log_hyperparams(hparams)
-        logger.log_metrics(hp_metrics)
+        # if isinstance(logger, pl.loggers.tensorboard.TensorBoardLogger):
+        #     logger.log_hyperparams(hparams, hp_metrics)
+        # else:
+        #     logger.log_hyperparams(hparams)
+        #     logger.log_metrics(hp_metrics)
 
     # disable logging any more hyperparameters for all loggers
     # see: https://github.com/ashleve/lightning-hydra-template/blob/main/src/utils/utils.py
     def empty(*args, **kwargs):
         pass
-
-    log_hyperparams_ = logger.log_hyperparams
-    logger.log_hyperparams = empty
+    
+    # TODO: check on this with Andrea
+    for key, logger in iter(loggers):
+        log_hyperparams_ = logger.log_hyperparams
+        logger.log_hyperparams = empty
 
     #  Log hparams to console too
     log.info("Num of train samples: %d" % len(datamodule.train_data))
@@ -148,7 +159,8 @@ def train(cfg: DictConfig, **kwargs) -> None:
     ########
 
     if cfg.test_strategy is None:
-        logger.finalize(status="FINISHED")
+        for key, logger in iter(loggers): 
+            logger.finalize(status="FINISHED")
         return
 
     #  Test model on supported strategies:
@@ -171,7 +183,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
         batch_size=64,
         shuffle=False,
         pin_memory=pin_memory,
-        persistent_workers=True,
+        persistent_workers=bool(cfg.datamodule.num_workers),
         num_workers=cfg.datamodule.num_workers
     )
     trainer.test(model, dataloaders=dataloader)
@@ -181,5 +193,6 @@ def train(cfg: DictConfig, **kwargs) -> None:
     ############
 
     #  Finalize objects
-    logger.finalize(status="FINISHED")
+    for key, logger in iter(loggers):
+        logger.finalize(status="FINISHED")
 

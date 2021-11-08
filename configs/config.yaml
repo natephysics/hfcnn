@@ -9,7 +9,8 @@ defaults:
   - trainer: default
   - metric: default
   - callback: default
-  - logger: tensorboard
+  - logger: both
+  - experiment: null
 
 hydra:
   run:
@@ -21,7 +22,7 @@ test_strategy: train
 ignore_warnings: false
 
 # global seed
-seed: null
+seed: 10
 
 # path to original working directory
 # learn more here: https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory

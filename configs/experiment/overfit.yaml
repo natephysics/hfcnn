@@ -1,0 +1,22 @@
+# @package _global_
+
+# to execute this experiment run:
+# python hfcnn experiment=overfit
+
+defaults:
+  - override /action: train
+  - override /callback: none
+
+# train:
+#   name: overfit
+
+datamodule:
+  batch_size: 4
+  shuffle: false
+  num_workers: 0
+
+trainer:
+  max_epochs: 2000
+  limit_train_batches: 1
+  limit_val_batches: 0
+  log_every_n_steps: 10

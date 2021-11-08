@@ -6,7 +6,7 @@
     "configurations": [
 
         {
-            "name": "Python: Run Project",
+            "name": "Run Project",
             "type": "python",
             "request": "launch",
             "program": "hfcnn",
@@ -18,11 +18,24 @@
             // "args": ["hydra.run.dir=."],
         },
         {
-            "name": "Python: Run Current File",
+            "name": "Run Current File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": { 
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Exp: Overfit",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": ["experiment=overfit"],
             "env": { 
                 "PYTHONPATH": "${workspaceFolder}"
             }

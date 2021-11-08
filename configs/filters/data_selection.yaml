@@ -1,6 +1,8 @@
+# Removes any data that isn't available
 is_available:
   _target_: hfcnn.filters.Missing_Data_Filter
 
+# Filters data based on heat load thresholds of the images 
 data_selection:
   _target_: hfcnn.filters.Data_Selection_Filter
   int_threshold: 5

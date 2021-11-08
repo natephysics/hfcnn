@@ -1,0 +1,18 @@
+tensorboard:
+  _target_: pytorch_lightning.loggers.tensorboard.TensorBoardLogger
+  save_dir: logs
+  version: null
+  log_graph: false
+  default_hp_metric: false
+  prefix: ""
+  sub_dir: null
+
+mlflow:
+  _target_: pytorch_lightning.loggers.mlflow.MLFlowLogger
+  experiment_name: default
+  run_name: null
+  tracking_uri: file://${hydra:runtime.cwd}/mlruns
+  tags: null
+  save_dir: null
+  prefix: ""
+  artifact_location: null
