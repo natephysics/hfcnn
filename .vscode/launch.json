@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+    
 
         {
             "name": "Run Project",
@@ -39,6 +40,30 @@
             "env": { 
                 "PYTHONPATH": "${workspaceFolder}"
             }
+        },
+        {
+            "name": "Exp: Full",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": ["experiment=full"],
+            "env": { 
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Multirun Test",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": { 
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "args": ["--multirun"],
         }
     ]
 }

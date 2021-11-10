@@ -73,7 +73,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
         log.info("Callback: %s" % c.__class__.__name__)
 
     # Instantiate logger
-    loggers: LightningLoggerBase = hydra.utils.instantiate(cfg.logger)
+    loggers: LightningLoggerBase = instantiate_list(cfg.logger)
 
     deterministic = True if cfg.seed is not None else False
 
@@ -119,7 +119,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
 
     #  Log hparams
     #  TensorBoard requires metrics to be defined with hyperparameters
-    for key, logger in iter(loggers):
+    for logger in loggers:
         logger.log_hyperparams(hparams)
         # if isinstance(logger, pl.loggers.tensorboard.TensorBoardLogger):
         #     logger.log_hyperparams(hparams, hp_metrics)
@@ -133,7 +133,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
         pass
     
     # TODO: check on this with Andrea
-    for key, logger in iter(loggers):
+    for logger in loggers:
         log_hyperparams_ = logger.log_hyperparams
         logger.log_hyperparams = empty
 
@@ -154,12 +154,31 @@ def train(cfg: DictConfig, **kwargs) -> None:
     log.info("Start training ...")
     trainer.fit(model, datamodule=datamodule)
 
+    # retreive best validation loss from training
+    best_model_score = None
+    for callback in trainer.callbacks:
+        if isinstance(callback, pl.callbacks.ModelCheckpoint):
+            best_model_score = callback.best_model_score.cpu().detach().numpy()
+            break
+    
+
+    #########
+    # Log #
+    #########
+
+    # log.info("Logging ... ")
+    # for logger in loggers:
+    #     logger.log_metrics(trainer.logger.metrics)
+    #     logger.log_metrics(trainer.logger.metrics, step=trainer.global_step)
+
+    # log.info("Done.")
+
     ########
     # Test #
     ########
 
     if cfg.test_strategy is None:
-        for key, logger in iter(loggers): 
+        for logger in loggers: 
             logger.finalize(status="FINISHED")
         return
 
@@ -193,6 +212,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
     ############
 
     #  Finalize objects
-    for key, logger in iter(loggers):
+    for logger in loggers:
         logger.finalize(status="FINISHED")
 
+    return best_model_score

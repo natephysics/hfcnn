@@ -32,7 +32,7 @@
     "nvidia-smi-plus.refresh.autoRefresh": true,
     "terminal.integrated.shell.windows": "c:\\Program Files\\PowerShell\\7\\pwsh.exe",
     "terminal.integrated.shellArgs.windows": ["-NoLogo", "-NoExit", "-Command", "& { Write-Host }"],
-    // "env": {
-    //     "PYTHONPATH": "C:\\Users\\natep\\projects\\hfcnn"
-    // }
+    "env": {
+        "PYTHONPATH": "E:\\projects\\hfcnn"
+    },
 }

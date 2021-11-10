@@ -7,6 +7,8 @@ events.out.tfevents.*.1
 
 # outputs
 outputs/*
+mlruns/*
+multirun/*
 
 # user defined config files
 config/config.cfg
