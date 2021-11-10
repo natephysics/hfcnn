@@ -158,7 +158,8 @@ def train(cfg: DictConfig, **kwargs) -> None:
     best_model_score = None
     for callback in trainer.callbacks:
         if isinstance(callback, pl.callbacks.ModelCheckpoint):
-            best_model_score = callback.best_model_score.cpu().detach().numpy()
+            if callback.best_model_score is not None:
+                best_model_score = callback.best_model_score.cpu().detach().numpy()
             break
     
 
