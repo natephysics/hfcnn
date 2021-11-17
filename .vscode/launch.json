@@ -54,16 +54,28 @@
             }
         },
         {
-            "name": "Multirun Test",
+            "name": "Exp: Ax",
             "type": "python",
             "request": "launch",
             "program": "hfcnn",
             "console": "integratedTerminal",
             "justMyCode": false,
+            "args": ["--multirun", "experiment=ax"],
             "env": { 
                 "PYTHONPATH": "${workspaceFolder}"
-            },
-            "args": ["--multirun"],
+            }
+        },
+        {
+            "name": "Exp: Nevergrad",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": ["--multirun", "experiment=nevergrad"],
+            "env": { 
+                "PYTHONPATH": "${workspaceFolder}"
+            }
         }
     ]
 }

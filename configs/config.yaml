@@ -11,10 +11,12 @@ defaults:
   - callback: default
   - logger: both
   - experiment: null
+  - override hydra/sweeper: ax
 
 hydra:
   run:
     dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-${dict:${action},name}
+
 
 test_strategy: train
 

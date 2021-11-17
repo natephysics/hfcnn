@@ -1,0 +1,15 @@
+# @package _global_
+
+# To run:
+# python hfcnn --multirun experiment=ax
+  
+hydra:
+  sweeper:
+    ax_config:
+      max_trials: 3
+      params:
+        optimizer.lr:
+          type: range
+          bounds: [1e-4, 5e-2]
+          log_scale: true
+          value_type: float

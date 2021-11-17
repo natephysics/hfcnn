@@ -159,21 +159,9 @@ def train(cfg: DictConfig, **kwargs) -> None:
     for callback in trainer.callbacks:
         if isinstance(callback, pl.callbacks.ModelCheckpoint):
             if callback.best_model_score is not None:
-                best_model_score = callback.best_model_score.cpu().detach().numpy()
+                best_model_score = callback.best_model_score.item()
             break
     
-
-    #########
-    # Log #
-    #########
-
-    # log.info("Logging ... ")
-    # for logger in loggers:
-    #     logger.log_metrics(trainer.logger.metrics)
-    #     logger.log_metrics(trainer.logger.metrics, step=trainer.global_step)
-
-    # log.info("Done.")
-
     ########
     # Test #
     ########
