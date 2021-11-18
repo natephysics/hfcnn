@@ -42,11 +42,10 @@ class HeatLoadDataModule(LightningDataModule):
     def setup(self, stage: Optional[str] = None) -> None:
         """ Method to import the datasets.
         """
-        # TODO: Add options to specify data_root
         if stage == "fit" or stage is None:
             self.train_data = dataset.HeatLoadDataset(
                 # Path to processed dataframe
-                self.test_data_path,
+                self.train_data_path,
                 # Path to the raw image files
                 img_dir = self.data_root
                 )
