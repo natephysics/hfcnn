@@ -1,7 +1,9 @@
 defaults:
   - _self_
+  - data: default
   - action: train
   - filters: data_selection
+  - transforms: half_resolution
   - datamodule: heat_load
   - model: cnn
   - optimizer: adam
@@ -17,40 +19,9 @@ hydra:
   run:
     dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-${dict:${action},name}
 
-
-test_strategy: train
-
 # disable python warnings
 ignore_warnings: false
-
-# global seed
-seed: 10
 
 # path to original working directory
 # learn more here: https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
 orig_wd: ${hydra:runtime.cwd}
-
-# dataframe column names to use for image labels
-label_names:
-  - 'PC1'
-
-# List of filters use to select the data
-filter_list:
-- - data_selection
-  - data/raw
-
-# validation ratio
-val_split: 0.2
-
-# test ratio
-test_split: 0.2
-
-# generate the standardization parameters for the inputs of the training set
-normalize_labels: true
-
-# Name of the file that contains the raw data set labels (original working directory)
-# File must be in the root of 'data/raw' by default 
-data_file: df.pkl
-
-# Path to the folder that copies of the data used to train will be saved to (hydra wd)
-save_data_folder: data

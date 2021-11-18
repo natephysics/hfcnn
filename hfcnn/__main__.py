@@ -14,8 +14,8 @@ def main(cfg: DictConfig):
     if cfg.ignore_warnings:
         disable_warnings()
 
-    if cfg.seed is not None:
-        seed_everything(cfg.seed)
+    if cfg.data.seed is not None:
+        seed_everything(cfg.data.seed)
 
     if cfg.orig_wd is not None:
         os.environ['OWD'] = cfg.orig_wd

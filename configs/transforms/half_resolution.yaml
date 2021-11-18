@@ -1,0 +1,6 @@
+resize:
+  _target_: torchvision.transforms.Resize
+  _convert_: partial
+  size:
+  - 130
+  - 520

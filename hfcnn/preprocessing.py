@@ -1,5 +1,6 @@
 from hfcnn import dataset, utils
 from hfcnn.utils import get_logger, instantiate_list
+from torchvision import transforms
 from omegaconf import DictConfig
 import os
 
@@ -13,16 +14,21 @@ def prepare_test_data(cfg: DictConfig, **kwargs) -> None:
     # Importing Data #
     ##################
 
+    if cfg.transforms is not None:
+        composed_transforms = transforms.Compose(instantiate_list(cfg.transforms))
+    else:
+        composed_transforms = None
+
     data_settings = {
         'img_dir': default_paths['raw_folder'],
-        'label_list': cfg.label_names
+        'label_list': cfg.data.label_names,
+        'transforms': composed_transforms
     }
 
     raw_data = dataset.HeatLoadDataset(
-        os.path.join(default_paths['raw_folder'], cfg.data_file), 
+        os.path.join(default_paths['raw_folder'], cfg.data.data_file), 
         **data_settings
         )
-    
 
     ## TODO: Move this to the import step
     # Adding new columns for IA
@@ -52,7 +58,7 @@ def prepare_test_data(cfg: DictConfig, **kwargs) -> None:
     # Because data for a given program number is likely corolated we'll divide
     # the sets up by program number.
 
-    _, test_data = raw_data.validation_split(cfg.test_split)
+    _, test_data = raw_data.validation_split(cfg.data.test_split)
 
     log.info(f"Preprocseeing Data: Test dataset generated with {test_data.__len__()} samples.")
 
@@ -72,13 +78,19 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
     # Importing Data #
     ##################
 
+    if cfg.transforms is not None:
+        composed_transforms = transforms.Compose(instantiate_list(cfg.transforms))
+    else:
+        composed_transforms = None
+
     data_settings = {
         'img_dir': default_paths['raw_folder'],
-        'label_list': cfg.label_names
+        'label_list': cfg.data.label_names,
+        'transforms': composed_transforms
     }
 
     raw_data = dataset.HeatLoadDataset(
-        os.path.join(default_paths['raw_folder'], cfg.data_file), 
+        os.path.join(default_paths['raw_folder'], cfg.data.data_file), 
         **data_settings
         )
     
@@ -130,7 +142,7 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
     # Because data for a given program number is likely corolated we'll divide
     # the sets up by program number.
 
-    training_data, validation_data = raw_data.validation_split(cfg.val_split)
+    training_data, validation_data = raw_data.validation_split(cfg.data.val_split)
 
     log.info(f"Preprocseeing Data: Training dataset generated with {training_data.__len__()} samples.")
     log.info(f"Preprocseeing Data: Validation dataset generated with {validation_data.__len__()} samples.")
@@ -146,8 +158,8 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
     log.info(f"std: {training_data.settings['norm_param']['image_labels'][1]}")
     
 
-    if cfg.normalize_labels:
-        training_data.normalize_labels(cfg.label_names)
+    if cfg.data.normalize_labels:
+        training_data.normalize_labels(cfg.data.label_names)
         data_settings = training_data.settings
         
         # update valdation
@@ -160,5 +172,7 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
         test_data.to_file(default_paths['test'])
 
     training_data.to_file(default_paths['train'])
+
+    test_data.__getitem__(0)
 
     log.info("Preprocessing Complete.")

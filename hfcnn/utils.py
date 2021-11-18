@@ -59,6 +59,8 @@ def instantiate_list(cfg: DictConfig, **kwargs) -> List[any]:
         if "_target_" in cfg_:
             #  Add kwargs if found under configuration
             kwargs_ = {k: v for k, v in kwargs.items() if k in cfg_}
+            for key, value in cfg_.items():
+                cfg_[key] = value
             objects.append(instantiate(cfg_, **kwargs_))
     return objects
 

@@ -42,13 +42,25 @@
             }
         },
         {
-            "name": "Exp: Full",
+            "name": "Exp: Prepare Data",
             "type": "python",
             "request": "launch",
             "program": "hfcnn",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "args": ["experiment=full"],
+            "args": ["action=prepare_data"],
+            "env": { 
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Exp: Prepare Test",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": ["action=prepare_test"],
             "env": { 
                 "PYTHONPATH": "${workspaceFolder}"
             }

@@ -5,6 +5,7 @@ from numpy import integer, issubdtype
 from typing import Callable, Tuple, Union, List
 from torch.utils.data import Dataset, DataLoader
 from torch import sqrt, Tensor
+from torchvision import transforms
 from hfcnn import files, filters
 from mlxtend.preprocessing import standardize
 from tqdm import tqdm
@@ -132,18 +133,19 @@ class HeatLoadDataset(Dataset):
         if self.settings['drop_neg_values']:
             image = image.clip(min=0)
 
+                # add channel for tensor 
+        if image.ndim < 3:
+            image = image[None, :, :]
+
         # apply any provided transformations of the data
         if not (self.settings['transforms'] == None):
             image = self.settings['transforms'](image)
         
         # standardize the data
         if 'image_labels' in self.settings['norm_param']:
-            image = (image - self.settings['norm_param']['image_labels'][0]) /\
-                 self.settings['norm_param']['image_labels'][1]
-        
-        # add channel for tensor 
-        if image.ndim < 3:
-            image = image[None, :, :]
+            img_mean = self.settings['norm_param']['image_labels'][0]
+            img_std = self.settings['norm_param']['image_labels'][1]
+            image = transforms.Normalize(mean=(img_mean), std=(img_std))(image)
 
         # generate the labels
         label = row[self.settings['label_list']].copy()
