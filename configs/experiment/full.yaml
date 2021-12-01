@@ -4,7 +4,4 @@
 # python hfcnn experiment=full
 
 defaults:
-  - override /action: 
-    - prepare_test
-    - prepare_data
-    - train
+  - override /action: [prepare_test, prepare_data, train]

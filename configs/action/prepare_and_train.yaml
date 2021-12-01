@@ -1,0 +1,8 @@
+prepare:
+  _target_: hfcnn.preprocessing.prepare_data
+  name: prepare_data 
+
+
+train:
+  _target_: hfcnn.train.train
+  name: train

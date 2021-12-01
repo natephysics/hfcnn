@@ -78,13 +78,13 @@
             }
         },
         {
-            "name": "Exp: Nevergrad",
+            "name": "Exp: Half Res",
             "type": "python",
             "request": "launch",
             "program": "hfcnn",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "args": ["--multirun", "experiment=nevergrad"],
+            "args": ["experiment=reduce_dim"],
             "env": { 
                 "PYTHONPATH": "${workspaceFolder}"
             }

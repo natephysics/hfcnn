@@ -1,0 +1,8 @@
+# docs: https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.ReduceLROnPlateau.html#torch.optim.lr_scheduler.ReduceLROnPlateau
+
+_target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+mode: min
+factor: 0.8
+patience: 1
+cooldown: 20
+monitor: "val/loss"

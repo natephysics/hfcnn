@@ -52,7 +52,7 @@ def disable_warnings() -> None:
     log.info("Python warnings are disabled")
 
 
-def instantiate_list(cfg: DictConfig, **kwargs) -> List[any]:
+def instantiate_list(cfg: DictConfig, *args, **kwargs) -> List[any]:
     """Instatiate a list through hydra instantiate."""
     objects: List[any] = []
     for _, cfg_ in cfg.items():
@@ -61,7 +61,7 @@ def instantiate_list(cfg: DictConfig, **kwargs) -> List[any]:
             kwargs_ = {k: v for k, v in kwargs.items() if k in cfg_}
             for key, value in cfg_.items():
                 cfg_[key] = value
-            objects.append(instantiate(cfg_, **kwargs_))
+            objects.append(instantiate(cfg_, *args, **kwargs_))
     return objects
 
 def build_default_paths(cfg: DictConfig) -> DictConfig:

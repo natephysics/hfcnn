@@ -1,4 +1,5 @@
 import hydra
+from hfcnn.utils import instantiate_list
 from omegaconf import DictConfig, OmegaConf
 import omegaconf
 import os
@@ -21,8 +22,8 @@ def main(cfg: DictConfig):
         os.environ['OWD'] = cfg.orig_wd
 
     #  Start action
+    # return instantiate_list(cfg.action, cfg)
     return hydra.utils.instantiate(cfg.action, cfg)
-
 
 if __name__ == "__main__":
     main()

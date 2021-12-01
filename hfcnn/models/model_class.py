@@ -12,22 +12,36 @@ class ImageClassificationBase(pl.LightningModule):
     """
     def __init__(
         self,
+        log_training: Optional[bool] = False,
         criterion: Optional[DictConfig] = {},
         optimizer: Optional[DictConfig] = {},
+        scheduler: Optional[DictConfig] = {},
         metrics: Optional[DictConfig] = {}
         ) -> None:
         super().__init__()
         self.save_hyperparameters(
-            "criterion", "optimizer", "metrics"
+            "log_training", "criterion", "optimizer", "scheduler", "metrics"
         )
         self.network = None
         self.criterion = instantiate(criterion)
         self.optimizer = optimizer
 
+        # Metrics
         metrics = instantiate_list(metrics)
         metrics = MetricCollection(metrics)
+        self.train_metrics = metrics.clone(prefix="train/")
         self.val_metrics = metrics.clone(prefix="val/")
         self.test_metrics = metrics.clone(prefix="test/")
+
+        # define "lr" as attribute to leverage pl learning rate tuner
+        self.optimizer = optimizer
+        self.lr = optimizer.lr
+
+        #  Whether to log gradient and weights during training
+        self.log_training = log_training
+
+        self.scheduler = scheduler
+
 
     def forward(self, x: Tensor, *args, **kwargs) -> Tensor:
         for layer in self.network:
@@ -45,6 +59,16 @@ class ImageClassificationBase(pl.LightningModule):
     def training_step(self, batch: any, batch_idx: int):
         loss, _, y = self.step(batch, batch_idx)
         self.log("train/loss", loss)
+        if self.log_training:
+            self.train_metrics(y_hat, y)
+            self.log_dict(self.train_metrics)
+            for layer, param in self.named_parameters():
+                self.logger.experiment.add_histogram(
+                    f"train/{layer}", param, global_step=self.global_step
+                )
+                if batch_idx != 0:
+                    self.log(f"train/{layer}.max_grad", torch.max(param.grad))
+
         return loss
 
     def validation_step(self, batch: any, batch_idx: int):
@@ -66,8 +90,17 @@ class ImageClassificationBase(pl.LightningModule):
         return self(x)
 
     def configure_optimizers(self):
-        optimizer = instantiate(self.optimizer, self.parameters())
-        return optimizer
+        optimizer = instantiate(self.optimizer, self.parameters(), lr=self.lr)
+        if self.scheduler != {}:
+            scheduler = self.scheduler.copy()
+            monitor = scheduler.pop("monitor", None)
+            lr_scheduler = {
+                "scheduler": instantiate(scheduler, optimizer),
+                "monitor": monitor,
+            }
+            return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
+        else:
+            return optimizer
     
     def _forward(self, x: Tensor) -> Tensor:
         raise NotImplementedError

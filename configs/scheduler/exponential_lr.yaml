@@ -1,0 +1,4 @@
+# docs: https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.ExponentialLR.html
+
+_target_: torch.optim.lr_scheduler.ExponentialLR
+gamma: 0.999

@@ -3,7 +3,7 @@ defaults:
   - data: default
   - action: train
   - filters: data_selection
-  - transforms: half_resolution
+  - transforms: none
   - datamodule: heat_load
   - model: cnn
   - optimizer: adam
@@ -12,6 +12,7 @@ defaults:
   - metric: default
   - callback: default
   - logger: both
+  - scheduler: exponential_lr
   - experiment: null
   - override hydra/sweeper: ax
 

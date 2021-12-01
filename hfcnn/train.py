@@ -43,7 +43,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
     datamodule.setup()
 
     # Save a copy of the data in the hydra wd
-    datamodule.save_data(cfg.save_data_folder)
+    datamodule.save_data(cfg.data.save_data_folder)
 
     log.info("DataModule: %s" % datamodule)
 
@@ -75,7 +75,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
     # Instantiate logger
     loggers: LightningLoggerBase = instantiate_list(cfg.logger)
 
-    deterministic = True if cfg.seed is not None else False
+    deterministic = True if cfg.data.seed is not None else False
 
     if not isinstance(loggers, list):
         loggers = [loggers]
@@ -106,7 +106,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
         hparams["callback"] = cfg.callback
 
     #  Add additional training hps
-    hparams["seed"] = cfg.seed
+    hparams["seed"] = cfg.data.seed
 
     #  Add datamodule metrics
     hparams["datamodule/num_train"] = len(datamodule.train_data)
@@ -132,7 +132,6 @@ def train(cfg: DictConfig, **kwargs) -> None:
     def empty(*args, **kwargs):
         pass
     
-    # TODO: check on this with Andrea
     for logger in loggers:
         log_hyperparams_ = logger.log_hyperparams
         logger.log_hyperparams = empty
@@ -166,7 +165,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
     # Test #
     ########
 
-    if cfg.test_strategy is None:
+    if cfg.data.test_strategy is None:
         for logger in loggers: 
             logger.finalize(status="FINISHED")
         return
@@ -176,14 +175,14 @@ def train(cfg: DictConfig, **kwargs) -> None:
     #  - test: use test data from datamodule
     #  - train: use train data from datamodule
 
-    log.info("Test the model according to test strategy: %s" % cfg.test_strategy)
+    log.info("Test the model according to test strategy: %s" % cfg.data.test_strategy)
 
-    if cfg.test_strategy == "test":
+    if cfg.data.test_strategy == "test":
         dataset = datamodule.test_data
-    elif cfg.test_strategy == "train":
+    elif cfg.data.test_strategy == "train":
         dataset = datamodule.train_data
     else:
-        raise ValueError("%s test strategy is not supported" % cfg.test_strategy)
+        raise ValueError("%s test strategy is not supported" % cfg.data.test_strategy)
 
     #  Test first data with trainer
     dataloader = DataLoader(
