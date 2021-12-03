@@ -1,7 +1,0 @@
-# @package _global_
-
-# to execute this experiment run:
-# python hfcnn experiment=full
-
-defaults:
-  - override /action: [prepare_test, prepare_data, train]

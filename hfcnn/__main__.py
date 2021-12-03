@@ -22,8 +22,11 @@ def main(cfg: DictConfig):
         os.environ['OWD'] = cfg.orig_wd
 
     #  Start action
-    # return instantiate_list(cfg.action, cfg)
-    return hydra.utils.instantiate(cfg.action, cfg)
+    #  Start action (or list of actions)
+    if '_target_' in cfg.action.keys():
+        return hydra.utils.instantiate(cfg.action, cfg)
+    else: 
+        return instantiate_list(cfg.action, cfg)
 
 if __name__ == "__main__":
     main()

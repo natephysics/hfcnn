@@ -14,12 +14,12 @@ Features
 
 Setup
 -----
-The enviroment used to run the code can be reproduced with the enviroment.yaml file in the root directory. This will create a conda enviroment called PyTorch. To install this enviroment simply install anacdona and run the following command:
+The environment used to run the code can be reproduced with the environment.yaml file in the root directory. This will create a conda enviroment called PyTorch. To install this environment simply install anaconda and run the following command:
 
 .. code-block:: console
-    $ conda env create -f enviroment.yaml
+    $ conda env create -f environment.yaml
         ...
-In the future this will be better handeled but this is a placeholder for now.
+In the future this will be better handled but this is a placeholder for now.
 
 Data:
 -----
@@ -38,7 +38,7 @@ data/
             100343888387473.pkl <- timestamp of data
         data_table.pkl <- name defined in configs/config.yaml
 
-The processed data is generated when running the proprocessing actions.
+The processed data is generated when running the preprocessing actions.
 
 
 Configuration:
@@ -46,21 +46,33 @@ Configuration:
 
 The code is designed with modular yaml config files. Instead of directly modifying each file per run it's suggested to create experiments which are run. Experiments will use the default settings unless a setting is overrided. (see Use Example)
 
-By default, confg files are stored in the following directory structure:
+By default, config files are stored in the following directory structure:
 
 config/
     actions/
+
     callbacks/
+
     criterion/
+
     datamodule/
+
     experiments/
+
     filters/
+
     logger/
+
     metric/
+
     model/
+
     optimizer/
+
     trainer/
+
     config.yaml
+    
 
 Each folder contains optional modules that can be called easily from the command line or an experiment. The core config file is the config.yaml in the root of the configs folder. 
 

@@ -1,0 +1,7 @@
+test:
+  _target_: hfcnn.preprocessing.prepare_test_data
+
+prepare:
+  _target_: hfcnn.preprocessing.prepare_data
+ 
+name: prepare_test_and_train

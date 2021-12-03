@@ -6,3 +6,6 @@
 defaults:
   - override /transforms: half_resolution
   - override /action: prepare_and_train
+
+action:
+  name: reduce_dim
