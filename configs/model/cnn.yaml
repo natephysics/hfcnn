@@ -1,1 +1,3 @@
 _target_: hfcnn.models.hf_model.HF_Model
+act_fn_name: 
+  _target_: nn.ReLU

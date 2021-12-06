@@ -303,3 +303,19 @@ class HeatLoadDataset(Dataset):
             settings (dict): self.settings from a Heatloaddataset object. 
         """
         self.settings = settings
+
+    def get_output_dim(self) -> int:
+        """Returns the output dimension of the dataset.
+
+        Returns:
+            int: output dimension
+        """
+        return self.__getitem__(0)['label'].size(dim=0)
+
+    def get_input_dim(self) -> int:
+        """Returns the input dimension of the dataset.
+
+        Returns:
+            int: input dimension
+        """
+        return list(self.__getitem__(0)['image'].size())

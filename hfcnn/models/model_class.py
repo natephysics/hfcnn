@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 import pytorch_lightning as pl
 from omegaconf import DictConfig
 from hydra.utils import instantiate
@@ -16,7 +16,10 @@ class ImageClassificationBase(pl.LightningModule):
         criterion: Optional[DictConfig] = {},
         optimizer: Optional[DictConfig] = {},
         scheduler: Optional[DictConfig] = {},
-        metrics: Optional[DictConfig] = {}
+        metrics: Optional[DictConfig] = {},
+        input_dim: int or List[int] = None,
+        output_dim: int = None,
+        act_fn_name: str = None,
         ) -> None:
         super().__init__()
         self.save_hyperparameters(
@@ -25,6 +28,9 @@ class ImageClassificationBase(pl.LightningModule):
         self.network = None
         self.criterion = instantiate(criterion)
         self.optimizer = optimizer
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.act_fun = instantiate(act_fn_name)
 
         # Metrics
         metrics = instantiate_list(metrics)
@@ -102,5 +108,5 @@ class ImageClassificationBase(pl.LightningModule):
         else:
             return optimizer
     
-    def _forward(self, x: Tensor) -> Tensor:
-        raise NotImplementedError
+    # def _forward(self, x: Tensor) -> Tensor:
+    #     raise NotImplementedError

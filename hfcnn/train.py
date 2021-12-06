@@ -45,7 +45,12 @@ def train(cfg: DictConfig, **kwargs) -> None:
     # Save a copy of the data in the hydra wd
     datamodule.save_data(cfg.data.save_data_folder)
 
+    # Extract the input/output dimension of the data set
+    input_dim = datamodule.get_input_dim()
+    output_dim = datamodule.get_output_dim()
+
     log.info("DataModule: %s" % datamodule)
+
 
 
     #########
@@ -57,6 +62,8 @@ def train(cfg: DictConfig, **kwargs) -> None:
         criterion=cfg.criterion,
         optimizer=cfg.optimizer,
         metrics=cfg.metric,
+        input_dim=input_dim,
+        output_dim=output_dim,
         _recursive_=False, # for hydra (won't recursively instantiate criterion)
     )
     log.info("Model: %s" % model)

@@ -1,0 +1,8 @@
+# @package _global_
+
+# to execute this experiment run:
+# python hfcnn experiment=overfit
+
+defaults:
+  - override /action: train
+  - override /model: inceptnet

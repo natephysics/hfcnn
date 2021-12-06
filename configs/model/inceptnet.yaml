@@ -1,0 +1,3 @@
+_target_: hfcnn.models.hf_model.GoogleNet
+act_fn_name: 
+  _target_: torch.nn.ReLU

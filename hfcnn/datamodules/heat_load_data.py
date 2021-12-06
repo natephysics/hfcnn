@@ -109,3 +109,13 @@ class HeatLoadDataModule(LightningDataModule):
         # if test set exists, copy as well. 
         if self.test_data_path is not None:       
             self.test_data.to_file(os.path.join(directory, 'test.pkl'))
+
+    def get_output_dim(self) -> int:
+        """Returns the output dimension of the model.
+        """
+        return self.train_data.get_output_dim()
+
+    def get_input_dim(self) -> int:
+        """Returns the input dimension of the model.
+        """
+        return self.train_data.get_input_dim()

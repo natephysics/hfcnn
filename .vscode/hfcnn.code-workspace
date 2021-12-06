@@ -10,6 +10,6 @@
 			"*.dvc": "yaml",
 			"dvc.lock": "yaml"
 		},
-		"nvidia-smi-plus.refresh.autoRefresh": true
+		"nvidia-smi-plus.refresh.autoRefresh": false
 	}
 }

@@ -88,6 +88,18 @@
             "env": { 
                 "PYTHONPATH": "${workspaceFolder}"
             }
+        },
+        {
+            "name": "Exp: Incept",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": ["experiment=incept"],
+            "env": { 
+                "PYTHONPATH": "${workspaceFolder}"
+            }
         }
     ]
 }
