@@ -1,11 +1,10 @@
 # @package _global_
 
 # to execute this experiment run:
-# python hfcnn experiment=overfit
+# python hfcnn experiment=full_res
 
 defaults:
-  - override /transforms: half_resolution
   - override /action: prepare_all_data
 
 action:
-  name: reduce_dim
+  name: full_res

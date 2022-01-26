@@ -6,3 +6,7 @@
 defaults:
   - override /action: train
   - override /model: inceptnet
+  - override /callback: checkpoint
+
+trainer:
+  max_epochs: 30

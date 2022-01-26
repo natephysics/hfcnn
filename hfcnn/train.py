@@ -182,6 +182,8 @@ def train(cfg: DictConfig, **kwargs) -> None:
     #  - test: use test data from datamodule
     #  - train: use train data from datamodule
 
+    
+
     log.info("Test the model according to test strategy: %s" % cfg.data.test_strategy)
 
     if cfg.data.test_strategy == "test":

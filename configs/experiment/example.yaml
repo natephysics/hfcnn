@@ -1,9 +1,0 @@
-# @package _global_
-
-# python hfcnn experiment=example
-
-defaults:
-  - override /action: prepare_test
-
-data_file:
-  test_split: 0.3

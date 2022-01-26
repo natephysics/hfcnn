@@ -4,4 +4,4 @@ test:
 prepare:
   _target_: hfcnn.preprocessing.prepare_data
  
-name: prepare_test_and_train
+name: prepare_test_prepare_train

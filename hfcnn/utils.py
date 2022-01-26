@@ -64,6 +64,7 @@ def instantiate_list(cfg: DictConfig, *args, **kwargs) -> List[any]:
             objects.append(instantiate(cfg_, *args, **kwargs_))
     return objects
 
+
 def build_default_paths(cfg: DictConfig) -> DictConfig:
     """Updates the cfg with the default paths
 

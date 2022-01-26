@@ -21,7 +21,6 @@ def main(cfg: DictConfig):
     if cfg.orig_wd is not None:
         os.environ['OWD'] = cfg.orig_wd
 
-    #  Start action
     #  Start action (or list of actions)
     if '_target_' in cfg.action.keys():
         return hydra.utils.instantiate(cfg.action, cfg)

@@ -36,6 +36,16 @@ def prepare_test_data(cfg: DictConfig, **kwargs) -> None:
 
     log.info(f"Preprocseeing Data: Imported {raw_data.__len__()} images from the raw data set.")
 
+    ####################
+    #### Test Split ####
+    ####################
+    # Because data for a given program number is likely corolated we'll divide
+    # the sets up by program number.
+
+    _, test_data = raw_data.validation_split(cfg.data.test_split)
+
+    log.info(f"Preprocseeing Data: Test dataset generated with {test_data.__len__()} samples.")
+
     ########################################
     #### Applying filter(s) to the data ####
     ########################################
@@ -49,18 +59,8 @@ def prepare_test_data(cfg: DictConfig, **kwargs) -> None:
     else:
         print(len(list_of_filters))
         print('Preprocseeing Data: Begining to filter data, for larger data sets this may take a while')
-        raw_data = raw_data.apply(list_of_filters)
-        log.info(f"{raw_data.__len__()} images remain after applying {len(list_of_filters)} filters")
-
-    ####################
-    #### Test Split ####
-    ####################
-    # Because data for a given program number is likely corolated we'll divide
-    # the sets up by program number.
-
-    _, test_data = raw_data.validation_split(cfg.data.test_split)
-
-    log.info(f"Preprocseeing Data: Test dataset generated with {test_data.__len__()} samples.")
+        test_data = test_data.apply(list_of_filters)
+        log.info(f"{test_data.__len__()} test images remain after applying {len(list_of_filters)} filters")
 
     # Save the data
     test_data.to_file(default_paths['test'])
@@ -120,6 +120,18 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
 
     log.info(f"Preprocseeing Data: Imported {raw_data.__len__()} images from the raw data set.")
 
+    #########################
+    #### Train/Val Split ####
+    #########################
+    # Because data for a given program number is likely corolated we'll divide
+    # the sets up by program number.
+
+    training_data, validation_data = raw_data.validation_split(cfg.data.val_split)
+
+    log.info(f"Preprocseeing Data: Training dataset generated with {training_data.__len__()} samples.")
+    log.info(f"Preprocseeing Data: Validation dataset generated with {validation_data.__len__()} samples.")
+
+
     ########################################
     #### Applying filter(s) to the data ####
     ########################################
@@ -132,21 +144,12 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
         log.info("Preprocseeing Data: No filters to apply. Skipping step")
     else:
         print(len(list_of_filters))
-        print('Preprocseeing Data: Begining to filter data, for larger data sets this may take a while')
-        raw_data = raw_data.apply(list_of_filters)
-        log.info(f"{raw_data.__len__()} images remain after applying {len(list_of_filters)} filters")
-
-    #########################
-    #### Train/Val Split ####
-    #########################
-    # Because data for a given program number is likely corolated we'll divide
-    # the sets up by program number.
-
-    training_data, validation_data = raw_data.validation_split(cfg.data.val_split)
-
-    log.info(f"Preprocseeing Data: Training dataset generated with {training_data.__len__()} samples.")
-    log.info(f"Preprocseeing Data: Validation dataset generated with {validation_data.__len__()} samples.")
-
+        print('Preprocseeing Data: Begining to filter training data, for larger data sets this may take a while')
+        training_data = training_data.apply(list_of_filters)
+        print('Preprocseeing Data: Begining to filter validation data, for larger data sets this may take a while')
+        validation_data = validation_data.apply(list_of_filters)
+        log.info(f"{training_data.__len__()} images remain after applying {len(list_of_filters)} filters")
+        log.info(f"{validation_data.__len__()} images remain after applying {len(list_of_filters)} filters")
 
     ##################################################
     #### Normalized the training data and labels. ####

@@ -1,0 +1,6 @@
+# callback to save the best model according to validation loss
+model_checkpoint:
+  _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  monitor: "val/loss"
+  mode: "min"
+  filename: "{epoch}-{val\/loss:.2f}"

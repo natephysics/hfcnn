@@ -78,6 +78,18 @@
             }
         },
         {
+            "name": "Exp: Full Res",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": ["experiment=full_res"],
+            "env": { 
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
             "name": "Exp: Half Res",
             "type": "python",
             "request": "launch",
