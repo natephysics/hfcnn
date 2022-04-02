@@ -14,11 +14,11 @@ Features
 
 Setup
 -----
-The environment used to run the code can be reproduced with the environment.yaml file in the root directory. This will create a conda enviroment called PyTorch. To install this environment simply install anaconda and run the following command:
+The environment used to run the code can be reproduced with the environment.yaml file in the root directory. This will create a conda environment called PyTorch. To install this environment simply install anaconda and run the following command:
 
-.. code-block:: console
+``` bash
     $ conda env create -f environment.yaml
-        ...
+```
 In the future this will be better handled but this is a placeholder for now.
 
 Data:
@@ -28,6 +28,7 @@ If you run the package the __main__ will instantiate the action defined in the c
 
 By default, data is stored in the following directory structure:
 
+```
 data/
     processed/
         train.pkl       ########################
@@ -37,42 +38,57 @@ data/
         51/ <- port number of the data
             100343888387473.pkl <- timestamp of data
         data_table.pkl <- name defined in configs/config.yaml
+```
 
 The processed data is generated when running the preprocessing actions.
 
+DVC & Datashare:
+-----
+Datashare is a common tool used at the institute and is compatible with DVC as a remote share.
+
+- On Datashare, create a folder to store the data and share the folder. Under the sharing tab go to `Public Links > Create public link`. Select the `Download / View / Edit` option and provide a secure password. Create the share URL. The url should be formatted as `https://datashare.mpcdf.mpg.de/s/<PublicShareLinkEnd>`, which is a series of numbers and characters. Save both the password and the `<PublicShareLinkEnd>` portion of the URL. 
+
+- Inside the project folder the `.dvc/config` file should already exist and contain the following:
+```
+[core]
+    remote = datashare
+['remote "datashare"']
+    url = webdavs://datashare.mpcdf.mpg.de/public.php/webdav
+```
+- In the same directory should be a file called `config.local.example`. Copy this file to the same directory as `config.local`. Inside the file there should be the following:
+```
+['remote "datashare"']
+    password = PublicLinkPassword
+    user = PublicShareLinkEnd
+```
+- Replace `PublicLinkPassword` with the password you set. Replace `PublicShareLinkEnd` with the `<PublicShareLinkEnd>` you generated with the link. 
+
+- **Important:** Make sure to add `.git\config.local` to your `.gitignore` file.
+
+- Now the data repository is set to your Datashare account. Optionally, if you know an existing repository that contains data you're interested in working with you can use the username and password for that Datashare repository. 
 
 Configuration:
 --------------
 
-The code is designed with modular yaml config files. Instead of directly modifying each file per run it's suggested to create experiments which are run. Experiments will use the default settings unless a setting is overrided. (see Use Example)
+The code is designed with modular yaml config files. Instead of directly modifying each file per run it's suggested to create experiments which are run. Experiments will use the default settings unless a setting is overridden. (see Use Example)
 
 By default, config files are stored in the following directory structure:
 
+```
 config/
     actions/
-
     callbacks/
-
     criterion/
-
     datamodule/
-
     experiments/
-
     filters/
-
     logger/
-
     metric/
-
     model/
-
     optimizer/
-
     trainer/
-
     config.yaml
-    
+```
 
 Each folder contains optional modules that can be called easily from the command line or an experiment. The core config file is the config.yaml in the root of the configs folder. 
 
