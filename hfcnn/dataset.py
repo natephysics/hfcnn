@@ -6,7 +6,7 @@ from typing import Callable, Tuple, Union, List
 from torch.utils.data import Dataset, DataLoader
 from torch import sqrt, Tensor
 from torchvision import transforms
-from hfcnn import files, filters
+from hfcnn import files, filters, utils
 from mlxtend.preprocessing import standardize
 from tqdm import tqdm
 
@@ -69,9 +69,18 @@ class HeatLoadDataset(Dataset):
         Raises:
             TypeError: [description]
         """
-        # TODO: add excel support
+        # if a string is passed check to see if df is .csv or .hkl
         if isinstance(df, str):
-            data = files.import_file_from_local_cache(df)
+            if df.endswith('.csv'):
+                data = pd.read_csv(df, converters={
+                    'pressure': lambda x: utils.str_to_array(x),
+                     'iota': lambda x: utils.str_to_array(x)
+                     })
+            elif df.endswith('.hkl'):
+                data = files.import_file_from_local_cache(df)
+            else:
+                raise ValueError("File must be .csv or .hkl")
+            # check to see if the data is a dataframe or dict
             if isinstance(data, dict):
                 self.img_labels = data.pop("img_labels")
                 self.img_labels = self.img_labels.reset_index(drop=True)
