@@ -69,17 +69,17 @@ class HeatLoadDataset(Dataset):
         Raises:
             TypeError: [description]
         """
-        # if a string is passed check to see if df is .csv or .hkl
+        # if a string is passed check to see if df is .csv or .pkl
         if isinstance(df, str):
             if df.endswith('.csv'):
                 data = pd.read_csv(df, converters={
                     'pressure': lambda x: utils.str_to_array(x),
                      'iota': lambda x: utils.str_to_array(x)
                      })
-            elif df.endswith('.hkl'):
+            elif df.endswith('.pkl'):
                 data = files.import_file_from_local_cache(df)
             else:
-                raise ValueError("File must be .csv or .hkl")
+                raise ValueError("File must be .csv or .pkl")
             # check to see if the data is a dataframe or dict
             if isinstance(data, dict):
                 self.img_labels = data.pop("img_labels")
