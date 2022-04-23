@@ -8,6 +8,8 @@ from pytorch_lightning import seed_everything as seed_everthing
 from pytorch_lightning.utilities import rank_zero_only
 from omegaconf import DictConfig
 from hfcnn.yaml_tools import import_configuration
+from numpy import array
+from re import findall
 
 
 def get_logger(name=__name__, level=logging.INFO) -> logging.Logger:
@@ -89,3 +91,7 @@ def build_default_paths(cfg: DictConfig) -> DictConfig:
                 
 
     return default_paths
+
+def str_to_array(x): 
+    """Takes in a string and returns an array of floats."""
+    return array(findall(r'[\de\+\-\.]+', x), dtype=float)
