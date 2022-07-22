@@ -19,7 +19,6 @@ class ImageClassificationBase(pl.LightningModule):
         metrics: Optional[DictConfig] = {},
         input_dim: int or List[int] = None,
         output_dim: int = None,
-        act_fn_name: str = None,
         ) -> None:
         super().__init__()
         self.save_hyperparameters(
@@ -30,7 +29,6 @@ class ImageClassificationBase(pl.LightningModule):
         self.optimizer = optimizer
         self.input_dim = input_dim
         self.output_dim = output_dim
-        self.act_fun = instantiate(act_fn_name)
 
         # Metrics
         metrics = instantiate_list(metrics)
@@ -56,14 +54,14 @@ class ImageClassificationBase(pl.LightningModule):
 
     def step(self, batch: any, batch_idx: int):
         x, y = batch['image'], batch['label']
-        y_hat = self(x)
+        y_hat = self.forward(x)
         loss = self.criterion(y_hat, y)
         if torch.isnan(loss):
             print('Issue')
         return loss, y_hat, y
 
     def training_step(self, batch: any, batch_idx: int):
-        loss, _, y = self.step(batch, batch_idx)
+        loss, y_hat, y = self.step(batch, batch_idx)
         self.log("train/loss", loss)
         if self.log_training:
             self.train_metrics(y_hat, y)
@@ -107,6 +105,3 @@ class ImageClassificationBase(pl.LightningModule):
             return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
         else:
             return optimizer
-    
-    # def _forward(self, x: Tensor) -> Tensor:
-    #     raise NotImplementedError
