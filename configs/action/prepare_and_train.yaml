@@ -2,6 +2,6 @@ prepare:
   _target_: hfcnn.preprocessing.prepare_data
 
 train:
-  _target_: hfcnn.train.train
-  
+  _target_: hfcnn.train_pipeline.train
+
 name: prepare_and_train

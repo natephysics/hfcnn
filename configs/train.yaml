@@ -5,7 +5,7 @@ defaults:
   - filters: data_selection
   - transforms: none
   - datamodule: heat_load
-  - model: cnn
+  - model: googlenet
   - optimizer: adam
   - criterion: mse
   - trainer: default
@@ -14,7 +14,7 @@ defaults:
   - logger: both
   - scheduler: exponential_lr
   - experiment: null
-  - override hydra/sweeper: ax
+  # - override hydra/sweeper: ax
 
   # config for hyperparameter optimization
   - hparams_search: null
@@ -36,13 +36,3 @@ print_config: True
 # path to original working directory
 # learn more here: https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
 orig_wd: ${hydra:runtime.cwd}
-
-# set False to skip model training
-train: True
-
-# evaluate on test set, using best model weights achieved during training
-# lightning chooses best weights based on the metric specified in checkpoint callback
-test: False
-
-# seed for random number generators in pytorch, numpy and python.random. Default is one of the Munchausen numbers
-seed: 3435

@@ -1,12 +1,12 @@
 test_strategy: train
 
-# global seed
-seed: 10
+# seed for random number generators in pytorch, numpy and python.random. Default is one of the Munchausen numbers
+seed: 3435
 
 # dataframe column names to use for image labels
 label_names:
-  - 'PC1'
- 
+  - "PC1"
+
 # validation ratio
 val_split: 0.2
 
@@ -17,7 +17,7 @@ test_split: 0.2
 normalize_labels: true
 
 # Name of the file that contains the raw data set labels (original working directory)
-# File must be in the root of 'data/raw' by default 
+# File must be in the root of 'data/raw' by default
 data_file: data_pressure.csv
 
 # Path to the folder that copies of the data used to train will be saved to (hydra wd)

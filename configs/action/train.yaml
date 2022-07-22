@@ -1,2 +1,2 @@
-_target_: hfcnn.train.train
+_target_: hfcnn.train_pipeline.train
 name: train

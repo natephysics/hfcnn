@@ -5,7 +5,7 @@
 
 defaults:
   - override /action: train
-  - override /model: inceptnet
+  - override /model: googlenet
   - override /callback: checkpoint
 
 trainer:
