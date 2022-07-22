@@ -1,5 +1,4 @@
 from __future__ import annotations
-import os
 import pandas as pd  # needed for the df format
 from numpy import integer, issubdtype
 from typing import Callable, Tuple, Union, List

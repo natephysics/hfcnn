@@ -4,7 +4,7 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from typing import List
 from omegaconf import DictConfig
-from hfcnn.utils import get_logger, instantiate_list, build_default_paths
+from hfcnn.utils import get_logger, instantiate_list, build_default_paths, seed_everything
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer, Callback
 from pytorch_lightning.loggers import LightningLoggerBase
 
@@ -12,7 +12,19 @@ def train(cfg: DictConfig, **kwargs) -> None:
 
     log = get_logger(__name__)
 
+    # Set seed for random number generators in pytorch, numpy and python.random
+    if cfg.data.get("seed"):
+        seed_everything(cfg.data.seed)
+
+
     default_paths = build_default_paths(cfg)
+    
+    # Convert relative ckpt path to absolute path if necessary
+    ckpt_path = cfg.trainer.get("resume_from_checkpoint")
+    if ckpt_path and not os.path.isabs(ckpt_path):
+        cfg.trainer.resume_from_checkpoint = os.path.join(
+            hydra.utils.get_original_cwd(), ckpt_path
+        )
 
     ##############
     # Datamodule #
