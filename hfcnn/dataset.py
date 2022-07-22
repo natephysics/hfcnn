@@ -23,7 +23,6 @@ def check_defaults(source1, source2):
         'drop_neg_values': True,
         'norm_param': {}
     }
-
     for setting, value in default_settings.items():
         # check to see if setting is in source1
         if setting in source1:
