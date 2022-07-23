@@ -2,6 +2,7 @@ import os
 import hydra
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
+from torchinfo import summary
 from typing import List
 from omegaconf import DictConfig
 from hfcnn.utils import get_logger, instantiate_list, build_default_paths, seed_everything
@@ -79,7 +80,16 @@ def train(cfg: DictConfig, **kwargs) -> None:
         _recursive_=False, # for hydra (won't recursively instantiate criterion)
     )
     log.info("Model: %s" % model)
+    
 
+    # NCHW order
+    # N represents the batch dimension 
+    # C represents the channel dimension 
+    # H represents the image height (number of rows) 
+    # and W represents the image width (number of columns)
+    C, H, W = input_dim
+    
+    summary(model, input_size=(datamodule.batch_size, C, H, W), depth=0)
     # if cfg.zeros_weight:
     #     model.zeros_all_trainable_parameters()
 

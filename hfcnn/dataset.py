@@ -319,7 +319,7 @@ class HeatLoadDataset(Dataset):
         """
         return self.__getitem__(0)['label'].size(dim=0)
 
-    def get_input_dim(self) -> int:
+    def get_input_dim(self) -> List[int]:
         """Returns the input dimension of the dataset.
 
         Returns:

@@ -18,7 +18,7 @@ class ImageClassificationBase(pl.LightningModule):
         scheduler: Optional[DictConfig] = {},
         metrics: Optional[DictConfig] = {},
         input_dim: int or List[int] = None,
-        output_dim: int = None,
+        output_dim: int or List[int] = None,
         ) -> None:
         super().__init__()
         self.save_hyperparameters(

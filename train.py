@@ -14,23 +14,26 @@ def main(cfg: DictConfig):
 
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
-    from hfcnn.utils import disable_warnings, seed_everything, instantiate_list
+    from hfcnn import utils
     import os
 
     if cfg.ignore_warnings:
-        disable_warnings()
+        utils.disable_warnings()
 
     if cfg.data.seed is not None:
-        seed_everything(cfg.data.seed)
+        utils.seed_everything(cfg.data.seed)
 
     if cfg.orig_wd is not None:
         os.environ['OWD'] = cfg.orig_wd
+
+    # Applies optional utilities
+    utils.extras(cfg)
 
     #  Start action (or list of actions)
     if '_target_' in cfg.action.keys():
         return hydra.utils.instantiate(cfg.action, cfg)
     else: 
-        return instantiate_list(cfg.action, cfg)
+        return utils.instantiate_list(cfg.action, cfg)
 
 if __name__ == "__main__":
     main()

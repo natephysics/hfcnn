@@ -3,12 +3,13 @@ import logging
 import warnings
 import torch
 import rich.tree
+import rich.syntax
 import pytorch_lightning as pl
 from typing import List, Sequence
 from hydra.utils import instantiate
 from pytorch_lightning import seed_everything as seed_everthing
 from pytorch_lightning.utilities import rank_zero_only
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from hfcnn.yaml_tools import import_configuration
 from numpy import array
 from re import findall
@@ -39,7 +40,7 @@ def get_logger(name=__name__, level=logging.INFO) -> logging.Logger:
 
     return logger
 
-# log = get_logger(__name__)
+log = get_logger(__name__)
 
 
 def extras(config: DictConfig) -> None:
@@ -58,7 +59,7 @@ def extras(config: DictConfig) -> None:
     # pretty print config tree using Rich library if <config.print_config=True>
     if config.get("print_config"):
         log.info("Printing config tree with Rich! <config.print_config=True>")
-        ju(config, resolve=True)
+        print_config(config, resolve=True)
 
 
 @rank_zero_only
