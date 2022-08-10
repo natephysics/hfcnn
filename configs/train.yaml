@@ -25,7 +25,7 @@ defaults:
 
 hydra:
   run:
-    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-${dict:${action},name}
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-train
 
 # disable python warnings
 ignore_warnings: false
