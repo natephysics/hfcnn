@@ -2,6 +2,8 @@ import os
 import logging
 import warnings
 import torch
+import numpy as np
+import random
 import rich.tree
 import rich.syntax
 import pytorch_lightning as pl
@@ -11,7 +13,6 @@ from pytorch_lightning import seed_everything as seed_everthing
 from pytorch_lightning.utilities import rank_zero_only
 from omegaconf import DictConfig, OmegaConf
 from hfcnn.yaml_tools import import_configuration
-from numpy import array
 from re import findall
 
 
@@ -39,6 +40,7 @@ def get_logger(name=__name__, level=logging.INFO) -> logging.Logger:
         setattr(logger, level, rank_zero_only(getattr(logger, level)))
 
     return logger
+
 
 log = get_logger(__name__)
 
@@ -88,7 +90,9 @@ def print_config(
     quee = []
 
     for field in print_order:
-        quee.append(field) if field in config else log.info(f"Field '{field}' not found in config")
+        quee.append(field) if field in config else log.info(
+            f"Field '{field}' not found in config"
+        )
 
     for field in config:
         if field not in quee:
@@ -175,12 +179,14 @@ def finish(
 
 def seed_everything(seed: int) -> None:
     """Set random seeds for reproducibility."""
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
     seed_everthing(seed, workers=True)
+    torch.use_deterministic_algorithms(True)
     if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
-    os.environ["PYTHONHASHSEED"] = str(seed)
-    
+
 
 def disable_warnings() -> None:
     """Disable python warnings."""
@@ -214,19 +220,21 @@ def build_default_paths(cfg: DictConfig) -> DictConfig:
     path_to_default_config = "hfcnn/default_settings/default_paths.yaml"
 
     # improt the correct paths
-    default_paths = import_configuration(os.path.join(cfg.orig_wd, path_to_default_config))
+    default_paths = import_configuration(
+        os.path.join(cfg.orig_wd, path_to_default_config)
+    )
 
     for key in default_paths.keys():
         # use the default path if available
         if key in cfg.keys():
             default_paths[key] = os.path.join(cfg.orig_wd, cfg[key])
-        # if exists, if the path isn't absolute, update the path to include the correct working directory 
+        # if exists, if the path isn't absolute, update the path to include the correct working directory
         else:
             default_paths[key] = os.path.join(cfg.orig_wd, default_paths[key])
-                
 
     return default_paths
 
-def str_to_array(x): 
+
+def str_to_array(x):
     """Takes in a string and returns an array of floats."""
-    return array(findall(r'[\de\+\-\.]+', x), dtype=float)
+    return np.array(findall(r"[\de\+\-\.]+", x), dtype=float)
