@@ -9,13 +9,15 @@ dotenv.load_dotenv(override=True)
 
 OmegaConf.register_new_resolver("dict", lambda x, y: x.get(y))
 
-@hydra.main(config_path="configs/", config_name="train.yaml")
+@hydra.main(version_base='1.2', config_path="configs/", config_name="train.yaml")
 def main(cfg: DictConfig):
 
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
     from hfcnn import utils
     import os
+    from hfcnn.train_pipeline import train
+    from hfcnn.datamodules.heat_load_data import HeatLoadDataModule
 
     if cfg.ignore_warnings:
         utils.disable_warnings()
@@ -29,11 +31,9 @@ def main(cfg: DictConfig):
     # Applies optional utilities
     utils.extras(cfg)
 
-    #  Start action (or list of actions)
-    if '_target_' in cfg.action.keys():
-        return hydra.utils.instantiate(cfg.action, cfg)
-    else: 
-        return utils.instantiate_list(cfg.action, cfg)
+    return train(cfg)
 
+    #  Start action (or list of actions)
+    
 if __name__ == "__main__":
     main()
