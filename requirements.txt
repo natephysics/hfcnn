@@ -1,0 +1,23 @@
+black
+dill
+dvc[webdav]
+hydra-colorlog
+hydra-core
+hyperopt
+mlflow
+mlxtend
+numpy
+pandarallel
+pandas
+pathlib
+python-dotenv
+pytorch_lightning
+rich
+rna
+scipy
+tensorboard
+--pre --extra-index-url https://download.pytorch.org/whl/nightly/cu116
+torch 
+torchinfo
+torchvision
+tqdm
