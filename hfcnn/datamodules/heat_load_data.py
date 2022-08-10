@@ -22,9 +22,6 @@ class HeatLoadDataModule(LightningDataModule):
         shuffle: Optional[bool] = True,
         ):
         super().__init__(
-            train_transforms=train_transforms, 
-            val_transforms=val_transforms, 
-            test_transforms=test_transforms, 
             )
         self.train_data_path = train_data_path
         self.val_data_path = val_data_path
