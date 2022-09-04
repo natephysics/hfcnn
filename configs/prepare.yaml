@@ -3,34 +3,25 @@ defaults:
   - data: default
   - filters: data_selection
   - transforms: none
-  - datamodule: heat_load
-  - model: googlenet
-  - optimizer: adam
-  - criterion: mse
-  - trainer: default
-  - metric: default
-  - callback: default
   - logger: both
   - scheduler: exponential_lr
   - experiment: null
-  # - override hydra/sweeper: ax
 
   # config for hyperparameter optimization
   - hparams_search: null
 
-  # enable color logging
+  # # enable color logging
   - override hydra/hydra_logging: colorlog
   - override hydra/job_logging: colorlog
 
+prepare_test: true
+
 hydra:
   run:
-    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-train
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-prepare
 
 # disable python warnings
 ignore_warnings: false
-
-# pretty print config at the start of the run using Rich library
-print_config: True
 
 # path to original working directory
 # learn more here: https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
