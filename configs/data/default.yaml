@@ -18,7 +18,7 @@ normalize_labels: true
 
 # Name of the file that contains the raw data set labels (original working directory)
 # File must be in the root of 'data/raw' by default
-data_file: data_pressure.csv
+data_file: full_cleaned_data_final.csv
 
 # Path to the folder that copies of the data used to train will be saved to (hydra wd)
 save_data_folder: data

@@ -1,6 +1,11 @@
 import dotenv
 import hydra
 from omegaconf import DictConfig, OmegaConf
+from pytorch_lightning.loggers import LightningLoggerBase
+from numpy import set_printoptions
+
+# for exporting the data
+set_printoptions(linewidth=100000)
 
 # load environment variables from `.env` file if it exists
 # recursively searches for `.env` in all folders starting from work dir
@@ -30,6 +35,8 @@ def main(cfg: DictConfig):
 
     # Applies optional utilities
     utils.extras(cfg)
+
+    loggers: LightningLoggerBase = utils.instantiate_list(cfg.logger)
 
     if cfg.prepare_test == True:
         prepare_test_data(cfg)

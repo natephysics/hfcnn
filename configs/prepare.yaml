@@ -2,6 +2,7 @@ defaults:
   - _self_
   - data: default
   - filters: data_selection
+  - features: default
   - transforms: none
   - logger: both
   - scheduler: exponential_lr

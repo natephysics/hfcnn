@@ -18,7 +18,7 @@ def check_defaults(source1, source2):
     """
     default_settings = {
         "img_dir": "./data/raw/",
-        "label_list": ["PC1"],
+        "label_list": [],
         "transforms": None,
         "drop_neg_values": True,
         "norm_param": {},
@@ -72,6 +72,8 @@ class HeatLoadDataset(Dataset):
                     converters={
                         "pressure": lambda x: utils.str_to_array(x),
                         "iota": lambda x: utils.str_to_array(x),
+                        "vol": lambda x: utils.str_to_array(x),
+                        "phi_edge": lambda x: utils.str_to_array(x),
                     },
                 )
             elif df.endswith(".pkl"):
@@ -96,6 +98,7 @@ class HeatLoadDataset(Dataset):
             self.settings = check_defaults(kwargs, {})
         else:
             raise TypeError("Input must be a str (path) or df")
+        self._timestamp = None
 
     def __len__(self) -> int:
         """Returns the number of data points in the set
@@ -157,8 +160,13 @@ class HeatLoadDataset(Dataset):
             img_std = self.settings["norm_param"]["image_labels"][1]
             image = transforms.Normalize(mean=(img_mean), std=(img_std))(image)
 
-        # generate the labels
-        label = row[self.settings["label_list"]].copy()
+        # get the labels
+        label = []
+
+        for label_function in self.settings["label_list"]:
+            label.append(self.__getattribute__(label_function)(row["times"].item()))
+
+        # standardize the labels
         for label_name in self.settings["label_list"]:
             if label_name in self.settings["norm_param"].keys():
                 rawvalue = label[label_name].values
@@ -166,7 +174,6 @@ class HeatLoadDataset(Dataset):
                     rawvalue - self.settings["norm_param"][label_name][0]
                 ) / self.settings["norm_param"][label_name][1]
 
-        label = label.to_numpy()
         if len(label) == 1:
             label = label.flatten()
 
@@ -363,3 +370,38 @@ class HeatLoadDataset(Dataset):
         sum_of_squared_error = sum_of_squared_error / current_image.size
 
         return sum_of_squared_error
+
+    ##################
+    #### features ####
+    ##################
+
+    def IA(self, timestamp: str = None) -> float:
+        """Returns iota at the edge of the plasma."""
+
+        # find the row that matches the timestamp and return IA
+        return self.img_labels.loc[self.img_labels["times"] == timestamp, "IA"].item()
+
+    def pressure(self, timestamp: str = None) -> List[float]:
+        """Returns list of pressures across the plasma from r=0 to r=1."""
+
+        # find the row that matches the timestamp and returns list of pressures across the plasma
+        return self.img_labels.loc[
+            self.img_labels["times"] == timestamp, "pressure"
+        ].item()
+
+    def pressure_at_edge(self, timestamp: str = None) -> float:
+        """Returns pressure at the edge of the plasma."""
+
+        # load the image file from the pandas row
+        pressure_list = self.pressure(timestamp)
+
+        # find the row that matches the timestamp and return pressure
+        return pressure_list[-1]
+
+    def W_dia(self, timestamp: str = None) -> float:
+        """Returns the diameter of the plasma."""
+
+        # find the row that matches the timestamp and return W_dia
+        return self.img_labels.loc[
+            self.img_labels["times"] == timestamp, "W_dia"
+        ].item()
