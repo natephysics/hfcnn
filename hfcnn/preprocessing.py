@@ -124,12 +124,6 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
         # update raw
         raw_data = raw_data.split_by_program_num(diff_program_nums)
 
-    ## TODO: Move this to the import step
-    # Adding new columns for IA
-    raw_data.img_labels["IA"] = raw_data.img_labels["PC1"].div(
-        raw_data.img_labels["NPC1"]
-    )
-
     log.info(
         f"Preprocseeing Data: Imported {raw_data.__len__()} images from the raw data set."
     )
@@ -179,14 +173,13 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
     ##################################################
     #### Normalized the training data and labels. ####
     ##################################################
-
-    training_data.normalize_data()
     log.info(f"Preprocseeing Data: Training set standardization parameters.")
+    training_data.normalize_data()
     log.info(f"mean: {training_data.settings['norm_param']['image_labels'][0]}")
     log.info(f"std: {training_data.settings['norm_param']['image_labels'][1]}")
 
     if cfg.data.normalize_labels:
-        training_data.normalize_labels(cfg.data.label_names)
+        training_data.normalize_labels(cfg.features)
         data_settings = training_data.settings
 
         # update valdation
@@ -199,7 +192,5 @@ def prepare_data(cfg: DictConfig, **kwargs) -> None:
         test_data.to_file(default_paths["test"])
 
     training_data.to_file(default_paths["train"])
-
-    test_data.__getitem__(0)
 
     log.info("Preprocessing Complete.")

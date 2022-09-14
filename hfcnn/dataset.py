@@ -1,10 +1,11 @@
 from __future__ import annotations
 import pandas as pd  # needed for the df format
 import numpy as np
+from collections import OrderedDict
 from numpy import integer, issubdtype
 from typing import Callable, Tuple, Union, List
 from torch.utils.data import Dataset, DataLoader
-from torch import Tensor
+from torch import Tensor, float16, from_numpy
 from torchvision import transforms
 from hfcnn import files, filters, utils
 from mlxtend.preprocessing import standardize
@@ -140,11 +141,9 @@ class HeatLoadDataset(Dataset):
         timestamp, port = row["times"].values[0], row["port"].values[0]
         img_path = files.generate_file_path(timestamp, port, self.settings["img_dir"])
         image = files.import_file_from_local_cache(img_path)
-        image = Tensor(image)
-
-        # set any pixels below zero to zero
-        if self.settings["drop_neg_values"]:
-            image = image.clip(min=0)
+        image = image.clip(min=0)
+        image = image.astype(np.float32)
+        image = from_numpy(image)
 
         # add channel for tensor
         if image.ndim < 3:
@@ -160,22 +159,21 @@ class HeatLoadDataset(Dataset):
             img_std = self.settings["norm_param"]["image_labels"][1]
             image = transforms.Normalize(mean=(img_mean), std=(img_std))(image)
 
-        # get the labels
-        label = []
+        # get and standardize the labels
+        label = OrderedDict()
 
         for label_function in self.settings["label_list"]:
-            label.append(self.__getattribute__(label_function)(row["times"].item()))
+            rawvalue = self.__getattribute__(label_function)(row["times"].item())
 
-        # standardize the labels
-        for label_name in self.settings["label_list"]:
-            if label_name in self.settings["norm_param"].keys():
-                rawvalue = label[label_name].values
-                label[label_name] = (
-                    rawvalue - self.settings["norm_param"][label_name][0]
-                ) / self.settings["norm_param"][label_name][1]
+            # if the normalization parameters are provided then standardize
+            if label_function in self.settings["norm_param"]:
+                label[label_function] = (
+                    rawvalue - self.settings["norm_param"][label_function][0]
+                ) / self.settings["norm_param"][label_function][1]
+            else:
+                label[label_function] = rawvalue
 
-        if len(label) == 1:
-            label = label.flatten()
+        label = [value for key, value in label.items()]
 
         label = Tensor(label)
 
@@ -282,14 +280,14 @@ class HeatLoadDataset(Dataset):
 
         # solve for mean
         tqdm.pandas()
-        log.info("Calculating mean of dataset")
+        log.info("Calculating mean of the images")
 
         sums = self.img_labels.progress_apply(lambda x: self.image_mean(x), axis=1)
         sums = sums / self.__len__()
         mean = sums.sum().item()
 
         # solve for std
-        log.info("Calculating std. of dataset")
+        log.info("Calculating std. of the images")
         sum_of_squared_error = self.img_labels.progress_apply(
             lambda x: self.image_sum_squared_error(x, mean), axis=1
         )
@@ -306,16 +304,22 @@ class HeatLoadDataset(Dataset):
         labels.
 
         Args:
-            labels (list[str]): List of strings that reprepset the labels of the df.
+            labels (list[str]): List of strings of labels.
         """
-        norm_data = standardize(
-            self.img_labels[labels], columns=labels, return_params=True
-        )
+        log = get_logger(__name__)
+        tqdm.pandas()
 
         for label in labels:
+            log.info(f"Calculating mean and std. of feature {label}")
+            norm_params = standardize(
+                self.img_labels.progress_apply(
+                    lambda x: self.__getattribute__(label)(x["times"]), axis=1
+                ),
+                return_params=True,
+            )
             self.settings["norm_param"][label] = (
-                norm_data[1]["avgs"][label],
-                norm_data[1]["stds"][label],
+                norm_params[1]["avgs"].item(),
+                norm_params[1]["stds"].item(),
             )
 
     def import_settings(self, settings: dict) -> None:
@@ -404,4 +408,12 @@ class HeatLoadDataset(Dataset):
         # find the row that matches the timestamp and return W_dia
         return self.img_labels.loc[
             self.img_labels["times"] == timestamp, "W_dia"
+        ].item()
+
+    def iota_edge(self, timestamp: str = None) -> float:
+        """Returns the diameter of the plasma."""
+
+        # find the row that matches the timestamp and return W_dia
+        return self.img_labels.loc[
+            self.img_labels["times"] == timestamp, "iota_edge"
         ].item()
