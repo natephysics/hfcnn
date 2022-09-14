@@ -7,9 +7,10 @@ from hfcnn.utils import instantiate_list
 from torch import Tensor
 import torch
 
+
 class ImageClassificationBase(pl.LightningModule):
-    """[summary]
-    """
+    """[summary]"""
+
     def __init__(
         self,
         log_training: Optional[bool] = False,
@@ -19,7 +20,7 @@ class ImageClassificationBase(pl.LightningModule):
         metrics: Optional[DictConfig] = {},
         input_dim: int or List[int] = None,
         output_dim: int or List[int] = None,
-        ) -> None:
+    ) -> None:
         super().__init__()
         self.save_hyperparameters(
             "log_training", "criterion", "optimizer", "scheduler", "metrics"
@@ -46,18 +47,17 @@ class ImageClassificationBase(pl.LightningModule):
 
         self.scheduler = scheduler
 
-
     def forward(self, x: Tensor, *args, **kwargs) -> Tensor:
         for layer in self.network:
             x = layer(x)
         return x
 
     def step(self, batch: any, batch_idx: int):
-        x, y = batch['image'], batch['label']
+        x, y = batch["image"], batch["label"]
         y_hat = self.forward(x)
         loss = self.criterion(y_hat, y)
         if torch.isnan(loss):
-            print('Issue')
+            print("Issue")
         return loss, y_hat, y
 
     def training_step(self, batch: any, batch_idx: int):
@@ -72,7 +72,7 @@ class ImageClassificationBase(pl.LightningModule):
                 )
                 if batch_idx != 0:
                     self.log(f"train/{layer}.max_grad", torch.max(param.grad))
-
+        del y_hat, y
         return loss
 
     def validation_step(self, batch: any, batch_idx: int):
@@ -80,6 +80,7 @@ class ImageClassificationBase(pl.LightningModule):
         self.log("val/loss", loss)
         self.val_metrics(y_hat, y)
         self.log_dict(self.val_metrics)
+        del y_hat, y
         return loss
 
     def test_step(self, batch: any, batch_idx: int):
@@ -87,6 +88,7 @@ class ImageClassificationBase(pl.LightningModule):
         self.log("test/loss", loss)
         self.test_metrics(y_hat, y)
         self.log_dict(self.test_metrics)
+        del y_hat, y
         return loss
 
     def predict_step(self, batch: any, batch_idx: int):
