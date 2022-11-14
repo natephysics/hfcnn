@@ -1,18 +1,33 @@
-tensorboard:
+tensorboard_local:
   _target_: pytorch_lightning.loggers.tensorboard.TensorBoardLogger
   save_dir: logs
   version: null
-  log_graph: false
-  default_hp_metric: false
+  log_graph: true
+  default_hp_metric: true
   prefix: ""
   sub_dir: null
 
-mlflow:
-  _target_: pytorch_lightning.loggers.mlflow.MLFlowLogger
-  experiment_name: default
-  run_name: null
-  tracking_uri: file://${hydra:runtime.cwd}/mlruns
-  tags: null
-  save_dir: null
+tensorboard_global:
+  _target_: pytorch_lightning.loggers.tensorboard.TensorBoardLogger
+  save_dir: ${hydra:runtime.cwd}/outputs
+  version: null
+  log_graph: true
+  default_hp_metric: true
   prefix: ""
-  artifact_location: null
+  sub_dir: null
+
+# mlflow:
+#   _target_: pytorch_lightning.loggers.mlflow.MLFlowLogger
+#   experiment_name: default
+#   run_name: null
+#   tracking_uri: file://${hydra:runtime.cwd}/mlruns
+#   tags: null
+#   save_dir: null
+#   prefix: ""
+#   artifact_location: null
+
+csv:
+  _target_: pytorch_lightning.loggers.CSVLogger
+  save_dir: ./logs
+  version: null
+  prefix: ""

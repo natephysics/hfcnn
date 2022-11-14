@@ -1,17 +1,20 @@
 black
 dill
 dvc[webdav]
-hydra-colorlog
-hydra-core
-hyperopt
+hydra-colorlog==1.2.0
+hydra-core==1.2.0
+hydra-optuna-sweeper==1.2.0
 mlflow
 mlxtend
 numpy
 pandarallel
 pandas
 pathlib
+pre-commit
+pytest
 python-dotenv
-pytorch_lightning
+pytorch_lightning==1.7.1
+pyrootutils
 rich
 rna
 scipy
@@ -19,5 +22,6 @@ tensorboard
 --pre --extra-index-url https://download.pytorch.org/whl/nightly/cu116
 torch 
 torchinfo
+torchmetrics==0.9.3
 torchvision
 tqdm

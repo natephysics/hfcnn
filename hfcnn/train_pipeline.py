@@ -25,12 +25,12 @@ def train(cfg: DictConfig, **kwargs) -> None:
 
     default_paths = build_default_paths(cfg)
 
-    # Convert relative ckpt path to absolute path if necessary
-    ckpt_path = cfg.trainer.get("resume_from_checkpoint")
-    if ckpt_path and not os.path.isabs(ckpt_path):
-        cfg.trainer.resume_from_checkpoint = os.path.join(
-            hydra.utils.get_original_cwd(), ckpt_path
-        )
+    # # Convert relative ckpt path to absolute path if necessary
+    # ckpt_path = cfg.trainer.get("resume_from_checkpoint")
+    # if ckpt_path and not os.path.isabs(ckpt_path):
+    #     cfg.trainer.resume_from_checkpoint = os.path.join(
+    #         hydra.utils.get_original_cwd(), ckpt_path
+    #     )
 
     ##############
     # Datamodule #
@@ -55,6 +55,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
         data_root=default_paths["raw_folder"],
         params_file_path=params_file_path,
         pin_memory=pin_memory,
+        cache=False,
     )
 
     # Setup the data set
@@ -113,7 +114,10 @@ def train(cfg: DictConfig, **kwargs) -> None:
 
     # Instantate trainer
     trainer: Trainer = hydra.utils.instantiate(
-        cfg.trainer, logger=loggers, callbacks=callbacks, deterministic=deterministic
+        cfg.trainer,
+        logger=loggers,
+        callbacks=callbacks,
+        deterministic=deterministic,
     )
 
     for i, logger in enumerate(loggers):
@@ -220,8 +224,6 @@ def train(cfg: DictConfig, **kwargs) -> None:
         batch_size=64,
         shuffle=False,
         pin_memory=pin_memory,
-        persistent_workers=bool(cfg.datamodule.num_workers),
-        num_workers=cfg.datamodule.num_workers,
     )
     trainer.test(model, dataloaders=dataloader)
 

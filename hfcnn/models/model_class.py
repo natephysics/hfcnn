@@ -62,9 +62,9 @@ class ImageClassificationBase(pl.LightningModule):
 
     def training_step(self, batch: any, batch_idx: int):
         loss, y_hat, y = self.step(batch, batch_idx)
-        self.log("train/loss", loss)
+        # self.log("train/loss", loss)
+        self.train_metrics(y_hat, y)
         if self.log_training:
-            self.train_metrics(y_hat, y)
             self.log_dict(self.train_metrics)
             for layer, param in self.named_parameters():
                 self.logger.experiment.add_histogram(
@@ -77,7 +77,7 @@ class ImageClassificationBase(pl.LightningModule):
 
     def validation_step(self, batch: any, batch_idx: int):
         loss, y_hat, y = self.step(batch, batch_idx)
-        self.log("val/loss", loss)
+        # self.log("val/loss", loss)
         self.val_metrics(y_hat, y)
         self.log_dict(self.val_metrics)
         del y_hat, y
@@ -85,7 +85,7 @@ class ImageClassificationBase(pl.LightningModule):
 
     def test_step(self, batch: any, batch_idx: int):
         loss, y_hat, y = self.step(batch, batch_idx)
-        self.log("test/loss", loss)
+        # self.log("test/loss", loss)
         self.test_metrics(y_hat, y)
         self.log_dict(self.test_metrics)
         del y_hat, y

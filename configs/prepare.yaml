@@ -3,7 +3,7 @@ defaults:
   - data: default
   - filters: data_selection
   - features: default
-  - transforms: none
+  - transforms: half_resolution
   - logger: both
   - scheduler: exponential_lr
   - experiment: null

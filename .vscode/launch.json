@@ -4,8 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
-
         {
             "name": "Run Project",
             "type": "python",
@@ -13,7 +11,7 @@
             "program": "hfcnn",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "env": { 
+            "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             },
             // "args": ["hydra.run.dir=."],
@@ -25,7 +23,8 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "env": { 
+            "suppressMultipleSessionWarning": true,
+            "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
         },
@@ -36,68 +35,10 @@
             "program": "hfcnn",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "args": ["experiment=overfit"],
-            "env": { 
-                "PYTHONPATH": "${workspaceFolder}"
-            }
-        },
-        {
-            "name": "Exp: Prepare Data",
-            "type": "python",
-            "request": "launch",
-            "program": "hfcnn",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": ["action=prepare_data"],
-            "env": { 
-                "PYTHONPATH": "${workspaceFolder}"
-            }
-        },
-        {
-            "name": "Exp: Prepare Test",
-            "type": "python",
-            "request": "launch",
-            "program": "hfcnn",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": ["action=prepare_test"],
-            "env": { 
-                "PYTHONPATH": "${workspaceFolder}"
-            }
-        },
-        {
-            "name": "Exp: Ax",
-            "type": "python",
-            "request": "launch",
-            "program": "hfcnn",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": ["--multirun", "experiment=ax"],
-            "env": { 
-                "PYTHONPATH": "${workspaceFolder}"
-            }
-        },
-        {
-            "name": "Exp: Full Res",
-            "type": "python",
-            "request": "launch",
-            "program": "hfcnn",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": ["experiment=full_res"],
-            "env": { 
-                "PYTHONPATH": "${workspaceFolder}"
-            }
-        },
-        {
-            "name": "Exp: Half Res",
-            "type": "python",
-            "request": "launch",
-            "program": "hfcnn",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": ["experiment=reduce_dim"],
-            "env": { 
+            "args": [
+                "experiment=overfit"
+            ],
+            "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
         },
@@ -108,8 +49,95 @@
             "program": "hfcnn",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "args": ["experiment=incept"],
-            "env": { 
+            "args": [
+                "experiment=incept"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Exp: Prepare Data",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "action=prepare_data"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Exp: Prepare Test",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "action=prepare_test"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Exp: Ax",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--multirun",
+                "experiment=ax"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Exp: Full Res",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "experiment=full_res"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Exp: Half Res",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "experiment=reduce_dim"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Exp: temp",
+            "type": "python",
+            "request": "launch",
+            "program": "hfcnn",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "experiment=temp"
+            ],
+            "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
         }

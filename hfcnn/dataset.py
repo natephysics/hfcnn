@@ -1,6 +1,8 @@
 from __future__ import annotations
+import functools
 import pandas as pd  # needed for the df format
 import numpy as np
+from methodtools import lru_cache
 from collections import OrderedDict
 from numpy import integer, issubdtype
 from typing import Callable, Tuple, Union, List
@@ -99,17 +101,43 @@ class HeatLoadDataset(Dataset):
             self.settings = check_defaults(kwargs, {})
         else:
             raise TypeError("Input must be a str (path) or df")
-        self._timestamp = None
 
-    def __len__(self) -> int:
-        """Returns the number of data points in the set
+        if "cache" in kwargs:
+            self.cache = kwargs["cache"]
+        else:
+            self.cache = False
+
+        # To enable cache without worrying about garbage collection
+        # see: https://rednafi.github.io/reflections/dont-wrap-instance-methods-with-functoolslru_cache-decorator-in-python.html
+        # self._get_cached_item__ = functools.cache(self._getitem)
+
+    def __getitem__(self, idx: int) -> dict[Tensor]:
+        """Returns a data point from the dataset
+
+        Args:
+            idx (int): index of the data point
 
         Returns:
-            length: number of data points in the set
+            Tuple[Tensor, Tensor]: data point and label
         """
-        return self.img_labels.shape[0]
+        if self.cache:
+            return self._getcacheditem(idx)
+        else:
+            return self._getitem(idx)
 
-    def __getitem__(self, idx: int) -> dict:
+    @lru_cache(maxsize=None)
+    def _getcacheditem(self, idx: int) -> dict[Tensor]:
+        """Returns a data point from the dataset
+
+        Args:
+            idx (int): index of the data point
+
+        Returns:
+            Tuple[Tensor, Tensor]: data point and label
+        """
+        return self._getitem(idx)
+
+    def _getitem(self, idx: int) -> dict[Tensor]:
         """Returns a data point with "image" and "label" where the labels are
         pulled from the label_list, a list of column names from the data frame.
 
@@ -181,6 +209,15 @@ class HeatLoadDataset(Dataset):
         sample = {"image": image, "label": label}
         return sample
 
+    def __len__(self) -> int:
+        """Returns the number of data points in the set
+
+        Returns:
+            length: number of data points in the set
+        """
+        return self.img_labels.shape[0]
+
+    # TODO: use @classmethod
     def apply(self, filter_fn: Union[Callable, list]) -> HeatLoadDataset:
         """Applies a list of filter to the dataset and removes any elements that
         don't pass the filter criteria. Filters do no change the content of the

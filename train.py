@@ -37,8 +37,6 @@ def main(cfg: DictConfig):
 
     return train(cfg)
 
-    #  Start action (or list of actions)
-
 
 if __name__ == "__main__":
     main()

@@ -9,6 +9,7 @@ events.out.tfevents.*.1
 outputs/*
 mlruns/*
 multirun/*
+*.ckpt
 
 # user defined config files
 config/config.cfg
