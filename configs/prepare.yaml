@@ -3,8 +3,8 @@ defaults:
   - data: default
   - filters: data_selection
   - features: default
-  - transforms: half_resolution
-  - logger: both
+  - transforms: res780x195
+  - logger: none
   - scheduler: exponential_lr
   - experiment: null
 

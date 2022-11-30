@@ -91,7 +91,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
     # H represents the image height (number of rows)
     # and W represents the image width (number of columns)
     C, H, W = input_dim
-
+    log.info(f"Input shape: (N, C, H, W) = (N, {C}, {H}, {W})")
     summary(model, input_size=(datamodule.batch_size, C, H, W), depth=0)
     # if cfg.zeros_weight:
     #     model.zeros_all_trainable_parameters()

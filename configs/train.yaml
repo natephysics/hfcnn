@@ -2,7 +2,7 @@ defaults:
   - _self_
   - data: default
   - filters: data_selection
-  - transforms: half_resolution
+  - transforms: none # these are defined in the preprocessing step
   - datamodule: heat_load
   - model: googlenet
   - optimizer: adam
@@ -10,8 +10,8 @@ defaults:
   - trainer: default
   - metric: default
   - callback: default
-  - logger: both
-  - scheduler: exponential_lr
+  - logger: default
+  - scheduler: none
   - experiment: null
   # - override hydra/sweeper: ax
 
@@ -25,7 +25,7 @@ defaults:
 # logging directories for checkpoints, logs, and data.
 hydra:
   run:
-    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-train-none-half-res
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-train
   job:
     chdir: true
 

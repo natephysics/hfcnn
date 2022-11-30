@@ -14,7 +14,7 @@ defaults:
   - logger: both
   - scheduler: exponential_lr
   - experiment: null
-  - override hydra/sweeper: ax
+  # - override hydra/sweeper: ax
 
 hydra:
   run:

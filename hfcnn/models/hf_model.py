@@ -5,23 +5,22 @@ from torch import Tensor
 from hydra.utils import instantiate
 
 
-
 class HF_Model(model_class.ImageClassificationBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.network = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size = 12, padding = 1),
+            nn.Conv2d(1, 16, kernel_size=12, padding=1),
             self.act_fn,
-            nn.Conv2d(16,32, kernel_size = 12, stride = 6, padding = 1),
+            nn.Conv2d(16, 32, kernel_size=12, stride=6, padding=1),
             self.act_fn,
-            nn.MaxPool2d(2,2),
+            nn.MaxPool2d(2, 2),
             nn.Flatten(),
             nn.LazyLinear(20),
             self.act_fn,
             nn.Linear(20, 1),
         )
-    
+
     def forward(self, x: Tensor) -> Tensor:
         y = self.network(x)
         for layer in self.network:
@@ -29,30 +28,26 @@ class HF_Model(model_class.ImageClassificationBase):
             # print(x.size())
         return y
 
+
 class GoogleNet(model_class.ImageClassificationBase):
-    def __init__(
-        self,
-        act_fn,
-        *args,
-        **kwargs
-        ):
+    def __init__(self, act_fn, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.act_fn = instantiate(act_fn)
         self.hparams["network_parameters"] = {
-            "act_fn_name": act_fn._target_, 
+            "act_fn_name": act_fn._target_,
             "act_fn": self.act_fn,
             "input_dim": self.input_dim,
             "output_dim": self.output_dim,
         }
         self._create_network()
         self._init_params()
-        
-
 
     def _create_network(self):
         # A first convolution on the original image to scale up the channel size
         self.input_net = nn.Sequential(
-            nn.Conv2d(self.input_dim[0], 64, kernel_size=3, padding=1), nn.BatchNorm2d(64), self.act_fn
+            nn.Conv2d(self.input_dim[0], 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            self.act_fn,
         )
         # Stacking inception blocks
         self.inception_blocks = nn.Sequential(
@@ -116,7 +111,7 @@ class GoogleNet(model_class.ImageClassificationBase):
         # Initialize the convolutions according to the activation function
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
+                nn.init.kaiming_normal_(m.weight, nonlinearity="relu")
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
