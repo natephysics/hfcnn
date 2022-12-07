@@ -11,11 +11,13 @@ from hfcnn.utils import (
     build_default_paths,
     seed_everything,
 )
+from hfcnn.models.hf_model import GoogleNet
+from hfcnn.datamodules.heat_load_data import HeatLoadDataModule
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer, Callback
 from pytorch_lightning.loggers import LightningLoggerBase
 
 
-def train(cfg: DictConfig, **kwargs) -> None:
+def test(cfg: DictConfig, **kwargs) -> None:
 
     log = get_logger(__name__)
 
@@ -24,13 +26,6 @@ def train(cfg: DictConfig, **kwargs) -> None:
         seed_everything(cfg.data.seed)
 
     default_paths = build_default_paths(cfg)
-
-    # # Convert relative ckpt path to absolute path if necessary
-    # ckpt_path = cfg.trainer.get("resume_from_checkpoint")
-    # if ckpt_path and not os.path.isabs(ckpt_path):
-    #     cfg.trainer.resume_from_checkpoint = os.path.join(
-    #         hydra.utils.get_original_cwd(), ckpt_path
-    #     )
 
     ##############
     # Datamodule #
@@ -43,12 +38,10 @@ def train(cfg: DictConfig, **kwargs) -> None:
         params_file_path = False
 
     pin_memory = False
-    if cfg.trainer.accelerator is not None and cfg.trainer.devices != 0:
-        pin_memory = True
 
     #  Instatiate datamodule
-    datamodule: LightningDataModule = hydra.utils.instantiate(
-        cfg.datamodule,
+    datamodule: HeatLoadDataModule = HeatLoadDataModule.load_from_checkpoint(
+        cfg.ckpt_path,
         train_data_path=default_paths["train"],
         val_data_path=default_paths["validation"],
         test_data_path=default_paths["test"],
@@ -56,6 +49,8 @@ def train(cfg: DictConfig, **kwargs) -> None:
         params_file_path=params_file_path,
         pin_memory=pin_memory,
         cache=False,
+        batch_size=1,
+        num_workers=0,
     )
 
     # Setup the data set
@@ -74,14 +69,21 @@ def train(cfg: DictConfig, **kwargs) -> None:
     # Model #
     #########
 
-    model: LightningModule = hydra.utils.instantiate(
-        cfg.model,
-        criterion=cfg.criterion,
-        optimizer=cfg.optimizer,
-        metrics=cfg.metric,
+    # model: LightningModule = hydra.utils.instantiate(
+    #     cfg.model,
+    #     criterion=cfg.criterion,
+    #     optimizer=cfg.optimizer,
+    #     metrics=cfg.metric,
+    #     input_dim=input_dim,
+    #     output_dim=output_dim,
+    #     _recursive_=False,  # for hydra (won't recursively instantiate criterion)
+    # )
+    model = GoogleNet.load_from_checkpoint(
+        cfg.ckpt_path,
+        act_fn=cfg.model.act_fn,
+        figures=cfg.figures,
         input_dim=input_dim,
         output_dim=output_dim,
-        _recursive_=False,  # for hydra (won't recursively instantiate criterion)
     )
     log.info("Model: %s" % model)
 
@@ -92,7 +94,7 @@ def train(cfg: DictConfig, **kwargs) -> None:
     # and W represents the image width (number of columns)
     C, H, W = input_dim
     log.info(f"Input shape: (N, C, H, W) = (N, {C}, {H}, {W})")
-    summary(model, input_size=(datamodule.batch_size, C, H, W), depth=0)
+    # summary(model, input_size=(datamodule.batch_size, C, H, W), depth=0)
     # if cfg.zeros_weight:
     #     model.zeros_all_trainable_parameters()
 
@@ -125,107 +127,29 @@ def train(cfg: DictConfig, **kwargs) -> None:
 
     log.info("Trainer: %s" % trainer.__class__.__name__)
 
-    ###################
-    # Hyperparameters #
-    ###################
-
-    hparams = {}
-
-    hparams["datamodule"] = cfg.datamodule
-    hparams["model"] = cfg.model
-    hparams["optimizer"] = cfg.optimizer
-    hparams["criterion"] = cfg.criterion
-    hparams["trainer"] = cfg.trainer
-
-    if "callback" in cfg:
-        hparams["callback"] = cfg.callback
-
-    #  Add additional training hps
-    hparams["seed"] = cfg.data.seed
-
-    #  Add datamodule metrics
-    hparams["datamodule/num_train"] = len(datamodule.train_data)
-    hparams["datamodule/num_val"] = len(datamodule.val_data)
-    hparams["datamodule/num_test"] = len(datamodule.test_data)
-
-    #  Add hp metrics
-    # hp_metrics = {}
-    # hp_metrics["val/loss"] = 0
-
-    #  Log hparams
-    #  TensorBoard requires metrics to be defined with hyperparameters
-    for logger in loggers:
-        logger.log_hyperparams(hparams)
-        # if isinstance(logger, pl.loggers.tensorboard.TensorBoardLogger):
-        #     logger.log_hyperparams(hparams, hp_metrics)
-        # else:
-        #     logger.log_hyperparams(hparams)
-        #     logger.log_metrics(hp_metrics)
-
-    # disable logging any more hyperparameters for all loggers
-    # see: https://github.com/ashleve/lightning-hydra-template/blob/main/src/utils/utils.py
-    def empty(*args, **kwargs):
-        pass
-
-    for logger in loggers:
-        log_hyperparams_ = logger.log_hyperparams
-        logger.log_hyperparams = empty
-
     #  Log hparams to console too
     log.info("Num of train samples: %d" % len(datamodule.train_data))
     log.info("Num of validation samples: %d" % len(datamodule.val_data))
     log.info("Num of test samples: %d" % len(datamodule.test_data))
     log.info("Train transforms: %s" % datamodule.train_data.settings["transforms"])
 
-    #########
-    # Train #
-    #########
-
-    log.info("Check loss before training ...")
-    trainer.validate(model, datamodule=datamodule)
-
-    log.info("Start training ...")
-    trainer.fit(model, datamodule=datamodule)
-
-    # retreive best validation loss from training
-    best_model_score = None
-    for callback in trainer.callbacks:
-        if isinstance(callback, pl.callbacks.ModelCheckpoint):
-            if callback.best_model_score is not None:
-                best_model_score = callback.best_model_score.item()
-            break
-
     ########
     # Test #
     ########
 
-    if cfg.test_strategy is None:
-        for logger in loggers:
-            logger.finalize(status="FINISHED")
-        return
-
     #  Test model on supported strategies:
     #  - None: exit
     #  - test: use test data from datamodule
-    #  - train: use train data from datamodule
+    #  - val: use val data from datamodule
 
     log.info("Test the model according to test strategy: %s" % cfg.test_strategy)
 
     if cfg.test_strategy == "test":
-        dataset = datamodule.test_data
-    elif cfg.test_strategy == "train":
-        dataset = datamodule.train_data
+        trainer.test(model, dataloaders=datamodule)
+    elif cfg.test_strategy == "val":
+        trainer.validate(model, dataloaders=datamodule)
     else:
         raise ValueError("%s test strategy is not supported" % cfg.test_strategy)
-
-    #  Test first data with trainer
-    dataloader = DataLoader(
-        dataset,
-        batch_size=64,
-        shuffle=False,
-        pin_memory=pin_memory,
-    )
-    trainer.test(model, dataloaders=dataloader)
 
     ############
     # Finalize #
@@ -235,4 +159,4 @@ def train(cfg: DictConfig, **kwargs) -> None:
     for logger in loggers:
         logger.finalize(status="FINISHED")
 
-    return best_model_score
+    return

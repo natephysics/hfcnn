@@ -1,19 +1,16 @@
 defaults:
   - _self_
   - data: default
-  - filters: data_selection
-  - transforms: none # these are defined in the preprocessing step
   - datamodule: heat_load
   - model: googlenet
   - optimizer: adam
   - criterion: mse
   - trainer: default
   - metric: default
-  - callback: default
   - logger: default
-  - scheduler: none
   - experiment: null
-  # - override hydra/sweeper: ax
+  - callback: none
+  - figures: inputVSoutput
 
   # config for hyperparameter optimization
   - hparams_search: null
@@ -25,7 +22,7 @@ defaults:
 # logging directories for checkpoints, logs, and data.
 hydra:
   run:
-    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-train-780x195
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}-test-104x26
   job:
     chdir: true
 
@@ -35,9 +32,10 @@ ignore_warnings: false
 # pretty print config at the start of the run using Rich library
 print_config: true
 
-# testing using test set
-test_strategy: test
-
 # path to original working directory
 # learn more here: https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
 orig_wd: ${hydra:runtime.cwd}
+
+ckpt_path: ${hydra:runtime.cwd}/models/res104x26.ckpt
+
+test_strategy: test

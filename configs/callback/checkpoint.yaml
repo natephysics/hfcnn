@@ -3,4 +3,5 @@ model_checkpoint:
   _target_: pytorch_lightning.callbacks.ModelCheckpoint
   monitor: "val/loss"
   mode: "min"
-  filename: "{epoch}-{val\/loss:.2f}"
+  save_weights_only: true
+  filename: "{epoch}-{val\/loss:.4f}"

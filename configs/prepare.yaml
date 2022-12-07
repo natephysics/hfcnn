@@ -3,7 +3,7 @@ defaults:
   - data: default
   - filters: data_selection
   - features: default
-  - transforms: res780x195
+  - transforms: res104x26
   - logger: none
   - scheduler: exponential_lr
   - experiment: null

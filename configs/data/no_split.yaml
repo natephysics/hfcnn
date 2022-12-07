@@ -1,12 +1,10 @@
-test_strategy: train
-
 # global seed
 seed: 10
 
 # dataframe column names to use for image labels
 label_names:
-  - 'PC1'
- 
+  - "PC1"
+
 # validation ratio
 val_split: 0
 
@@ -17,7 +15,7 @@ test_split: 0
 normalize_labels: true
 
 # Name of the file that contains the raw data set labels (original working directory)
-# File must be in the root of 'data/raw' by default 
+# File must be in the root of 'data/raw' by default
 data_file: df.pkl
 
 # Path to the folder that copies of the data used to train will be saved to (hydra wd)

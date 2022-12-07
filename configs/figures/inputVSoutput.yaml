@@ -1,0 +1,13 @@
+inputVSoutput:
+  # figure title
+  title: Input vs Output
+  # figure subtitle
+  subtitle: Iota prediction
+  # figure caption
+  caption: iota prediction vs actual iota
+  # figure save path
+  save_path: ./inputVSoutput.png
+  # track test set
+  track_test: true
+  # track validation set
+  track_val: false

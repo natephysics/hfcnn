@@ -1,5 +1,3 @@
-test_strategy: train
-
 # seed for random number generators in pytorch, numpy and python.random. Default is one of the Munchausen numbers
 seed: 3435
 

@@ -10,6 +10,7 @@ outputs/*
 mlruns/*
 multirun/*
 *.ckpt
+analysis/*
 
 # user defined config files
 config/config.cfg
@@ -196,3 +197,4 @@ models/*
 # images
 *.png
 *.zip
+configs/prepare.yaml

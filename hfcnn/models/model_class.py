@@ -1,5 +1,6 @@
 from typing import Optional, List
 import pytorch_lightning as pl
+from io import StringIO
 from omegaconf import DictConfig
 from hydra.utils import instantiate
 from torchmetrics import MetricCollection
@@ -18,6 +19,7 @@ class ImageClassificationBase(pl.LightningModule):
         optimizer: Optional[DictConfig] = {},
         scheduler: Optional[DictConfig] = {},
         metrics: Optional[DictConfig] = {},
+        figures: Optional[DictConfig] = {"track_val": False, "track_test": False},
         input_dim: int or List[int] = None,
         output_dim: int or List[int] = None,
     ) -> None:
@@ -30,6 +32,7 @@ class ImageClassificationBase(pl.LightningModule):
         self.optimizer = optimizer
         self.input_dim = input_dim
         self.output_dim = output_dim
+        self.figures = figures
 
         # Metrics
         metrics = instantiate_list(metrics)
@@ -46,6 +49,8 @@ class ImageClassificationBase(pl.LightningModule):
         self.log_training = log_training
 
         self.scheduler = scheduler
+        self.local_test_step = 1
+        self.local_val_step = 1
 
     def forward(self, x: Tensor, *args, **kwargs) -> Tensor:
         for layer in self.network:
@@ -80,14 +85,21 @@ class ImageClassificationBase(pl.LightningModule):
         # self.log("val/loss", loss)
         self.val_metrics(y_hat, y)
         self.log_dict(self.val_metrics)
+
         del y_hat, y
         return loss
 
     def test_step(self, batch: any, batch_idx: int):
         loss, y_hat, y = self.step(batch, batch_idx)
-        # self.log("test/loss", loss)
+        self.log("test/loss", loss)
         self.test_metrics(y_hat, y)
         self.log_dict(self.test_metrics)
+
+        # Logging data used for figures
+        with open("results.csv", "a+") as f:
+            for y_, y_hat_ in zip(y, y_hat):
+                line = f"{y_.cpu().numpy()[0]}, {y_hat_.cpu().numpy()[0]}\n"
+                f.write(line)
         del y_hat, y
         return loss
 

@@ -31,14 +31,19 @@ class HF_Model(model_class.ImageClassificationBase):
 
 class GoogleNet(model_class.ImageClassificationBase):
     def __init__(self, act_fn, *args, **kwargs):
+        if "network_parameters" in kwargs:
+            del kwargs["network_parameters"]
         super().__init__(*args, **kwargs)
         self.act_fn = instantiate(act_fn)
+        self.input_dim = kwargs["input_dim"]
+        self.output_dim = kwargs["output_dim"]
         self.hparams["network_parameters"] = {
             "act_fn_name": act_fn._target_,
             "act_fn": self.act_fn,
             "input_dim": self.input_dim,
             "output_dim": self.output_dim,
         }
+
         self._create_network()
         self._init_params()
 
